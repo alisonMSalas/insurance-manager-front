@@ -6,7 +6,7 @@ import { getInsuranceTypeLabel, getPaymentPeriodLabel, getPaymentPeriodOptions, 
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ErrorResponse } from '../../shared/interfaces/error-response';
 import { DialogModule } from 'primeng/dialog';
@@ -16,13 +16,20 @@ import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 
+import { SelectModule } from 'primeng/select';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { TooltipModule } from 'primeng/tooltip';
+
+interface StatusOption {
+  label: string;
+  value: boolean | null;
+}
 
 @Component({
   selector: 'app-list-seguros',
   standalone: true,
   imports: [
     CommonModule,
-    // Módulos de PrimeNG
     ButtonModule,
     CardModule,
     ToastModule,
@@ -31,15 +38,17 @@ import { TextareaModule } from 'primeng/textarea';
     DropdownModule,
     InputTextModule,
     TextareaModule,
-    
-    // Módulos de Angular
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    SelectModule,
+    ConfirmDialogModule,
+    TooltipModule
   ],
-  providers: [MessageService],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './list-seguros.component.html',
   styleUrls: ['./list-seguros.component.css']
 })
+
 export class ListSegurosComponent implements OnInit {
   insurances: Insurance[] = [];
   display=false;
@@ -47,13 +56,36 @@ export class ListSegurosComponent implements OnInit {
   currentInsuranceId: string | null = null;
   displayViewModal = false;
   selectedInsurance: Insurance | null = null;
+  filteredInsurances: Insurance[] = [];
+  loading = false;
+
+  statusOptions: StatusOption[] = [
+    { label: 'Todos', value: null },
+    { label: 'Activos', value: true },
+    { label: 'Inactivos', value: false }
+  ];
+
+  typeOptions = getInsuranceTypeOptions();
+  typeOptionsWithAll = [
+    { label: 'Todos', value: null },
+    ...this.typeOptions
+  ];
+
+  selectedStatus: boolean | null = null;
+  selectedType: string | null = null;
 
   constructor(
     private segurosService: SegurosService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) { }
 
   ngOnInit(): void {
+    this.loadInsurances();
+  }
+
+  refreshData(): void {
+    this.loading = true;
     this.loadInsurances();
   }
 
@@ -66,9 +98,12 @@ export class ListSegurosComponent implements OnInit {
           }
           return a.active ? -1 : 1;
         });
+        this.applyFilters();
+        this.loading = false;
       },
       error: (error: HttpErrorResponse) => {
         this.handleError(error);
+        this.loading = false;
       }
     });
   }
@@ -77,6 +112,17 @@ export class ListSegurosComponent implements OnInit {
     this.displayViewModal = true;
   }
 
+  applyFilters(): void {
+    this.filteredInsurances = this.insurances.filter(insurance => {
+      const statusMatch = this.selectedStatus === null || insurance.active === this.selectedStatus;
+      const typeMatch = this.selectedType === null || insurance.type === this.selectedType;
+      return statusMatch && typeMatch;
+    });
+  }
+
+  onFilterChange(): void {
+    this.applyFilters();
+  }
   changeStatus(insurance: Insurance): void {
     this.segurosService.updateStatus(insurance.id!, !insurance.active).subscribe({
       next: () => {
@@ -94,17 +140,24 @@ export class ListSegurosComponent implements OnInit {
   }
 
   deleteInsurance(insurance: Insurance): void {
-    this.segurosService.delete(insurance.id!).subscribe({
-      next: () => {
-        this.loadInsurances();
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Seguro eliminado correctamente'
+    this.confirmationService.confirm({
+      message: `¿Estás seguro de que deseas eliminar el seguro ${insurance.name}?`,
+      header: 'Confirmar eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.segurosService.delete(insurance.id!).subscribe({
+          next: () => {
+            this.loadInsurances();
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Éxito',
+              detail: 'Seguro eliminado correctamente'
+            });
+          },
+          error: (error: HttpErrorResponse) => {
+            this.handleError(error);
+          }
         });
-      },
-      error: (error: HttpErrorResponse) => {
-        this.handleError(error);
       }
     });
   }

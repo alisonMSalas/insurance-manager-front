@@ -1,4 +1,8 @@
 <div class="content-area">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <!-- Encabezado -->
   <div class="insurance-header">
     <div>
       <h2 class="section-title">Todos los Seguros</h2>
@@ -7,8 +11,54 @@
     <p-button icon="pi pi-plus" label="Nuevo Seguro" styleClass="p-button-primary" (click)="openModal()"></p-button>
   </div>
 
+  <!-- Filtros -->
+  <div class="filters-container">
+    <div class="filter-group">
+      <label for="statusFilter">Estado:</label>
+      <p-select
+        [options]="statusOptions"
+        [(ngModel)]="selectedStatus"
+        optionLabel="label"
+        optionValue="value"
+        (ngModelChange)="applyFilters()"
+        [showClear]="true"
+        placeholder="Todos"
+        class="w-full md:w-56"
+      >
+      </p-select>
+    </div>
+
+    <div class="filter-group">
+      <label for="typeFilter">Tipo:</label>
+      <p-select
+        [options]="typeOptionsWithAll"
+        [(ngModel)]="selectedType"
+        optionLabel="label"
+        optionValue="value"
+        (ngModelChange)="applyFilters()"
+        [showClear]="true"
+        placeholder="Todos"
+        class="w-full md:w-56"
+      >
+      </p-select>
+    </div>
+
+    <div class="filter-group">
+      <label>&nbsp;</label>
+      <p-button
+        icon="pi pi-refresh"
+        (onClick)="refreshData()"
+        [loading]="loading"
+        styleClass="p-button-text"
+        [pTooltip]="'Actualizar datos'"
+        tooltipPosition="bottom"
+      ></p-button>
+    </div>
+  </div>
+
+  <!-- Grid de tarjetas -->
   <div class="insurance-grid">
-    <p-card *ngFor="let insurance of insurances" class="insurance-card">
+    <p-card *ngFor="let insurance of filteredInsurances" class="insurance-card">
       <div class="insurance-header">
         <h3 class="insurance-title">{{ insurance.name }}</h3>
         <span [ngClass]="{
@@ -33,16 +83,27 @@
       </div>
 
       <div class="insurance-actions">
-        <p-button icon="pi pi-eye" [label]="insurance.active ? 'Inactivar' : 'Activar'" size="small"
-          (onClick)="changeStatus(insurance)" styleClass="p-button-text p-button-plain action-btn view"></p-button>
-          <p-button icon="pi pi-eye" label="Ver" size="small"
+        <p-button
+          [icon]="insurance.active ? 'pi pi-arrow-down' : 'pi pi-arrow-up'"
+          [label]="insurance.active ? 'Inactivar' : 'Activar'"
+          size="small"
+          (onClick)="changeStatus(insurance)"
+          styleClass="p-button-text p-button-plain action-btn view"
+        ></p-button>
+        <p-button icon="pi pi-eye" label="Ver" size="small"
           (click)="openViewModal(insurance)"
           styleClass="p-button-text p-button-plain action-btn view"></p-button>
           <p-button icon="pi pi-pencil" label="Editar" size="small"
           (click)="openModal(insurance)"
           styleClass="p-button-text p-button-plain action-btn edit"></p-button>
-        <p-button icon="pi pi-trash" label="Eliminar" size="small" (onClick)="deleteInsurance(insurance)"
-          styleClass="p-button-text p-button-plain action-btn delete"></p-button>
+        <p-button
+          icon="pi pi-trash"
+          label="Eliminar"
+          size="small"
+          (onClick)="deleteInsurance(insurance)"
+          styleClass="p-button-text p-button-plain action-btn delete"
+        ></p-button>
+          
       </div>
     </p-card>
   </div>

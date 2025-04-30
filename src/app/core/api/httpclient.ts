@@ -9,23 +9,34 @@ import { PLATFORM_ID } from '@angular/core';
 })
 export class ApiClientService {
   private baseUrl = 'http://localhost:8080';
-  private token = 'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJ0ZXN0MjIyMkB0ZXN0LmNvbSIsImlhdCI6MTc0NjAyNzg2NiwiZXhwIjoxNzQ2MDYzODY2fQ.gYX73nue5cxYJ-tMqUgeC03w66KMcWRU2WjBQPczK5Y';
+  private token = '';
   private platformId = inject(PLATFORM_ID);
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   private getHeaders(): HttpHeaders {
-    let token = this.token;
-    if (isPlatformBrowser(this.platformId)) {
-      token =  this.token;
+    const token = isPlatformBrowser(this.platformId)
+      ? localStorage.getItem('token')
+      : null;
+
+    const headersConfig: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+
+    if (token) {
+      headersConfig['Authorization'] = `Bearer ${token}`;
     }
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    });
+
+    const headers = new HttpHeaders(headersConfig);
+
+    console.log('→ Authorization header:', headers.get('Authorization'));
+    console.log('→ All header keys:', headers.keys());
+
+    return headers;
   }
 
   get<T>(endpoint: string): Observable<T> {
+    console.log(this.getHeaders());
     return this.http.get<T>(`${this.baseUrl}/${endpoint}`, { headers: this.getHeaders() });
   }
 
