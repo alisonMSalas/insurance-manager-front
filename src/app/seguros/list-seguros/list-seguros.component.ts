@@ -123,7 +123,7 @@ export class ListSegurosComponent implements OnInit {
       header: 'Confirmar eliminación',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.segurosService.delete('a').subscribe({
+        this.segurosService.delete(insurance.id!).subscribe({
           next: () => {
             this.loadInsurances();
             this.messageService.add({
