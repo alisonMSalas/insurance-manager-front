@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output,inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AvatarModule } from 'primeng/avatar';
@@ -6,6 +6,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-header',
   imports: [CommonModule,
@@ -20,7 +21,7 @@ import { MenuItem } from 'primeng/api';
 export class HeaderComponent {
   @Input() pageTitle: string = 'Gestión de Seguros'; // Título dinámico
   @Input() pageSubtitle: string = 'Administra y revisa todas las pólizas de seguros'; // Subtítulo dinámico
-
+ router = inject(Router);
   searchQuery: string = ''; // Valor de la búsqueda
 
   user = {
@@ -43,6 +44,6 @@ export class HeaderComponent {
   }
 
   logout() {
-    console.log('Cerrando sesión');
+    this.router.navigate(['login']);
   }
 }

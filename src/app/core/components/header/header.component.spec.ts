@@ -6,12 +6,16 @@ import { AvatarModule } from 'primeng/avatar';
 import { InputTextModule } from 'primeng/inputtext';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
+import { Router } from '@angular/router';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
+  let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+
     await TestBed.configureTestingModule({
       imports: [
         CommonModule,
@@ -21,6 +25,9 @@ describe('HeaderComponent', () => {
         MenuModule,
         ButtonModule,
         HeaderComponent
+      ],
+      providers: [
+        { provide: Router, useValue: mockRouter }
       ]
     }).compileComponents();
 
@@ -68,10 +75,9 @@ describe('HeaderComponent', () => {
     expect(consoleSpy).toHaveBeenCalledWith('Navegando a configuración');
   });
 
-  it('should call logout when logout is triggered', () => {
-    const consoleSpy = spyOn(console, 'log');
+  it('should call router.navigate when logout is triggered', () => {
     component.logout();
-    expect(consoleSpy).toHaveBeenCalledWith('Cerrando sesión');
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['login']);
   });
 
   it('should update search query when input changes', () => {

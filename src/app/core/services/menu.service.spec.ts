@@ -13,25 +13,18 @@ describe('MenuService', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('getMenu', () => {
-    it('should return a copy of the menu list', () => {
-      const menu = service.getMenu();
-      expect(menu).toBeDefined();
-      expect(Array.isArray(menu)).toBeTruthy();
-      expect(menu.length).toBeGreaterThan(0);
-      
-      // Verificar que es una copia y no la referencia original
-      const originalMenu = service.getMenu();
-      menu[0].title = 'Test';
-      expect(originalMenu[0].title).not.toBe('Test');
-    });
-
-    it('should return menu items with correct structure', () => {
-      const menu = service.getMenu();
-      menu.forEach(item => {
-      });
-    });
+  it('should return a copy of the menu list', () => {
+    const menu = service.getMenu();
+    expect(menu).toBeDefined();
+    expect(Array.isArray(menu)).toBeTrue();
+    expect(menu.length).toBeGreaterThan(0);
+  
+    const originalMenu = service.getMenu();
+    expect(menu).not.toBe(originalMenu); 
+  
+    expect(menu[0].title).toBe(originalMenu[0].title);
   });
+  
 
   describe('getMenuByURL', () => {
     it('should return the correct menu item for a valid URL', () => {

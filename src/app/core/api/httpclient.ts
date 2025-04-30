@@ -43,7 +43,10 @@ export class ApiClientService {
 
   getCurrentUserEmail(): string | null {
     try {
-      const token = localStorage.getItem('token') || this.token;
+      const token = localStorage.getItem('token');
+      if (!token) {
+        return null; // Devuelve null si no hay token en localStorage
+      }
       const payload = token.split('.')[1];
       const decodedPayload = atob(payload);
       const parsedPayload = JSON.parse(decodedPayload);

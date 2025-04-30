@@ -6,6 +6,7 @@ import { PLATFORM_ID } from '@angular/core';
 describe('ApiClientService', () => {
   let service: ApiClientService;
   let httpMock: HttpTestingController;
+  let getItemSpy: jasmine.Spy; // Store the spy reference
   const mockToken = 'mock.token.here';
 
   beforeEach(() => {
@@ -20,12 +21,14 @@ describe('ApiClientService', () => {
     service = TestBed.inject(ApiClientService);
     httpMock = TestBed.inject(HttpTestingController);
 
-    // Mock localStorage
-    spyOn(localStorage, 'getItem').and.returnValue(mockToken);
+    // Set up the spy once
+    getItemSpy = spyOn(localStorage, 'getItem').and.returnValue(mockToken);
   });
 
   afterEach(() => {
+    // Verify HTTP requests and reset spies
     httpMock.verify();
+    getItemSpy.and.callThrough(); // Reset the spy to its original behavior
   });
 
   it('should be created', () => {
@@ -102,25 +105,25 @@ describe('ApiClientService', () => {
 
   describe('getCurrentUserEmail', () => {
     it('should return email from token', () => {
-      const mockToken = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIn0.signature';
-      spyOn(localStorage, 'getItem').and.returnValue(mockToken);
+      const validToken = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIn0.signature';
+      getItemSpy.and.returnValue(validToken); // Configure existing spy
 
       const email = service.getCurrentUserEmail();
       expect(email).toBe('test@example.com');
     });
 
     it('should return null when token is invalid', () => {
-      spyOn(localStorage, 'getItem').and.returnValue('invalid-token');
+      getItemSpy.and.returnValue('invalid-token'); // Configure existing spy
 
       const email = service.getCurrentUserEmail();
       expect(email).toBeNull();
     });
 
     it('should return null when token is missing', () => {
-      spyOn(localStorage, 'getItem').and.returnValue(null);
+      getItemSpy.and.returnValue(null); // Configure existing spy
 
       const email = service.getCurrentUserEmail();
       expect(email).toBeNull();
     });
   });
-}); 
+});
