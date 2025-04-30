@@ -1,0 +1,70 @@
+<div class="login-container">
+    <div class="login-box" [ngClass]="{ 'register-active': !isLoginActive, 'login-active': isLoginActive }">
+  
+      <!-- Contenedor de Formularios -->
+      <div class="forms-container">
+        <!-- Iniciar Sesión -->
+        <div class="form-section login-form">
+          <h1 class="form-title">Iniciar Sesión</h1>
+          <span class="form-subtitle">Use su email y contraseña</span>
+  
+          <form [formGroup]="loginForm">
+            <div class="input-group">
+              <input formControlName="email" type="email" placeholder="Email" />
+              <span class="input-icon pi pi-user"></span>
+            </div>
+            <div class="input-group">
+              <input formControlName="password" type="password" placeholder="Password" />
+              <span class="input-icon pi pi-lock"></span>
+            </div>
+  
+            <div class="button-container">
+              <button type="button" class="submit-button">INICIAR SESIÓN</button>
+            </div>
+          </form>
+        </div>
+  
+        <!-- Registro -->
+        <div class="form-section register-form">
+          <h1 class="form-title">Crear Cuenta</h1>
+          <span class="form-subtitle">Use su email para registrarse</span>
+  
+          <form [formGroup]="registerForm">
+            <div class="input-group">
+              <input formControlName="name" type="text" placeholder="Nombre" />
+              <span class="input-icon pi pi-user"></span>
+            </div>
+            <div class="input-group">
+              <input formControlName="email" type="email" placeholder="Email" />
+              <span class="input-icon pi pi-envelope"></span>
+            </div>
+            <div class="input-group">
+              <input formControlName="password" type="password" placeholder="Password" />
+              <span class="input-icon pi pi-lock"></span>
+            </div>
+  
+            <div class="button-container">
+              <button type="button" class="submit-button">REGISTRARSE</button>
+            </div>
+          </form>
+        </div>
+      </div>
+  
+      <!-- Panel de Bienvenida -->
+      <div class="welcome-panel" [ngClass]="{ 'login-active': isLoginActive, 'register-active': !isLoginActive }">
+        <div class="welcome-panel-content">
+          <h1 class="welcome-title">
+            {{ isLoginActive ? '¿No tienes una cuenta?' : '¿Ya tienes una cuenta?' }}
+          </h1>
+          <p class="welcome-text">
+            {{ isLoginActive ? 'Regístrate para comenzar' : 'Inicia sesión si ya tienes una cuenta' }}
+          </p>
+          <button class="toggle-button" (click)="toggleForm()">
+            {{ isLoginActive ? 'REGÍSTRATE' : 'INICIA SESIÓN' }}
+          </button>
+        </div>
+      </div>
+  
+    </div>
+  </div>
+  

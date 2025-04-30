@@ -1,0 +1,208 @@
+/* Estilos generales */
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #e4eae9, #bbd7d5); /* Gradiente de celeste medio verde */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Contenedor principal del login */
+.login-box {
+    position: relative;
+    width: 800px;
+    height: 500px;
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: flex;
+}
+
+/* Contenedor de formularios */
+.forms-container {
+    width: 100%;
+    display: flex;
+    transition: all 0.6s ease-in-out;
+}
+
+/* Sección de formulario */
+.form-section {
+    width: 50%;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.5s ease;
+    position: relative;
+    z-index: 1;
+}
+
+/* Formulario de login */
+.login-form {
+    transform: translateX(0%);
+}
+
+/* Formulario de registro */
+.register-form {
+    transform: translateX(100%);
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    background: #f8f9fa;
+}
+
+/* Estados de los formularios */
+.login-active .login-form {
+    transform: translateX(0%);
+}
+
+.login-active .register-form {
+    transform: translateX(100%);
+}
+
+.register-active .login-form {
+    transform: translateX(-100%);
+}
+
+.register-active .register-form {
+    transform: translateX(0%);
+}
+
+/* Panel de bienvenida */
+.welcome-panel {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 50%;
+    background: linear-gradient(to right, #18b8ab, #0ab6a7); /* Gradiente celeste medio verde */
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    transition: all 0.6s ease-in-out;
+    border-radius: 0 30px 30px 0;
+    right: 0;
+    z-index: 2;
+}
+
+.welcome-panel-content {
+    transition: all 0.6s ease-in-out;
+    text-align: center;
+    opacity: 1;
+    width: 100%;
+    padding: 2rem;
+}
+
+.login-active .welcome-panel {
+    right: 0;
+}
+
+.register-active .welcome-panel {
+    right: 50%;
+    border-radius: 30px 0 0 30px;
+}
+
+/* Textos */
+.form-title,
+.welcome-title {
+    font-size: 1.75rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.welcome-title {
+    color: white !important;
+}
+
+.form-subtitle,
+.welcome-text {
+    color: #666;
+    font-size: 0.875rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.welcome-text {
+    color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Inputs */
+.input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus {
+    border-color: #00bfae; /* Celeste medio verde para foco */
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 191, 174, 0.2); /* Sombra con color celeste medio verde */
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 1rem;
+}
+
+/* Botones */
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.submit-button {
+    background-color: #00bfae; /* Celeste medio verde */
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 12rem;
+}
+
+.submit-button:hover {
+    background-color: #009b89; /* Celeste más oscuro al hacer hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-button {
+    background: transparent;
+    color: white;
+    border: 1px solid white;
+    padding: 0.75rem 2rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+}
+
+.toggle-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
