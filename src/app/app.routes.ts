@@ -8,7 +8,7 @@ export const routes: Routes = [
         path: 'login',
         component: LoginComponent
     },
-    
+
     {
         path: '',
         redirectTo: 'main',
@@ -18,7 +18,7 @@ export const routes: Routes = [
         path: 'main',
         component: MainComponent,
         children: [
-            {path:'users',component:ListUsersComponent}
+            { path: 'users', component: ListUsersComponent }
         ]
     }
 ];
