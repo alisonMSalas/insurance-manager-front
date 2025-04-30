@@ -1,6 +1,5 @@
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-
 import { routes } from './app.routes';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { providePrimeNG } from 'primeng/config';
@@ -13,7 +12,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes), 
     provideHttpClient(),
     provideClientHydration(withEventReplay()),
-    providePrimeNG({ theme: { preset: Aura } }),
+    providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: 'darks', } } }),
     provideAnimations()
     ]
+
 };

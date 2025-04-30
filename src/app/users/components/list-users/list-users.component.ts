@@ -5,26 +5,27 @@ import { CommonModule } from '@angular/common';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
-import { FloatLabelModule } from 'primeng/floatlabel';
-import { UsersService, User } from '../../../core/services/users.service';
+import { FloatLabel, FloatLabelModule } from 'primeng/floatlabel';
+import { UsersService } from '../../../core/services/users.service';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
 
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  rol: string;
+  active: boolean;
+}
 @Component({
   standalone: true,
   selector: 'app-list-users',
-  imports: [
-    TableModule, 
-    ButtonModule, 
-    CommonModule, 
-    ToggleSwitchModule, 
-    FormsModule, 
-    DropdownModule, 
-    FloatLabelModule,
-    ConfirmDialogModule,
-    ToastModule
-  ],
+  imports: [TableModule, ButtonModule, CommonModule, ToggleSwitchModule, FormsModule, SelectModule, FloatLabel, InputTextModule, DialogModule, ToastModule, ConfirmDialogModule],
   providers: [ConfirmationService, MessageService],
   templateUrl: './list-users.component.html',
   styleUrls: ['./list-users.component.css'],
@@ -106,8 +107,24 @@ export class ListUsersComponent {
       }
     });
   }
+  mostrarModal: boolean = false;
+
+  nuevoUsuario = {
+    nombre: '',
+    email: ''
+  };
+
+  roles: any[] = [
+    { codigo: 'ADMIN', nombre: 'Administrador' },
+    { codigo: 'REVIEWER', nombre: 'Revisor' },
+    { codigo: 'AGENT', nombre: 'Agente' },
+    { codigo: 'CLIENTE', nombre: 'Cliente' }
+  ];
+
 
   viewUser(user: User) {
     console.log('Ver usuario:', user);
   }
+
+
 }
