@@ -8,7 +8,7 @@
           <h1 class="form-title">Iniciar Sesión</h1>
           <span class="form-subtitle">Use su email y contraseña</span>
   
-          <form [formGroup]="loginForm">
+          <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
             <div class="input-group">
               <input formControlName="email" type="email" placeholder="Email" />
               <span class="input-icon pi pi-user"></span>
@@ -19,7 +19,7 @@
             </div>
   
             <div class="button-container">
-              <button type="button" class="submit-button">INICIAR SESIÓN</button>
+              <button type="submit" class="submit-button">INICIAR SESIÓN</button>
             </div>
           </form>
         </div>
@@ -29,7 +29,7 @@
           <h1 class="form-title">Crear Cuenta</h1>
           <span class="form-subtitle">Use su email para registrarse</span>
   
-          <form [formGroup]="registerForm">
+          <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
             <div class="input-group">
               <input formControlName="name" type="text" placeholder="Nombre" />
               <span class="input-icon pi pi-user"></span>
@@ -44,7 +44,7 @@
             </div>
   
             <div class="button-container">
-              <button type="button" class="submit-button">REGISTRARSE</button>
+              <button type="submit" class="submit-button">REGISTRARSE</button>
             </div>
           </form>
         </div>
@@ -60,7 +60,7 @@
             {{ isLoginActive ? 'Regístrate para comenzar' : 'Inicia sesión si ya tienes una cuenta' }}
           </p>
           <button class="toggle-button" (click)="toggleForm()">
-            {{ isLoginActive ? 'REGÍSTRATE' : 'INICIA SESIÓN' }}
+            {{ isLoginActive ? 'REGÍSTRATE' : 'INICIA SESION' }}
           </button>
         </div>
       </div>
