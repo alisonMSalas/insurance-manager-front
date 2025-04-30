@@ -7,14 +7,17 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { Router } from '@angular/router';
+import { ApiClientService } from '../../api/httpclient';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
   let mockRouter: jasmine.SpyObj<Router>;
+  let mockApiClient: jasmine.SpyObj<ApiClientService>;
 
   beforeEach(async () => {
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
+    mockApiClient = jasmine.createSpyObj('ApiClientService', ['getCurrentUserEmail']);
 
     await TestBed.configureTestingModule({
       imports: [
@@ -27,7 +30,8 @@ describe('HeaderComponent', () => {
         HeaderComponent
       ],
       providers: [
-        { provide: Router, useValue: mockRouter }
+        { provide: Router, useValue: mockRouter },
+        { provide: ApiClientService, useValue: mockApiClient }
       ]
     }).compileComponents();
 
@@ -49,10 +53,18 @@ describe('HeaderComponent', () => {
     expect(component.searchQuery).toBe('');
   });
 
-  it('should have user information', () => {
+  it('should have default user information', () => {
     expect(component.user).toBeDefined();
-    expect(component.user.name).toBe('Carlos Mendoza');
+    expect(component.user.name).toBe('Usuario');
+    expect(component.user.role).toBe('Agente de Seguros');
     expect(component.user.icon).toBe('pi pi-user');
+  });
+
+  it('should update user name with email from ApiClientService', () => {
+    const testEmail = 'test@example.com';
+    mockApiClient.getCurrentUserEmail.and.returnValue(testEmail);
+    component.ngOnInit();
+    expect(component.user.name).toBe(testEmail);
   });
 
   it('should have menu items', () => {
@@ -62,21 +74,9 @@ describe('HeaderComponent', () => {
     expect(component.menuItems[0].icon).toBe('pi pi-sign-out');
   });
 
-  it('should call navigateToProfile when profile navigation is triggered', () => {
-    const consoleSpy = spyOn(console, 'log');
-    component.navigateToProfile();
-    expect(consoleSpy).toHaveBeenCalledWith('Navegando al perfil');
-  });
-
-  it('should call navigateToSettings when settings navigation is triggered', () => {
-    const consoleSpy = spyOn(console, 'log');
-    component.navigateToSettings();
-    expect(consoleSpy).toHaveBeenCalledWith('Navegando a configuración');
-  });
-
   it('should call router.navigate when logout is triggered', () => {
     component.logout();
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['login']);
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
   });
 
   it('should update search query when input changes', () => {

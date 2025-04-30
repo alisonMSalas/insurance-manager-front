@@ -48,10 +48,4 @@ export class HeaderComponent implements OnInit {
     localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
-  navigateToSettings() {
-    console.log('Navegando a configuración');
-  }
-  navigateToProfile() {
-    console.log('Navegando al perfil');
-  }
 }
