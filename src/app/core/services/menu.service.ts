@@ -9,8 +9,9 @@ export interface IMenu {
 })
 export class MenuService {
   private listMenu: IMenu[] = [
+    { title: 'Usuarios', url: '/main/users', icon: 'pi pi-user' },
     { title: 'Seguros', url: '/main/policies', icon: 'pi pi-shield' },
-    { title: 'Usuarios', url: '/main/users', icon: 'pi pi-user' }
+   
   ];
 
  

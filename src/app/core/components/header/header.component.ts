@@ -18,7 +18,7 @@ import { MenuItem } from 'primeng/api';
   styleUrl: './header.component.css'
 })
 export class HeaderComponent {
-  @Input() pageTitle: string = 'Gestión de Pólizas'; // Título dinámico
+  @Input() pageTitle: string = 'Gestión de Seguros'; // Título dinámico
   @Input() pageSubtitle: string = 'Administra y revisa todas las pólizas de seguros'; // Subtítulo dinámico
 
   searchQuery: string = ''; // Valor de la búsqueda
@@ -26,7 +26,7 @@ export class HeaderComponent {
   user = {
     name: 'Carlos Mendoza',
     role: 'Agente de Seguros',
-    avatar: 'https://via.placeholder.com/40'
+    icon: 'pi pi-user',
   };
 
   menuItems: MenuItem[] = [
