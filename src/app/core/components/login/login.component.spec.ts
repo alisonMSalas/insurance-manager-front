@@ -31,7 +31,7 @@ describe('LoginComponent', () => {
         { provide: MessageService, useValue: messageServiceSpy },
         { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
         { provide: JwtHelperService, useValue: jwtHelperSpy },
-        { provide: PLATFORM_ID, useValue: 'browser' } // Simula ejecución en el navegador
+        { provide: PLATFORM_ID, useValue: 'browser' }
       ]
     }).compileComponents();
 
@@ -44,8 +44,25 @@ describe('LoginComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('should initialize form with empty values', () => {
+    expect(component.loginForm.get('email')?.value).toBe('');
+    expect(component.loginForm.get('password')?.value).toBe('');
+  });
+
   it('should not login with invalid form', () => {
     component.loginForm.setValue({ email: '', password: '' });
+    component.onLogin();
+    expect(authServiceSpy.login).not.toHaveBeenCalled();
+  });
+
+  it('should not login with invalid email', () => {
+    component.loginForm.setValue({ email: 'invalid-email', password: '123456' });
+    component.onLogin();
+    expect(authServiceSpy.login).not.toHaveBeenCalled();
+  });
+
+  it('should not login with short password', () => {
+    component.loginForm.setValue({ email: 'test@example.com', password: '12345' });
     component.onLogin();
     expect(authServiceSpy.login).not.toHaveBeenCalled();
   });
@@ -55,17 +72,23 @@ describe('LoginComponent', () => {
     authServiceSpy.login.and.returnValue(of(token));
 
     component.loginForm.setValue({ email: 'test@example.com', password: '123456' });
-
     component.onLogin();
     tick();
 
-    expect(authServiceSpy.login).toHaveBeenCalled();
+    expect(authServiceSpy.login).toHaveBeenCalledWith({
+      email: 'test@example.com',
+      password: '123456'
+    });
     expect(localStorage.getItem('token')).toBe(token);
     expect(routerSpy.navigate).toHaveBeenCalledWith(['/insurance']);
-    expect(messageServiceSpy.add).toHaveBeenCalled();
+    expect(messageServiceSpy.add).toHaveBeenCalledWith({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Inicio de sesión exitoso'
+    });
   }));
 
-  it('should handle login error gracefully', fakeAsync(() => {
+  it('should handle login error with error message', fakeAsync(() => {
     const error = new HttpErrorResponse({
       status: 401,
       statusText: 'Unauthorized',
@@ -79,7 +102,73 @@ describe('LoginComponent', () => {
     component.onLogin();
     tick();
 
-    // Este test no espera una acción concreta, pero asegura que no explota.
     expect(authServiceSpy.login).toHaveBeenCalled();
+    expect(messageServiceSpy.add).toHaveBeenCalledWith({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Invalid credentials'
+    });
   }));
+
+  it('should handle login error with string response', fakeAsync(() => {
+    const token = 'mock-token';
+    authServiceSpy.login.and.returnValue(throwError(() => token));
+
+    component.loginForm.setValue({ email: 'test@example.com', password: '123456' });
+    component.onLogin();
+    tick();
+
+    expect(authServiceSpy.login).toHaveBeenCalled();
+    expect(localStorage.getItem('token')).toBe(token);
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/insurance']);
+    expect(messageServiceSpy.add).toHaveBeenCalledWith({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Inicio de sesión exitoso'
+    });
+  }));
+
+  it('should handle login error with invalid JSON string', fakeAsync(() => {
+    const invalidJson = 'invalid-json';
+    authServiceSpy.login.and.returnValue(throwError(() => invalidJson));
+
+    component.loginForm.setValue({ email: 'test@example.com', password: '123456' });
+    component.onLogin();
+    tick();
+
+    expect(authServiceSpy.login).toHaveBeenCalled();
+    expect(messageServiceSpy.add).toHaveBeenCalledWith({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Error en el servidor'
+    });
+  }));
+
+  it('should redirect to insurance if valid token exists', fakeAsync(() => {
+    const validToken = 'valid-token';
+    localStorage.setItem('token', validToken);
+    jwtHelperSpy.isTokenExpired.and.returnValue(Promise.resolve(false));
+
+    component.ngOnInit();
+    tick();
+
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/insurance']);
+  }));
+
+  it('should not redirect if token is expired', fakeAsync(() => {
+    const expiredToken = 'expired-token';
+    localStorage.setItem('token', expiredToken);
+    jwtHelperSpy.isTokenExpired.and.returnValue(Promise.resolve(true));
+
+    component.ngOnInit();
+    tick();
+
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
+  }));
+
+  it('should not redirect if no token exists', () => {
+    localStorage.removeItem('token');
+    component.ngOnInit();
+    expect(routerSpy.navigate).not.toHaveBeenCalled();
+  });
 });
