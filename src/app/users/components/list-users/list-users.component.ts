@@ -57,7 +57,7 @@ export class ListUsersComponent {
     { codigo: 'ADMIN', nombre: 'Administrador' },
     { codigo: 'REVIEWER', nombre: 'Revisor' },
     { codigo: 'AGENT', nombre: 'Agente' },
-    { codigo: 'CLIENTE', nombre: 'Cliente' },
+    { codigo: 'CLIENT', nombre: 'Cliente' },
   ];
 
   // Nueva propiedad para las opciones del dropdown de roles

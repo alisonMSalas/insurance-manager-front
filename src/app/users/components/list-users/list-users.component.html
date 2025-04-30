@@ -4,20 +4,21 @@
 
   <div class="policies-header">
     <div>
-      <h2>Todos los Usuarios</h2>
+      <h2>Usuarios</h2>
       <p>Gestiona y revisa el estado de los usuarios del sistema</p>
     </div>
-    <button pButton class="p-button-primary" (click)="abrirModalCrear()">
-      <i class="pi pi-plus"></i> Crear Nuevo Usuario
+    <button class="btn btn-primary" (click)="abrirModalCrear()">
+      <i class="pi pi-plus"></i>
+       Nuevo Usuario
     </button>
   </div>
 
   <!-- Buscador y filtros -->
   <div class="filters-container">
-    <span class="p-floatlabel">
-      <input id="search" pInputText [(ngModel)]="searchQuery" (input)="onSearchChange($event)" />
+    <p-floatlabel>
+      <input id="search" pInputText [(ngModel)]="searchQuery" (input)="onSearchChange($event)"  />
       <label for="search">Buscar</label>
-    </span>
+  </p-floatlabel>
 
     <div class="filter-box">
       <p-dropdown
