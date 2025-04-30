@@ -9,7 +9,7 @@ import { PLATFORM_ID } from '@angular/core';
 })
 export class ApiClientService {
   private baseUrl = 'http://localhost:8080';
-  private token = 'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJyYWFuc29wcm8zMjRAZ21haWwuY29tIiwiaWF0IjoxNzQ2MDIyOTc5LCJleHAiOjE3NDYwNTg5Nzl9.c5qUnfrEhpbDleJfWTAeyAmBOpQkCbswmXqm3nhiDnM';
+  private token = 'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJyYWFuc29wcm8zMjRAZ21haWwuY29tIiwiaWF0IjoxNzQ2MDI1ODIyLCJleHAiOjE3NDYwNjE4MjJ9.KaTEGtFZfXO5o7ZB_o--PS09Jvj8MBaFKQjajlxkzdg';
   private platformId = inject(PLATFORM_ID);
 
   constructor(private http: HttpClient) {}

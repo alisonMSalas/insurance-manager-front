@@ -10,7 +10,7 @@ describe('ListSegurosComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ListSegurosComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ListSegurosComponent);
     component = fixture.componentInstance;
