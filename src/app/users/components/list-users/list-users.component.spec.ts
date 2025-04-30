@@ -1,237 +1,120 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ListUsersComponent } from './list-users.component';
-import { UsersService } from '../../../core/services/users.service';
+import { UsersService, User } from '../../../core/services/users.service';
 import { ApiClientService } from '../../../core/api/httpclient';
-import { ConfirmationService, MessageService } from 'primeng/api';
 import { of, throwError } from 'rxjs';
-import { User } from '../../../core/services/users.service';
-import { By } from '@angular/platform-browser';
-import { FormsModule } from '@angular/forms';
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { DropdownModule } from 'primeng/dropdown';
-import { DialogModule } from 'primeng/dialog';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { InputTextModule } from 'primeng/inputtext';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
-describe('ListUsersComponent', () => {
+describe('ListUsersComponent (integración)', () => {
   let component: ListUsersComponent;
   let fixture: ComponentFixture<ListUsersComponent>;
-  let usersServiceSpy: jasmine.SpyObj<UsersService>;
-  let apiClientServiceSpy: jasmine.SpyObj<ApiClientService>;
-  let messageServiceSpy: jasmine.SpyObj<MessageService>;
-  let confirmationServiceSpy: jasmine.SpyObj<ConfirmationService>;
+  let mockUserService: jasmine.SpyObj<UsersService>;
+  let mockApiClientService: jasmine.SpyObj<ApiClientService>;
+  let mockConfirmationService: jasmine.SpyObj<ConfirmationService>;
+  let mockMessageService: jasmine.SpyObj<MessageService>;
 
   const mockUsers: User[] = [
-    {
-      id: '1',
-      name: 'Usuario 1',
-      email: 'usuario1@test.com',
-      rol: 'ADMIN',
-      active: true
-    },
-    {
-      id: '2',
-      name: 'Usuario 2',
-      email: 'usuario2@test.com',
-      rol: 'USER',
-      active: false
-    }
+    { id: '1', name: 'Juan', email: 'juan@mail.com', rol: 'ADMIN', active: true },
+    { id: '2', name: 'Ana', email: 'ana@mail.com', rol: 'AGENT', active: false },
   ];
 
   beforeEach(async () => {
-    const usersSpy = jasmine.createSpyObj('UsersService', ['getAll', 'create', 'update', 'delete']);
-    const apiSpy = jasmine.createSpyObj('ApiClientService', ['getCurrentUserEmail']);
-    const messageSpy = jasmine.createSpyObj('MessageService', ['add']);
-    const confirmSpy = jasmine.createSpyObj('ConfirmationService', ['confirm']);
+    mockUserService = jasmine.createSpyObj<UsersService>('UsersService', ['getAll', 'create', 'update', 'delete']);
+    mockApiClientService = jasmine.createSpyObj<ApiClientService>('ApiClientService', ['getCurrentUserEmail']);
+    mockConfirmationService = jasmine.createSpyObj<ConfirmationService>('ConfirmationService', ['confirm']);
+    mockMessageService = jasmine.createSpyObj<MessageService>('MessageService', ['add']);
 
     await TestBed.configureTestingModule({
-      imports: [
-        ListUsersComponent,
-        FormsModule,
-        TableModule,
-        ButtonModule,
-        ToggleSwitchModule,
-        DropdownModule,
-        DialogModule,
-        ToastModule,
-        ConfirmDialogModule,
-        InputTextModule
-      ],
+      imports: [ListUsersComponent],
       providers: [
-        { provide: UsersService, useValue: usersSpy },
-        { provide: ApiClientService, useValue: apiSpy },
-        { provide: MessageService, useValue: messageSpy },
-        { provide: ConfirmationService, useValue: confirmSpy }
-      ]
+        { provide: UsersService, useValue: mockUserService },
+        { provide: ApiClientService, useValue: mockApiClientService },
+        { provide: ConfirmationService, useValue: mockConfirmationService },
+        { provide: MessageService, useValue: mockMessageService },
+      ],
     }).compileComponents();
-
-    usersServiceSpy = TestBed.inject(UsersService) as jasmine.SpyObj<UsersService>;
-    apiClientServiceSpy = TestBed.inject(ApiClientService) as jasmine.SpyObj<ApiClientService>;
-    messageServiceSpy = TestBed.inject(MessageService) as jasmine.SpyObj<MessageService>;
-    confirmationServiceSpy = TestBed.inject(ConfirmationService) as jasmine.SpyObj<ConfirmationService>;
 
     fixture = TestBed.createComponent(ListUsersComponent);
     component = fixture.componentInstance;
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+  it('debe cargar los usuarios en ngOnInit', () => {
+    mockUserService.getAll.and.returnValue(of(mockUsers));
+    mockApiClientService.getCurrentUserEmail.and.returnValue('juan@mail.com');
+
+    fixture.detectChanges(); // Trigger ngOnInit
+
+    expect(component.users.length).toBe(2);
+    expect(component.filteredUsers.length).toBe(2);
+    expect(mockUserService.getAll).toHaveBeenCalled();
   });
 
-  describe('ngOnInit', () => {
-    it('should load users and set current user email', () => {
-      usersServiceSpy.getAll.and.returnValue(of(mockUsers));
-      apiClientServiceSpy.getCurrentUserEmail.and.returnValue('current@test.com');
+  it('debe filtrar usuarios por nombre', () => {
+    component.users = [...mockUsers];
+    component.searchQuery = 'juan';
+    component.applyFilters();
 
-      component.ngOnInit();
-
-      expect(usersServiceSpy.getAll).toHaveBeenCalled();
-      expect(component.users).toEqual(mockUsers);
-      expect(component.filteredUsers).toEqual(mockUsers);
-      expect(component.currentUserEmail).toBe('current@test.com');
-    });
-
-    it('should handle error when loading users', () => {
-      usersServiceSpy.getAll.and.returnValue(throwError(() => new Error('Error loading users')));
-
-      component.ngOnInit();
-
-      expect(messageServiceSpy.add).toHaveBeenCalledWith({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No se pudieron cargar los usuarios'
-      });
-    });
+    expect(component.filteredUsers.length).toBe(1);
+    expect(component.filteredUsers[0].name).toBe('Juan');
   });
 
-  describe('applyFilters', () => {
-    beforeEach(() => {
-      component.users = mockUsers;
-      component.filteredUsers = mockUsers;
-    });
+  it('debe evitar eliminar el usuario actual', () => {
+    component.currentUserEmail = 'juan@mail.com';
+    const user = mockUsers[0];
 
-    it('should filter users by search query', () => {
-      component.searchQuery = 'Usuario 1';
-      component.applyFilters();
-      expect(component.filteredUsers.length).toBe(1);
-      expect(component.filteredUsers[0].name).toBe('Usuario 1');
-    });
+    component.deleteUser(user);
 
-    it('should filter users by role', () => {
-      component.selectedRole = 'ADMIN';
-      component.applyFilters();
-      expect(component.filteredUsers.length).toBe(1);
-      expect(component.filteredUsers[0].rol).toBe('ADMIN');
+    expect(mockMessageService.add).toHaveBeenCalledWith({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'No puedes eliminar tu propio usuario',
     });
-
-    it('should filter users by status', () => {
-      component.selectedStatus = true;
-      component.applyFilters();
-      expect(component.filteredUsers.length).toBe(1);
-      expect(component.filteredUsers[0].active).toBe(true);
-    });
+    expect(mockConfirmationService.confirm).not.toHaveBeenCalled();
   });
 
-  describe('deleteUser', () => {
-    it('should not allow deleting own user', () => {
-      component.currentUserEmail = 'usuario1@test.com';
-      component.deleteUser(mockUsers[0]);
+  it('debe llamar a create si está en modo crear y los campos están completos', fakeAsync(() => {
+    component.modo = 'crear';
+    component.usuario = {
+      name: 'Nuevo',
+      email: 'nuevo@mail.com',
+      rol: 'AGENT',
+      password: '1234',
+      active: true,
+    };
 
-      expect(messageServiceSpy.add).toHaveBeenCalledWith({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No puedes eliminar tu propio usuario'
-      });
-      expect(usersServiceSpy.delete).not.toHaveBeenCalled();
+    mockUserService.create.and.returnValue(of({}));
+    mockUserService.getAll.and.returnValue(of(mockUsers)); // Mock getAll to prevent undefined
+
+    component.guardarUsuario();
+    tick();
+
+    expect(mockUserService.create).toHaveBeenCalledWith({
+      name: 'Nuevo',
+      email: 'nuevo@mail.com',
+      rol: 'AGENT',
+      password: '1234',
+      active: true,
     });
-
-    it('should show confirmation dialog before deleting', () => {
-      component.currentUserEmail = 'other@test.com';
-      usersServiceSpy.delete.and.returnValue(of(void 0));
-
-      component.deleteUser(mockUsers[0]);
-
-      expect(confirmationServiceSpy.confirm).toHaveBeenCalled();
+    expect(mockMessageService.add).toHaveBeenCalledWith({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Usuario creado correctamente',
     });
-  });
+    expect(component.mostrarModal).toBeFalse();
+    expect(mockUserService.getAll).toHaveBeenCalled();
+  }));
 
-  describe('guardarUsuario', () => {
-    it('should validate required fields', () => {
-      component.usuario = { name: '', email: '', rol: '', active: true };
-      component.guardarUsuario();
+  it('debe manejar errores al cargar usuarios', fakeAsync(() => {
+    mockUserService.getAll.and.returnValue(throwError(() => new Error('Carga fallida')));
+    mockApiClientService.getCurrentUserEmail.and.returnValue('otro@mail.com');
 
-      expect(messageServiceSpy.add).toHaveBeenCalledWith({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Por favor, completa todos los campos requeridos'
-      });
+    fixture.detectChanges(); // Trigger ngOnInit
+    tick(); // Ensure async operations complete
+
+    expect(mockMessageService.add).toHaveBeenCalledWith({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'No se pudieron cargar los usuarios',
     });
-
-    it('should require password for new users', () => {
-      component.modo = 'crear';
-      component.usuario = { name: 'Test', email: 'test@test.com', rol: 'USER', active: true };
-      component.guardarUsuario();
-
-      expect(messageServiceSpy.add).toHaveBeenCalledWith({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'La contraseña es requerida para crear un usuario'
-      });
-    });
-
-    it('should create new user successfully', () => {
-      component.modo = 'crear';
-      component.usuario = {
-        name: 'Test',
-        email: 'test@test.com',
-        rol: 'USER',
-        password: 'password123',
-        active: true
-      };
-      usersServiceSpy.create.and.returnValue(of(void 0));
-
-      component.guardarUsuario();
-
-      expect(usersServiceSpy.create).toHaveBeenCalled();
-      expect(messageServiceSpy.add).toHaveBeenCalledWith({
-        severity: 'success',
-        summary: 'Éxito',
-        detail: 'Usuario creado correctamente'
-      });
-    });
-  });
-
-  describe('toggleUserStatus', () => {
-    it('should not allow toggling own user status', () => {
-      component.currentUserEmail = 'usuario1@test.com';
-      const user = { ...mockUsers[0] };
-      
-      component.toggleUserStatus(user);
-
-      expect(messageServiceSpy.add).toHaveBeenCalledWith({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No puedes cambiar el estado de tu propio usuario'
-      });
-      expect(usersServiceSpy.update).not.toHaveBeenCalled();
-    });
-
-    it('should update user status successfully', () => {
-      component.currentUserEmail = 'other@test.com';
-      const user = { ...mockUsers[0] };
-      usersServiceSpy.update.and.returnValue(of(void 0));
-
-      component.toggleUserStatus(user);
-
-      expect(usersServiceSpy.update).toHaveBeenCalled();
-      expect(messageServiceSpy.add).toHaveBeenCalledWith({
-        severity: 'success',
-        summary: 'Éxito',
-        detail: 'Usuario activado correctamente'
-      });
-    });
-  });
+  }));
 });

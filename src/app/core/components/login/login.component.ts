@@ -52,8 +52,7 @@ export class LoginComponent implements OnInit {
       this.authService.login(credentials).subscribe({
         next: (token: string) => {
           localStorage.setItem('token', token); // Guardar el token
-          console.log("Inicio de sesión exitoso");
-          console.log("Token recibido:", token); // Imprimir el token
+          this.router.navigate(['main']);
         },
         error: (err) => {
           console.error('Error al iniciar sesión', err);
