@@ -1,0 +1,201 @@
+<div class="users-view">
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <div class="policies-header">
+    <div>
+      <h2>Usuarios</h2>
+      <p>Gestiona y revisa el estado de los usuarios del sistema</p>
+    </div>
+    <button class="btn btn-primary" (click)="abrirModalCrear()">
+      <i class="pi pi-plus"></i>
+       Nuevo Usuario
+    </button>
+  </div>
+
+  <!-- Buscador y filtros -->
+  <div class="filters-container">
+    <p-floatlabel>
+      <input id="search" pInputText [(ngModel)]="searchQuery" (input)="onSearchChange($event)"  />
+      <label for="search">Buscar</label>
+  </p-floatlabel>
+
+    <div class="filter-box">
+      <p-dropdown
+        [options]="roleOptions"
+        [(ngModel)]="selectedRole"
+        (onChange)="onRoleChange($event)"
+        placeholder="Filtrar por rol"
+        [style]="{ 'min-width': '150px' }"
+      ></p-dropdown>
+    </div>
+    <div class="filter-box">
+      <p-dropdown
+        [options]="statusOptions"
+        [(ngModel)]="selectedStatus"
+        (onChange)="onStatusChange($event)"
+        placeholder="Filtrar por estado"
+        [style]="{ 'min-width': '150px' }"
+      ></p-dropdown>
+    </div>
+  </div>
+
+  <div class="policies-table-container">
+    <p-table
+      [value]="filteredUsers"
+      [tableStyle]="{ 'min-width': '50rem' }"
+      [scrollable]="true"
+      scrollHeight="500px"
+      [paginator]="true"
+      [rows]="5"
+      [rowsPerPageOptions]="[5, 10, 20]"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td class="policy-number">{{ user.id }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.email }}</td>
+          <td>
+            <span
+              class="role-status"
+              [ngClass]="{
+                'role-admin': user.rol === 'ADMIN',
+                'role-user': user.rol === 'REVIEWER',
+                'role-agent': user.rol === 'AGENT',
+                'role-cliente': user.rol === 'CLIENTE'
+              }"
+            >
+              {{ user.rol }}
+            </span>
+          </td>
+          <td>
+            <p-toggleswitch [(ngModel)]="user.active" (onChange)="toggleUserStatus(user)" />
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button pButton type="button" class="p-button-outlined p-button-info" icon="pi pi-eye" (click)="viewUser(user)"></button>
+              <button pButton type="button" class="p-button-outlined p-button-warning" icon="pi pi-pencil" (click)="abrirModalEditar(user)"></button>
+              <button pButton type="button" class="p-button-outlined p-button-danger" icon="pi pi-trash" (click)="deleteUser(user)"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <p-dialog
+    [header]="modo === 'crear' ? 'Agregar Nuevo Usuario' : 'Editar Usuario'"
+    [(visible)]="mostrarModal"
+    [modal]="true"
+    [style]="{ width: '500px' }"
+    [breakpoints]="{'960px': '75vw', '640px': '90vw'}"
+    [draggable]="false"
+    [resizable]="false"
+  >
+    <div class="p-fluid grid p-4">
+      <!-- Campo Nombre -->
+      <div class="field col-12">
+        <label for="nombre" class="block text-900 font-medium mb-2">Nombre Completo</label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon">
+            <i class="pi pi-user"></i>
+          </span>
+          <input
+            id="nombre"
+            type="text"
+            pInputText
+            class="w-full"
+            placeholder="Ej: Carlos Mendoza"
+            [(ngModel)]="usuario.name"
+          />
+        </div>
+      </div>
+
+      <!-- Campo Email -->
+      <div class="field col-12">
+        <label for="email" class="block text-900 font-medium mb-2">Correo Electrónico</label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon">
+            <i class="pi pi-envelope"></i>
+          </span>
+          <input
+            id="email"
+            type="email"
+            pInputText
+            class="w-full"
+            placeholder="Ej: usuario@dominio.com"
+            [(ngModel)]="usuario.email"
+          />
+        </div>
+      </div>
+
+      <!-- Campo Rol -->
+      <div class="field col-12">
+        <label for="rol" class="block text-900 font-medium mb-2">Rol del Usuario</label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon">
+            <i class="pi pi-shield"></i>
+          </span>
+          <p-dropdown
+            id="rol"
+            [options]="roles"
+            optionLabel="nombre"
+            optionValue="codigo"
+            [(ngModel)]="usuario.rol"
+            placeholder="Seleccione un rol"
+            [style]="{ width: '100%' }"
+          ></p-dropdown>
+        </div>
+      </div>
+
+      <!-- Campo Contraseña -->
+      <div class="field col-12" *ngIf="modo === 'crear'">
+        <label for="password" class="block text-900 font-medium mb-2">Contraseña</label>
+        <div class="p-inputgroup">
+          <span class="p-inputgroup-addon">
+            <i class="pi pi-lock"></i>
+          </span>
+          <input
+            id="password"
+            type="password"
+            pInputText
+            class="w-full"
+            placeholder="Mínimo 8 caracteres"
+            [(ngModel)]="usuario.password"
+          />
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="flex justify-content-between">
+        <button
+          pButton
+          label="Cancelar"
+          icon="pi pi-times"
+          class="p-button-outlined p-button-secondary"
+          (click)="mostrarModal = false"
+        ></button>
+        <button
+          pButton
+          label="Guardar Usuario"
+          icon="pi pi-check"
+          class="p-button-success"
+          (click)="guardarUsuario()"
+        ></button>
+      </div>
+    </ng-template>
+  </p-dialog>
+</div>
