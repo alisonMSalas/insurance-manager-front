@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output,inject } from '@angular/core';
+import { Component, EventEmitter, inject, Input, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AvatarModule } from 'primeng/avatar';
@@ -7,6 +7,8 @@ import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
 import { Router } from '@angular/router';
+import { ApiClientService } from '../../api/httpclient';
+
 @Component({
   selector: 'app-header',
   imports: [CommonModule,
@@ -18,32 +20,38 @@ import { Router } from '@angular/router';
   templateUrl: './header.component.html',
   styleUrl: './header.component.css'
 })
-export class HeaderComponent {
-  @Input() pageTitle: string = 'Gestión de Seguros'; // Título dinámico
-  @Input() pageSubtitle: string = 'Administra y revisa todas las pólizas de seguros'; // Subtítulo dinámico
- router = inject(Router);
-  searchQuery: string = ''; // Valor de la búsqueda
-
+export class HeaderComponent implements OnInit {
+  private router = inject(Router);
+  @Input() pageTitle: string = 'Gestión de Seguros'; 
+  @Input() pageSubtitle: string = 'Administra y revisa todas las pólizas de seguros'; 
+  searchQuery: string = '';
   user = {
-    name: 'Carlos Mendoza',
+    name: 'Usuario',
     role: 'Agente de Seguros',
     icon: 'pi pi-user',
   };
 
   menuItems: MenuItem[] = [
-    
     { label: 'Cerrar Sesión', icon: 'pi pi-sign-out', command: () => this.logout() }
   ];
 
-  navigateToProfile() {
-    console.log('Navegando al perfil');
-  }
+  constructor(private apiClient: ApiClientService) { }
 
-  navigateToSettings() {
-    console.log('Navegando a configuración');
+  ngOnInit() {
+    const email = this.apiClient.getCurrentUserEmail();
+    if (email) {
+      this.user.name = email;
+    }
   }
 
   logout() {
-    this.router.navigate(['login']);
+    localStorage.removeItem('token');
+    this.router.navigate(['/login']);
+  }
+  navigateToSettings() {
+    console.log('Navegando a configuración');
+  }
+  navigateToProfile() {
+    console.log('Navegando al perfil');
   }
 }

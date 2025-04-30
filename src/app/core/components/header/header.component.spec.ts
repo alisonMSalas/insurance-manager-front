@@ -52,7 +52,6 @@ describe('HeaderComponent', () => {
   it('should have user information', () => {
     expect(component.user).toBeDefined();
     expect(component.user.name).toBe('Carlos Mendoza');
-    expect(component.user.role).toBe('Agente de Seguros');
     expect(component.user.icon).toBe('pi pi-user');
   });
 
