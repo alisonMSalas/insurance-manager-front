@@ -1,16 +1,22 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Insurance, InsuranceType } from '../../shared/interfaces/insurance';
+import { Insurance, InsuranceType, PaymentPeriod } from '../../shared/interfaces/insurance';
 import { SegurosService } from '../service/seguros.service';
-import { getInsuranceTypeLabel, getInsuranceTypeOptions, getPaymentPeriodLabel } from '../../shared/utils/insurance.utils';
+import { getInsuranceTypeLabel, getPaymentPeriodLabel, getPaymentPeriodOptions, getInsuranceTypeOptions } from '../../shared/utils/insurance.utils';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ErrorResponse } from '../../shared/interfaces/error-response';
+import { DialogModule } from 'primeng/dialog';
+import { FormsModule,ReactiveFormsModule } from '@angular/forms';
+import { CheckboxModule } from 'primeng/checkbox';
+import { DropdownModule } from 'primeng/dropdown';
+import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
+
 import { SelectModule } from 'primeng/select';
-import { FormsModule } from '@angular/forms';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -27,8 +33,14 @@ interface StatusOption {
     ButtonModule,
     CardModule,
     ToastModule,
-    SelectModule,
+    DialogModule,
+    CheckboxModule,
+    DropdownModule,
+    InputTextModule,
+    TextareaModule,
     FormsModule,
+    ReactiveFormsModule,
+    SelectModule,
     ConfirmDialogModule,
     TooltipModule
   ],
@@ -36,8 +48,14 @@ interface StatusOption {
   templateUrl: './list-seguros.component.html',
   styleUrls: ['./list-seguros.component.css']
 })
+
 export class ListSegurosComponent implements OnInit {
   insurances: Insurance[] = [];
+  display=false;
+  isEditing: boolean = false;
+  currentInsuranceId: string | null = null;
+  displayViewModal = false;
+  selectedInsurance: Insurance | null = null;
   filteredInsurances: Insurance[] = [];
   loading = false;
 
@@ -88,6 +106,10 @@ export class ListSegurosComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+  openViewModal(insurance: Insurance) {
+    this.selectedInsurance = insurance;
+    this.displayViewModal = true;
   }
 
   applyFilters(): void {
@@ -140,7 +162,7 @@ export class ListSegurosComponent implements OnInit {
     });
   }
 
-  private handleError(error: HttpErrorResponse): void {
+   handleError(error: HttpErrorResponse): void {
     if (error.error && typeof error.error === 'object') {
       const errorResponse = error.error as ErrorResponse;
       if (errorResponse.message) {
@@ -162,4 +184,98 @@ export class ListSegurosComponent implements OnInit {
 
   getInsuranceTypeLabel = getInsuranceTypeLabel;
   getPaymentPeriodLabel = getPaymentPeriodLabel;
+
+  insurance: Omit<Insurance, 'id'> = {
+    name: '',
+    type: InsuranceType.HEALTH, 
+    description: '',
+    coverage: 0, 
+    deductible: 0, 
+    paymentAmount: 0, 
+    paymentPeriod: PaymentPeriod.MONTHLY, 
+    active: false,
+  };
+  
+  insuranceTypes = getInsuranceTypeOptions();
+  
+  paymentPeriods = getPaymentPeriodOptions();
+  
+  saveInsurance() {
+    if (this.isEditing && this.currentInsuranceId) {
+      // Lógica de actualización
+      const updatedInsurance: Insurance = {
+        ...this.insurance,
+        id: this.currentInsuranceId
+      };
+      
+      this.segurosService.update(this.currentInsuranceId,updatedInsurance).subscribe({
+        next: (response) => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Seguro actualizado correctamente'
+          });
+          this.loadInsurances();
+          this.display = false;
+          this.resetCampos();
+        },
+        error: (error: HttpErrorResponse) => {
+          this.handleError(error);
+        }
+      });
+    } else {
+      // Lógica de creación (existente)
+      this.segurosService.save(this.insurance).subscribe({
+        next: (response) => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Seguro registrado correctamente'
+          });
+          this.loadInsurances();
+          this.display = false;
+          this.resetCampos();
+        },
+        error: (error: HttpErrorResponse) => {
+          this.handleError(error);
+        }
+      });
+    }
+  }
+  openModal(insuranceToEdit?: Insurance) {
+    this.isEditing = !!insuranceToEdit;
+    
+    if (this.isEditing && insuranceToEdit) {
+      this.currentInsuranceId = insuranceToEdit.id || null;
+      // Copiar los datos del seguro a editar
+      this.insurance = {
+        name: insuranceToEdit.name,
+        type: insuranceToEdit.type,
+        description: insuranceToEdit.description,
+        coverage: insuranceToEdit.coverage,
+        deductible: insuranceToEdit.deductible,
+        paymentAmount: insuranceToEdit.paymentAmount,
+        paymentPeriod: insuranceToEdit.paymentPeriod,
+        active: insuranceToEdit.active || false
+      };
+    } else {
+      this.resetCampos();
+      this.currentInsuranceId = null;
+    }
+    
+    this.display = true;
+  }
+
+  resetCampos() {
+    this.insurance = {
+      name: '',
+      type: InsuranceType.HEALTH, // Valor por defecto del enum
+      description: '',
+      coverage: 0,
+      deductible: 0,
+      paymentAmount: 0,
+      paymentPeriod: PaymentPeriod.MONTHLY, // Valor por defecto del enum
+      active: false,
+    };
+  }
 }
