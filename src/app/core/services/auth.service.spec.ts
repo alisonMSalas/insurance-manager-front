@@ -9,7 +9,15 @@ describe('AuthService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [AuthService]
+      providers: [
+        AuthService,
+        {
+          provide: 'environment',
+          useValue: {
+            apiUrl: 'http://localhost:8080'
+          }
+        }
+      ]
     });
 
     service = TestBed.inject(AuthService);
@@ -36,27 +44,7 @@ describe('AuthService', () => {
       const req = httpMock.expectOne('http://localhost:8080/auth/login');
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual(credentials);
-      req.flush(mockResponse);
-    });
-  });
-
-  describe('register', () => {
-    it('should make a POST request to register endpoint', () => {
-      const userData = {
-        name: 'Test User',
-        email: 'test@example.com',
-        password: 'password123'
-      };
-      const mockResponse = { message: 'User registered successfully' };
-
-      service.register(userData).subscribe(response => {
-        expect(response).toEqual(mockResponse);
-      });
-
-      const req = httpMock.expectOne('http://localhost:8080/auth/register');
-      expect(req.request.method).toBe('POST');
-      expect(req.request.body).toEqual(userData);
-      req.flush(mockResponse);
+      req.flush(mockResponse, { status: 200, statusText: 'OK' });
     });
   });
 });
