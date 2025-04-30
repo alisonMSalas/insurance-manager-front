@@ -23,12 +23,12 @@ interface StatusOption {
   selector: 'app-list-seguros',
   standalone: true,
   imports: [
-    CommonModule, 
-    ButtonModule, 
-    CardModule, 
-    ToastModule, 
-    SelectModule, 
-    FormsModule, 
+    CommonModule,
+    ButtonModule,
+    CardModule,
+    ToastModule,
+    SelectModule,
+    FormsModule,
     ConfirmDialogModule,
     TooltipModule
   ],
@@ -40,13 +40,13 @@ export class ListSegurosComponent implements OnInit {
   insurances: Insurance[] = [];
   filteredInsurances: Insurance[] = [];
   loading = false;
-  
+
   statusOptions: StatusOption[] = [
     { label: 'Todos', value: null },
     { label: 'Activos', value: true },
     { label: 'Inactivos', value: false }
   ];
-  
+
   typeOptions = getInsuranceTypeOptions();
   typeOptionsWithAll = [
     { label: 'Todos', value: null },
@@ -123,7 +123,7 @@ export class ListSegurosComponent implements OnInit {
       header: 'Confirmar eliminación',
       icon: 'pi pi-exclamation-triangle',
       accept: () => {
-        this.segurosService.delete(insurance.id!).subscribe({
+        this.segurosService.delete('a').subscribe({
           next: () => {
             this.loadInsurances();
             this.messageService.add({
@@ -152,7 +152,7 @@ export class ListSegurosComponent implements OnInit {
         return;
       }
     }
-    
+
     this.messageService.add({
       severity: 'error',
       summary: 'Error',
