@@ -38,13 +38,23 @@ export class ListUsersComponent {
   ];
 
   mostrarModal: boolean = false;
-
-  nuevoUsuario = {
+  modo: 'crear' | 'editar' = 'crear';
+  usuario: any = {
     nombre: '',
-    email: ''
-  };
-
-
+    email: '',
+    rol: '',
+    password: ''
+  }
+  abrirModalCrear() {
+    this.modo = 'crear';
+    this.usuario = { nombre: '', email: '', rol: '', password: '' };
+    this.mostrarModal = true;
+  }
+  abrirModalEditar(user: any) {
+    this.modo = 'editar';
+    this.usuario = { ...user, password: '' }; // si no manejas password aquí, puedes omitirlo
+    this.mostrarModal = true;
+  }
 
   viewUser(user: User) {
     console.log('Ver usuario:', user);

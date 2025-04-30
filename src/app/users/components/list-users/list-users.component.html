@@ -4,7 +4,7 @@
         <h2>Todos los Usuarios</h2>
         <p>Gestiona y revisa el estado de los usuarios del sistema</p>
       </div>
-      <button class="btn btn-primary" (click)="mostrarModal = true">
+      <button class="btn btn-primary" (click)="abrirModalCrear()">
         <i class="pi pi-plus"></i>
         Crear Nuevo Usuario
       </button>
@@ -68,7 +68,7 @@
                 <button pButton type="button" class="btn btn-outline btn-view" (click)="viewUser(user)">
                   <i class="pi pi-eye"></i>
                 </button>
-                <button pButton type="button" class="btn btn-outline btn-edit"  >
+                <button pButton type="button" class="btn btn-outline btn-edit" (click)="abrirModalEditar(user)" >
                   <i class="pi pi-pencil"></i>
                 </button>
                 <button pButton type="button" class="btn btn-outline btn-delete">
