@@ -25,7 +25,7 @@ import { ApiClientService } from '../../../core/api/httpclient';
     FormsModule,
     FloatLabelModule,
     InputTextModule,
-    DropdownModule, // Usar DropdownModule para p-dropdown
+    DropdownModule, 
     DialogModule,
     ToastModule,
     ConfirmDialogModule,
