@@ -3,21 +3,21 @@
     flex-grow: 1;
   }
   
-  ::ng-deep .policies-grid .p-card {
+  ::ng-deep .insurance-grid .p-card {
     border-radius: 1rem !important;
     box-shadow: none !important;
     border: 1px solid var(--border-color) !important;
   }
   
-  ::ng-deep .policies-grid .p-card .p-card-body {
+  ::ng-deep .insurance-grid .p-card .p-card-body {
     padding: 1rem !important;
   }
   
-  ::ng-deep .policies-grid .p-card .p-card-content {
+  ::ng-deep .insurance-grid .p-card .p-card-content {
     padding: 0 !important;
   }
   /* Encabezado */
-  .policies-header {
+  .insurance-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -39,14 +39,14 @@
   }
   
   /* Grid de tarjetas */
-  .policies-grid {
+  .insurance-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     gap: 1.5rem;
   }
   
   
-  .policy-card {
+  .insurance-card {
     border-radius: 1rem;
     background-color: #fff;
     padding: 1rem;
@@ -58,26 +58,26 @@
   }
 
   
-  .policy-card:hover {
+  .insurance-card:hover {
     transform: translateY(-2px);
   }
   
   /* Encabezado del card */
-  .policy-header {
+  .insurance-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 0.75rem;
   }
   
-  .policy-title {
+  .insurance-title {
     font-size: 1rem;
     font-weight: 600;
     color: #1f2937;
   }
   
   /* Estado */
-  .policy-status {
+  .insurance-status {
     display: inline-flex;
     align-items: center;
     padding: 0.25rem 0.75rem;
@@ -111,8 +111,8 @@
     background-color: #f56565;
   }
   
-  /* Tipo de póliza */
-  .policy-type {
+  /* Tipo de seguro */
+  .insurance-type {
     display: inline-block;
     padding: 0.25rem 0.75rem;
     border-radius: 9999px;
@@ -124,8 +124,19 @@
     margin-bottom: 0.75rem;
   }
   
+  /* Detalles del seguro */
+  .insurance-details {
+    margin: 0.75rem 0;
+    font-size: 0.875rem;
+    color: #4a5568;
+  }
+  
+  .insurance-details p {
+    margin: 0.25rem 0;
+  }
+  
   /* Acciones */
-  .policy-actions {
+  .insurance-actions {
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
@@ -159,17 +170,17 @@
   
   /* Responsive */
   @media (max-width: 768px) {
-    .policies-header {
+    .insurance-header {
       flex-direction: column;
       align-items: flex-start;
       gap: 0.5rem;
     }
   
-    .policies-grid {
+    .insurance-grid {
       grid-template-columns: 1fr;
     }
   
-    .policy-actions {
+    .insurance-actions {
       justify-content: center;
     }
   }

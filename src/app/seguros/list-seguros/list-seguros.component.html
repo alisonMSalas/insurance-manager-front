@@ -1,35 +1,174 @@
 <div class="content-area">
-    <!-- Encabezado -->
-    <div class="policies-header">
-      <div>
-        <h2 class="section-title">Todas las Pólizas</h2>
-        <p class="section-subtitle">Gestiona y revisa el estado de las pólizas</p>
-      </div>
-      <p-button icon="pi pi-plus" label="Nueva Póliza" styleClass="p-button-primary"></p-button>
+  <div class="insurance-header">
+    <div>
+      <h2 class="section-title">Todos los Seguros</h2>
+      <p class="section-subtitle">Gestiona y revisa el estado de los seguros</p>
     </div>
-  
-    <!-- Grid de tarjetas -->
-    <div class="policies-grid">
-      <p-card *ngFor="let policy of policies" class="policy-card">
-        <div class="policy-header">
-          <h3 class="policy-title">{{ policy.title }}</h3>
-          <span [ngClass]="{
-            'policy-status': true,
-            'status-active': policy.status === 'active',
-            'status-inactive': policy.status === 'inactive'
-          }">
-            <span class="status-badge"></span>
-            {{ policy.status === 'active' ? 'Activo' : 'Inactivo' }}
-          </span>
-        </div>
-        <span class="policy-type">{{ policy.type }}</span>
-  
-        <div class="policy-actions">
-          <p-button icon="pi pi-eye" label="Ver" styleClass="p-button-text p-button-plain action-btn view" 
-                    ></p-button>
-          <p-button icon="pi pi-pencil" label="Editar" styleClass="p-button-text p-button-plain action-btn edit"></p-button>
-          <p-button icon="pi pi-trash" label="Eliminar" styleClass="p-button-text p-button-plain action-btn delete"></p-button>
-        </div>
-      </p-card>
-    </div>
+    <p-button
+      icon="pi pi-plus"
+      label="Nuevo Seguro"
+      styleClass="p-button-primary"
+    ></p-button>
   </div>
+
+  <div class="insurance-grid">
+    <p-card *ngFor="let insurance of insurances" class="insurance-card">
+      <div class="insurance-header">
+        <h3 class="insurance-title">{{ insurance.name }}</h3>
+        <span
+          [ngClass]="{
+            'insurance-status': true,
+            'status-active': insurance.active,
+            'status-inactive': !insurance.active
+          }"
+        >
+          <span class="status-badge"></span>
+          {{ insurance.active ? "Activo" : "Inactivo" }}
+        </span>
+      </div>
+      <span class="insurance-type">{{
+        getInsuranceTypeLabel(insurance.type)
+      }}</span>
+      <div class="insurance-details">
+        <p>Cobertura: {{ insurance.coverage | currency }}</p>
+        <p>Deducible: {{ insurance.deductible | currency }}</p>
+        <p>
+          Pago: {{ insurance.paymentAmount | currency }}
+          {{ getPaymentPeriodLabel(insurance.paymentPeriod) }}
+        </p>
+      </div>
+
+      <div class="insurance-actions">
+        <p-button
+          icon="pi pi-eye"
+          [label]="insurance.active ? 'Inactivar' : 'Activar'"
+          size="small"
+          (onClick)="changeStatus(insurance)"
+          styleClass="p-button-text p-button-plain action-btn view"
+        ></p-button>
+        <p-button
+          icon="pi pi-eye"
+          label="Ver"
+          size="small"
+          styleClass="p-button-text p-button-plain action-btn view"
+        ></p-button>
+        <p-button
+          icon="pi pi-pencil"
+          label="Editar"
+          size="small"
+          styleClass="p-button-text p-button-plain action-btn edit"
+        ></p-button>
+        <p-button
+          icon="pi pi-trash"
+          label="Eliminar"
+          size="small"
+          (onClick)="deleteInsurance(insurance)"
+          styleClass="p-button-text p-button-plain action-btn delete"
+        ></p-button>
+      </div>
+    </p-card>
+  </div>
+  <p-dialog
+    header="Registrar Nuevo Seguro"
+    [(visible)]="display"
+    [modal]="true"
+    [style]="{ width: '40vw' }"
+    [closable]="true"
+    [dismissableMask]="true"
+  >
+    <div class="p-fluid">
+      <div class="p-field">
+        <label for="name">Nombre del Seguro</label>
+        <input id="name" type="text" pInputText [(ngModel)]="insurance.name" />
+      </div>
+
+      <div class="p-field">
+        <label for="type">Tipo</label>
+        <p-dropdown
+          id="type"
+          [options]="insuranceTypes"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="insurance.type"
+          placeholder="Selecciona un tipo"
+        ></p-dropdown>
+      </div>
+
+      <div class="p-field">
+        <label for="description">Descripción</label>
+        <textarea
+          id="description"
+          pInputTextarea
+          rows="3"
+          [(ngModel)]="insurance.description"
+        ></textarea>
+      </div>
+
+      <div class="p-field">
+        <label for="coverage">Cobertura</label>
+        <input
+          id="coverage"
+          type="number"
+          pInputText
+          [(ngModel)]="insurance.coverage"
+        />
+      </div>
+
+      <div class="p-field">
+        <label for="deductible">Deducible</label>
+        <input
+          id="deductible"
+          type="number"
+          pInputText
+          [(ngModel)]="insurance.deductible"
+        />
+      </div>
+
+      <div class="p-field">
+        <label for="paymentAmount">Monto de Pago</label>
+        <input
+          id="paymentAmount"
+          type="number"
+          pInputText
+          [(ngModel)]="insurance.paymentAmount"
+        />
+      </div>
+
+      <div class="p-field">
+        <label for="paymentPeriod">Periodo de Pago</label>
+        <p-dropdown
+          id="paymentPeriod"
+          [options]="paymentPeriods"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="insurance.paymentPeriod"
+          placeholder="Selecciona un período"
+        ></p-dropdown>
+      </div>
+
+      <div class="p-field-checkbox">
+        <p-checkbox
+          inputId="active"
+          [(ngModel)]="insurance.active"
+          binary="true"
+        ></p-checkbox>
+        <label for="active">Activo</label>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        (onClick)="display = false"
+        class="p-button-text"
+      ></p-button>
+      <p-button
+        label="Guardar"
+        icon="pi pi-check"
+        (onClick)="saveInsurance()"
+        class="p-button-primary"
+      ></p-button>
+    </ng-template>
+  </p-dialog>
+</div>

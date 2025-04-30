@@ -1,77 +1,103 @@
-import { Component } from '@angular/core';
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Insurance } from '../../shared/interfaces/insurance';
+import { SegurosService } from '../service/seguros.service';
+import { getInsuranceTypeLabel, getPaymentPeriodLabel } from '../../shared/utils/insurance.utils';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ErrorResponse } from '../../shared/interfaces/error-response';
 
 @Component({
   selector: 'app-list-seguros',
   standalone: true,
-  imports: [CardModule, ButtonModule, FormsModule, CommonModule],
+  imports: [CommonModule, ButtonModule, CardModule, ToastModule],
+  providers: [MessageService],
   templateUrl: './list-seguros.component.html',
-  styleUrl: './list-seguros.component.css'
+  styleUrls: ['./list-seguros.component.css']
 })
-export class ListSegurosComponent {
-  seguros = [
-    { nombre: 'Seguro de Vida', tipo: 'Vida', estado: 'Activo' },
-    { nombre: 'Seguro Vehicular', tipo: 'Auto', estado: 'Inactivo' },
-    { nombre: 'Seguro Médico', tipo: 'Salud', estado: 'Activo' },
-  ];
-  policies = [
-    {
-      id: 1,
-      title: 'Seguro de Vida Plus',
-      status: 'active',
-      type: 'Vida',
-      coverages: [
-        'Muerte accidental e invalidez permanente',
-        'Gastos médicos por accidente',
-        'Indemnización por hospitalización',
-        'Asistencia funeraria'
-      ],
-      premium: '$850 mensuales',
-      duration: '1 año (renovable)',
-      conditions: [
-        'Edad máxima para contratar: 65 años',
-        'Período de carencia: 30 días',
-        'No cubre enfermedades preexistentes',
-        'Exclusión por deportes extremos'
-      ]
-    },
-    {
-      id: 2,
-      title: 'Protección Automotriz',
-      status: 'active',
-      type: 'Vehículo'
-    },
-    {
-      id: 3,
-      title: 'Salud Familiar',
-      status: 'inactive',
-      type: 'Salud'
-    },
-    {
-      id: 4,
-      title: 'Hogar Seguro Total',
-      status: 'active',
-      type: 'Hogar'
-    },
-    {
-      id: 5,
-      title: 'Protección Viajero',
-      status: 'active',
-      type: 'Viajes'
-    },
-    {
-      id: 6,
-      title: 'Negocio Protegido',
-      status: 'inactive',
-      type: 'Empresarial'
-    }
-  ];
+export class ListSegurosComponent implements OnInit {
+  insurances: Insurance[] = [];
 
-  showPolicyDetails(policy: any) {
-    // Aquí puedes implementar la lógica para mostrar los detalles
-    console.log('Mostrar detalles de:', policy);
+  constructor(
+    private segurosService: SegurosService,
+    private messageService: MessageService
+  ) { }
+
+  ngOnInit(): void {
+    this.loadInsurances();
   }
+
+  loadInsurances(): void {
+    this.segurosService.getAll().subscribe({
+      next: (data: Insurance[]) => {
+        this.insurances = data.sort((a, b) => {
+          if (a.active === b.active) {
+            return (a.id || '').localeCompare(b.id || '');
+          }
+          return a.active ? -1 : 1;
+        });
+      },
+      error: (error: HttpErrorResponse) => {
+        this.handleError(error);
+      }
+    });
+  }
+
+  changeStatus(insurance: Insurance): void {
+    this.segurosService.updateStatus(insurance.id!, !insurance.active).subscribe({
+      next: () => {
+        this.loadInsurances();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Éxito',
+          detail: 'Estado actualizado correctamente'
+        });
+      },
+      error: (error: HttpErrorResponse) => {
+        this.handleError(error);
+      }
+    });
+  }
+
+  deleteInsurance(insurance: Insurance): void {
+    this.segurosService.delete(insurance.id!).subscribe({
+      next: () => {
+        this.loadInsurances();
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Éxito',
+          detail: 'Seguro eliminado correctamente'
+        });
+      },
+      error: (error: HttpErrorResponse) => {
+        this.handleError(error);
+      }
+    });
+  }
+
+  private handleError(error: HttpErrorResponse): void {
+    if (error.error && typeof error.error === 'object') {
+      const errorResponse = error.error as ErrorResponse;
+      if (errorResponse.message) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: errorResponse.message
+        });
+        return;
+      }
+    }
+
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'Error en el servidor'
+    });
+  }
+
+  getInsuranceTypeLabel = getInsuranceTypeLabel;
+  getPaymentPeriodLabel = getPaymentPeriodLabel;
 }

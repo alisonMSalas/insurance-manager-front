@@ -10,11 +10,8 @@ export interface IMenu {
 export class MenuService {
   private listMenu: IMenu[] = [
     { title: 'Usuarios', url: '/main/users', icon: 'pi pi-user' },
-    { title: 'Seguros', url: '/main/policies', icon: 'pi pi-shield' },
-   
+    { title: 'Seguros', url: '/main/insurance', icon: 'pi pi-shield' },
   ];
-
- 
 
   getMenu(): IMenu[] {
     return [...this.listMenu];
@@ -23,5 +20,4 @@ export class MenuService {
   getMenuByURL(url: string): IMenu {
     return this.listMenu.find(menu => menu.url.toLowerCase() === url.toLowerCase()) as IMenu;
   }
-  
 }

@@ -9,7 +9,7 @@ import { PLATFORM_ID } from '@angular/core';
 })
 export class ApiClientService {
   private baseUrl = 'http://localhost:8080';
-  private token = 'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJ0ZXN0QHRlc3QuY29tIiwiaWF0IjoxNzQ1OTg5NjU4LCJleHAiOjE3NDYwMjU2NTh9.T8aNgjT_Ys9OgK1431fKLoYv81OPvSk4JZB-WF2Mavc';
+  private token = 'eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiQURNSU4iLCJzdWIiOiJyYWFuc29wcm8zMjRAZ21haWwuY29tIiwiaWF0IjoxNzQ2MDIyOTc5LCJleHAiOjE3NDYwNTg5Nzl9.c5qUnfrEhpbDleJfWTAeyAmBOpQkCbswmXqm3nhiDnM';
   private platformId = inject(PLATFORM_ID);
 
   constructor(private http: HttpClient) {}
@@ -17,7 +17,7 @@ export class ApiClientService {
   private getHeaders(): HttpHeaders {
     let token = this.token;
     if (isPlatformBrowser(this.platformId)) {
-      token = localStorage.getItem('token') || this.token;
+      token =  this.token;
     }
     return new HttpHeaders({
       'Content-Type': 'application/json',
