@@ -53,7 +53,9 @@ export class LoginComponent implements OnInit {
         next: (token: string) => {
           localStorage.setItem('token', token); // Guardar el token
           console.log("Inicio de sesión exitoso");
-          console.log("Token recibido:", token); // Imprimir el token
+          console.log("Token recibido:", token); 
+          this.router.navigate(['/main']);
+
         },
         error: (err) => {
           console.error('Error al iniciar sesión', err);
