@@ -108,11 +108,13 @@ export class ListUsersComponent {
     });
   }
   mostrarModal: boolean = false;
-
-  nuevoUsuario = {
+  modo: 'crear' | 'editar' = 'crear';
+  usuario: any = {
     nombre: '',
-    email: ''
-  };
+    email: '',
+    rol: '',
+    password: ''
+  }
 
   roles: any[] = [
     { codigo: 'ADMIN', nombre: 'Administrador' },
@@ -121,7 +123,16 @@ export class ListUsersComponent {
     { codigo: 'CLIENTE', nombre: 'Cliente' }
   ];
 
-
+  abrirModalCrear() {
+    this.modo = 'crear';
+    this.usuario = { nombre: '', email: '', rol: '', password: '' };
+    this.mostrarModal = true;
+  }
+  abrirModalEditar(user: any) {
+    this.modo = 'editar';
+    this.usuario = { ...user, password: '' }; 
+    this.mostrarModal = true;
+  }
   viewUser(user: User) {
     console.log('Ver usuario:', user);
   }

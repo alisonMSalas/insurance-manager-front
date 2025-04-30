@@ -13,10 +13,16 @@
   --menu-item-hover: #f0eeff;
   --nav-bg: linear-gradient(135deg, #6c63ff 0%, #4dccc6 100%);
   padding: 1rem 3rem;
+  padding-bottom: 2rem;
+  overflow: hidden;
+  height: 100%;
 }
 
 .users-view {
   font-family: "Montserrat", sans-serif;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .policies-header {
@@ -163,6 +169,10 @@
   box-shadow: 0 2px 8px rgba(108, 99, 255, 0.05);
   border: 1px solid #e9e6ff;
   font-family: "Montserrat", sans-serif;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 :host ::ng-deep .p-datatable .p-datatable-thead > tr > th {
@@ -317,6 +327,13 @@
   color: var(--primary);
 }
 
-app-list-users {
-  padding: 1rem;
+p-table {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+tbody {
+  overflow: auto;
 }
