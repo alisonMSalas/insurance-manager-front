@@ -1,22 +1,22 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { ApiClientService } from '../api/httpclient';
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private readonly endpoint = 'auth';
 
-  private apiUrl = 'http://localhost:8080/auth'; // URL de la API de autenticación
-  constructor(private http: HttpClient) {}
+  constructor(private apiClient: ApiClientService) { }
 
-  login(credentials: { email: string; password: string }): Observable<string> {
-    return this.http.post(`${this.apiUrl}/login`, credentials, {
-      responseType: 'text' as const
-    });
-  }
-  
-  register(userData: { name: string; email: string; password: string }): Observable<any> {
-    return this.http.post(`${this.apiUrl}/register`, userData);
+  login(creds: LoginRequest): Observable<string> {
+    return this.apiClient.post<string>(`${this.endpoint}/login`, creds);
   }
 }

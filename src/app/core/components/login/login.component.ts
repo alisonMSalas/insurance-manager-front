@@ -6,6 +6,10 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { MessageService } from 'primeng/api';
+import { HttpErrorResponse } from '@angular/common/http';
+// import { handleError } from '../../../shared/utils/error.utils';
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -15,35 +19,23 @@ import { Router } from '@angular/router';
     ButtonModule,
     ReactiveFormsModule,
   ],
+  providers: [MessageService],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnInit {
   private router = inject(Router);
+  private messageService = inject(MessageService);
   loginForm!: FormGroup;
-  registerForm!: FormGroup;
   authService = inject(AuthService);
 
-  isLoginActive: boolean = true;
-
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder) { }
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
     });
-
-    this.registerForm = this.fb.group({
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
-  }
-
-
-  toggleForm() {
-    this.isLoginActive = !this.isLoginActive;
   }
 
   onLogin() {
@@ -51,38 +43,18 @@ export class LoginComponent implements OnInit {
       const credentials = this.loginForm.value;
       this.authService.login(credentials).subscribe({
         next: (token: string) => {
-          localStorage.setItem('token', token); // Guardar el token
-          console.log("Inicio de sesión exitoso");
-          console.log("Token recibido:", token); // Imprimir el token
+          localStorage.setItem('token', token);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Inicio de sesión exitoso'
+          });
+          this.router.navigate(['/seguros']);
         },
-        error: (err) => {
-          console.error('Error al iniciar sesión', err);
+        error: (error: HttpErrorResponse) => {
+          
         }
       });
     }
   }
-   
-
-  onRegister() {
-    if (this.registerForm.valid) {
-      const user = this.registerForm.value;
-      console.log('Datos de registro:', user); // Verifica en consola
-      
-      this.authService.register(user).subscribe({
-        next: (response) => {
-          console.log('Registro exitoso', response);
-          this.toggleForm(); // Cambia a login si el registro es exitoso
-        },
-        error: (err) => {
-          console.error('Error en registro:', err);
-        }
-      });
-    } else {
-      console.log('Formulario inválido', this.registerForm.errors);
-      this.registerForm.markAllAsTouched(); // Marca los campos para mostrar errores
-    }
-  }
-
-  
-
 }
