@@ -1,0 +1,35 @@
+<div class="content-area">
+    <!-- Encabezado -->
+    <div class="policies-header">
+      <div>
+        <h2 class="section-title">Todas las Pólizas</h2>
+        <p class="section-subtitle">Gestiona y revisa el estado de las pólizas</p>
+      </div>
+      <p-button icon="pi pi-plus" label="Nueva Póliza" styleClass="p-button-primary"></p-button>
+    </div>
+  
+    <!-- Grid de tarjetas -->
+    <div class="policies-grid">
+      <p-card *ngFor="let policy of policies" class="policy-card">
+        <div class="policy-header">
+          <h3 class="policy-title">{{ policy.title }}</h3>
+          <span [ngClass]="{
+            'policy-status': true,
+            'status-active': policy.status === 'active',
+            'status-inactive': policy.status === 'inactive'
+          }">
+            <span class="status-badge"></span>
+            {{ policy.status === 'active' ? 'Activo' : 'Inactivo' }}
+          </span>
+        </div>
+        <span class="policy-type">{{ policy.type }}</span>
+  
+        <div class="policy-actions">
+          <p-button icon="pi pi-eye" label="Ver" styleClass="p-button-text p-button-plain action-btn view" 
+                    ></p-button>
+          <p-button icon="pi pi-pencil" label="Editar" styleClass="p-button-text p-button-plain action-btn edit"></p-button>
+          <p-button icon="pi pi-trash" label="Eliminar" styleClass="p-button-text p-button-plain action-btn delete"></p-button>
+        </div>
+      </p-card>
+    </div>
+  </div>
