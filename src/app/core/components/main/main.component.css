@@ -1,16 +1,16 @@
 .app-container {
-    display: flex;
-    min-height: 100vh;
-  }
-  
-  .main-panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  app-header {
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-  }
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+app-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}

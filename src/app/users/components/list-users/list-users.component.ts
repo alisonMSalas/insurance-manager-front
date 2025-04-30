@@ -4,10 +4,10 @@ import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
-import { DropdownModule } from 'primeng/dropdown';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
-import { FloatLabelModule } from 'primeng/floatlabel';
+import { SelectModule } from 'primeng/select';
+import { FloatLabel } from 'primeng/floatlabel';
+import { InputTextModule } from 'primeng/inputtext';
+
 interface User {
   id: string;
   name: string;
@@ -17,7 +17,7 @@ interface User {
 }
 @Component({
   selector: 'app-list-users',
-  imports: [TableModule, ButtonModule,CommonModule, ToggleSwitchModule,FormsModule,DropdownModule,FloatLabelModule],
+  imports: [TableModule, ButtonModule, CommonModule, ToggleSwitchModule, FormsModule, SelectModule, FloatLabel, InputTextModule],
   templateUrl: './list-users.component.html',
   styleUrl: './list-users.component.css'
 })

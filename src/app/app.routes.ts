@@ -4,10 +4,15 @@ import { ListUsersComponent } from './users/components/list-users/list-users.com
 
 export const routes: Routes = [
     {
+        path: '',
+        redirectTo: 'main',
+        pathMatch: 'full'
+    },
+    {
         path: 'main',
         component: MainComponent,
         children: [
             {path:'users',component:ListUsersComponent}
         ]
-            }
+    }
 ];
