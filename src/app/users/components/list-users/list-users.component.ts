@@ -1,34 +1,111 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
-import { IconFieldModule } from 'primeng/iconfield';
-import { InputIconModule } from 'primeng/inputicon';
 import { FloatLabelModule } from 'primeng/floatlabel';
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  rol: string;
-  active: boolean;
-}
+import { UsersService, User } from '../../../core/services/users.service';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastModule } from 'primeng/toast';
+
 @Component({
+  standalone: true,
   selector: 'app-list-users',
-  imports: [TableModule, ButtonModule,CommonModule, ToggleSwitchModule,FormsModule,DropdownModule,FloatLabelModule],
+  imports: [
+    TableModule, 
+    ButtonModule, 
+    CommonModule, 
+    ToggleSwitchModule, 
+    FormsModule, 
+    DropdownModule, 
+    FloatLabelModule,
+    ConfirmDialogModule,
+    ToastModule
+  ],
+  providers: [ConfirmationService, MessageService],
   templateUrl: './list-users.component.html',
-  styleUrl: './list-users.component.css'
+  styleUrls: ['./list-users.component.css'],
 })
 export class ListUsersComponent {
-  users: User[] = [
-    { id: '21044270-74a5-477a-b1ad-0c3811b2609b', name: 'Andres', email: 'raansopro324@gmail.com', rol: 'ADMIN', active: true },
-    { id: 'f5b7e9a1-3c2d-4e5f-8a9b-0c1d2e3f4a5b', name: 'Sofía Ramírez', email: 'sofia.ramirez@example.com', rol: 'USER', active: true },
-    { id: 'a1b2c3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d', name: 'Luis González', email: 'luis.gonzalez@example.com', rol: 'AGENT', active: false },
-    { id: 'b2c3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e', name: 'María Sánchez', email: 'maria.sanchez@example.com', rol: 'USER', active: true },
-    { id: 'c3d4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f', name: 'Jorge Martínez', email: 'jorge.martinez@example.com', rol: 'ADMIN', active: false }
-  ];
+  users: User[] = [];
+  currentUser: User | null = null;
+  userService = inject(UsersService);
+  confirmationService = inject(ConfirmationService);
+  messageService = inject(MessageService);
+
+  ngOnInit(): void {
+    this.loadUsers();
+    this.getCurrentUser();
+  }
+
+  loadUsers() {
+    this.userService.getAll().subscribe({
+      next: (users: User[]) => {
+        this.users = users;
+      },
+      error: (err) => {
+        console.error('Error fetching users:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudieron cargar los usuarios'
+        });
+      },
+    });
+  }
+
+  getCurrentUser() {
+    // Aquí deberías obtener el usuario actual de tu servicio de autenticación
+    // Por ahora lo simulamos con el primer usuario
+    this.userService.getCurrentUser().subscribe({
+      next: (user: User) => {
+        this.currentUser = user;
+      },
+      error: (err) => {
+        console.error('Error fetching current user:', err);
+      }
+    });
+  }
+
+  deleteUser(user: User) {
+    if (this.currentUser && user.id === this.currentUser.id) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No puedes eliminar tu propio usuario'
+      });
+      return;
+    }
+
+    this.confirmationService.confirm({
+      message: `¿Estás seguro de que deseas eliminar al usuario ${user.name}?`,
+      header: 'Confirmar eliminación',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.userService.delete(user.id).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Éxito',
+              detail: 'Usuario eliminado correctamente'
+            });
+            this.loadUsers();
+          },
+          error: (err) => {
+            console.error('Error deleting user:', err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'No se pudo eliminar el usuario'
+            });
+          }
+        });
+      }
+    });
+  }
 
   viewUser(user: User) {
     console.log('Ver usuario:', user);

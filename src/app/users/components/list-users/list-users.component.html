@@ -1,4 +1,7 @@
 <div class="users-view">
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+    
     <div class="policies-header">
       <div>
         <h2>Todos los Usuarios</h2>
@@ -35,7 +38,7 @@
     </div>
   
     <div class="policies-table-container">
-      <p-table [value]="users" [tableStyle]="{'min-width': '50rem'}">
+      <p-table [value]="users" [tableStyle]="{'min-width': '50rem'}" emptyMessage="No hay usuarios registrados">
         <ng-template pTemplate="header">
           <tr>
             <th>ID</th>
@@ -71,7 +74,7 @@
                 <button pButton type="button" class="btn btn-outline btn-edit" >
                   <i class="pi pi-pencil"></i>
                 </button>
-                <button pButton type="button" class="btn btn-outline btn-delete">
+                <button pButton type="button" class="btn btn-outline btn-delete" (click)="deleteUser(user)">
                   <i class="pi pi-trash"></i>
                 </button>
               </div>
