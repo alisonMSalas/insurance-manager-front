@@ -12,9 +12,10 @@ export class ApiClientService {
   constructor(private http: HttpClient) {}
 
   private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token') || this.token; // Obtener token dinámicamente
     return new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${this.token}`,
+      Authorization: `Bearer ${token}`,
     });
   }
 
@@ -32,5 +33,18 @@ export class ApiClientService {
 
   delete<T>(endpoint: string): Observable<T> {
     return this.http.delete<T>(`${this.baseUrl}/${endpoint}`, { headers: this.getHeaders() });
+  }
+
+  getCurrentUserEmail(): string | null {
+    try {
+      const token = localStorage.getItem('token') || this.token;
+      const payload = token.split('.')[1];
+      const decodedPayload = atob(payload);
+      const parsedPayload = JSON.parse(decodedPayload);
+      return parsedPayload.sub || null;
+    } catch (error) {
+      console.error('Error al decodificar el token:', error);
+      return null;
+    }
   }
 }

@@ -1,5 +1,5 @@
 :host {
-  --primary: #6c63ff;
+  --primary: #639582;
   --primary-light: #a5a1ff;
   --secondary: #4dccc6;
   --accent: #7b88ff;
@@ -68,7 +68,7 @@
 }
 
 .btn-primary:hover {
-  background-color: #5a52e0;
+  background-color: #407f68;
 }
 
 /* Estilos para el buscador y filtros */
@@ -223,8 +223,8 @@
 }
 
 .role-admin {
-  background-color: #d4f4e2;
-  color: #22543d;
+  background-color: #ded4f4;
+  color: #4a2254;
 }
 
 .role-user {
