@@ -98,14 +98,9 @@ export class ListSegurosComponent implements OnInit {
     });
   }
 
-  onStatusChange(): void {
+  onFilterChange(): void {
     this.applyFilters();
   }
-
-  onTypeChange(): void {
-    this.applyFilters();
-  }
-
   changeStatus(insurance: Insurance): void {
     this.segurosService.updateStatus(insurance.id!, !insurance.active).subscribe({
       next: () => {
