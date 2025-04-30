@@ -35,7 +35,7 @@
     </div>
   
     <div class="policies-table-container">
-      <p-table [value]="users" [tableStyle]="{'min-width': '50rem'}">
+    <p-table [value]="users" [tableStyle]="{ 'min-width': '50rem', 'max-height': '100%' }" [scrollable]="true" scrollHeight="flex">
         <ng-template pTemplate="header">
           <tr>
             <th>ID</th>
