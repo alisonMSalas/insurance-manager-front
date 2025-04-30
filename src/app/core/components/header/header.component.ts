@@ -22,13 +22,12 @@ import { ApiClientService } from '../../api/httpclient';
 })
 export class HeaderComponent implements OnInit {
   private router = inject(Router);
-  @Input() pageTitle: string = 'Gestión de Seguros'; // Título dinámico
-  @Input() pageSubtitle: string = 'Administra y revisa todas las pólizas de seguros'; // Subtítulo dinámico
-
+  @Input() pageTitle: string = 'Gestión de Seguros'; 
+  @Input() pageSubtitle: string = 'Administra y revisa todas las pólizas de seguros'; 
   searchQuery: string = '';
-
   user = {
     name: 'Usuario',
+    role: 'Agente de Seguros',
     icon: 'pi pi-user',
   };
 
@@ -48,5 +47,11 @@ export class HeaderComponent implements OnInit {
   logout() {
     localStorage.removeItem('token');
     this.router.navigate(['/login']);
+  }
+  navigateToSettings() {
+    console.log('Navegando a configuración');
+  }
+  navigateToProfile() {
+    console.log('Navegando al perfil');
   }
 }
