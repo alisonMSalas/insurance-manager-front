@@ -1,22 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ApiClientService } from '../api/httpclient';
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly endpoint = 'auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
 
-  constructor(private apiClient: ApiClientService) { }
+  constructor(private http: HttpClient) { }
 
-  login(creds: LoginRequest): Observable<string> {
-    return this.apiClient.post<string>(`${this.endpoint}/login`, creds);
+  login(credentials: { email: string; password: string }): Observable<string> {
+    return this.http.post<string>(`${this.apiUrl}/login`, credentials, { responseType: 'text' as 'json' });
   }
 }

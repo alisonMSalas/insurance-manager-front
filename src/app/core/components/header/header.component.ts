@@ -30,7 +30,7 @@ export class HeaderComponent {
   };
 
   menuItems: MenuItem[] = [
-    
+
     { label: 'Cerrar Sesión', icon: 'pi pi-sign-out', command: () => this.logout() }
   ];
 

@@ -15,7 +15,7 @@
 /* Contenedor principal del login */
 .login-box {
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
   background: white;
   border-radius: 30px;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
@@ -49,14 +49,15 @@
 .input-group {
   position: relative;
   margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 .input-group input {
   width: 100%;
-  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  padding: 1rem 1rem 1rem 3rem;
   border: 1px solid #ddd;
   border-radius: 8px;
-  font-size: 0.875rem;
+  font-size: 1rem;
   transition: all 0.3s ease;
   box-sizing: border-box;
 }
@@ -73,7 +74,7 @@
   top: 50%;
   transform: translateY(-50%);
   color: #666;
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
 /* Botones */
@@ -87,13 +88,13 @@
   background-color: #00bfae;
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
+  padding: 1rem 2rem;
   border-radius: 20px;
   font-weight: 500;
-  font-size: 0.875rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  width: 12rem;
+  width: 100%;
 }
 
 .submit-button:hover {
@@ -106,7 +107,7 @@
 @media (max-width: 768px) {
   .login-box {
     margin: 1rem;
-    padding: 1.5rem;
+    padding: 2rem;
   }
 
   .input-group input {
