@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
 import { FloatLabel } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
+import { DialogModule } from 'primeng/dialog';
 
 interface User {
   id: string;
@@ -17,7 +18,7 @@ interface User {
 }
 @Component({
   selector: 'app-list-users',
-  imports: [TableModule, ButtonModule, CommonModule, ToggleSwitchModule, FormsModule, SelectModule, FloatLabel, InputTextModule],
+  imports: [TableModule, ButtonModule, CommonModule, ToggleSwitchModule, FormsModule, SelectModule, FloatLabel, InputTextModule,DialogModule],
   templateUrl: './list-users.component.html',
   styleUrl: './list-users.component.css'
 })
@@ -29,35 +30,25 @@ export class ListUsersComponent {
     { id: 'b2c3d4e5-6f7a-8b9c-0d1e-2f3a4b5c6d7e', name: 'María Sánchez', email: 'maria.sanchez@example.com', rol: 'USER', active: true },
     { id: 'c3d4e5f6-7a8b-9c0d-1e2f-3a4b5c6d7e8f', name: 'Jorge Martínez', email: 'jorge.martinez@example.com', rol: 'ADMIN', active: false }
   ];
+  roles: any[] = [
+    { codigo: 'ADMIN', nombre: 'Administrador' },
+    { codigo: 'AGENTE', nombre: 'Agente de Seguros' },
+    { codigo: 'REVISOR', nombre: 'Revisor' },
+    { codigo: 'CLIENTE', nombre: 'Cliente' }
+  ];
 
-  showModal = false;
-modalMode: 'create' | 'edit' = 'create';
-selectedUser = {
-  id: null,
-  name: '',
-  email: '',
-  rol: null,
-  active: true
-};
+  mostrarModal: boolean = false;
+
+  nuevoUsuario = {
+    nombre: '',
+    email: ''
+  };
+
 
 
   viewUser(user: User) {
     console.log('Ver usuario:', user);
   }
-  openModal(mode: 'create' | 'edit', user?: any) {
-    this.modalMode = mode;
-    if (mode === 'edit' && user) {
-      this.selectedUser = { ...user }; // copia del usuario a editar
-    } else {
-      this.selectedUser = {
-        id: null,
-        name: '',
-        email: '',
-        rol: null,
-        active: true
-      };
-    }
-    this.showModal = true;
-  }
+  
   
 }
