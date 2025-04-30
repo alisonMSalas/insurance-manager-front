@@ -1,0 +1,95 @@
+:host {
+    --primary: #6c63ff;
+    --primary-light: #a5a1ff;
+    --secondary: #4dccc6;
+    --accent: #7b88ff;
+    --light: #f9f7fe;
+    --dark: #2d3748;
+    --gray: #718096;
+    --success: #68d391;
+    --danger: #fc8181;
+    --warning: #f6ad55;
+    --sidebar-bg: #ffffff;
+    --menu-item-hover: #f0eeff;
+    --nav-bg: linear-gradient(135deg, #6c63ff 0%, #4dccc6 100%);
+  }
+  
+  .menu-container {
+    background: var(--sidebar-bg);
+    border-right: 1px solid #e9e6ff;
+    padding: 1.5rem 0;
+    box-shadow: 2px 0 15px rgba(108, 99, 255, 0.05);
+    width: 240px;
+    font-family: 'Montserrat', sans-serif; /* Aplica Montserrat */
+  }
+  
+  .sidebar-logo {
+    margin-bottom: 2rem;
+    padding: 0 1.5rem;
+    
+    align-items: center;
+  }
+  
+ 
+  
+  .sidebar-logo h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary);
+    font-family: 'Montserrat', sans-serif; /* Asegura Montserrat para el título */
+  }
+  
+  .menu-items {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  :host ::ng-deep .p-menubar {
+    display: flex;
+    flex-direction: column;
+    border: none;
+    background: transparent;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif; /* Aplica Montserrat a p-menubar */
+  }
+  
+  :host ::ng-deep .p-menubar .p-menubar-root-list {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    padding: 0;
+  }
+  
+  :host ::ng-deep .p-menubar .p-menuitem {
+    margin-bottom: 0.25rem;
+    padding: 0 1rem;
+  }
+  
+  .menu-button {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    color: var(--dark);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-family: 'Montserrat', sans-serif; /* Aplica Montserrat a los ítems */
+  }
+  
+  .menu-button:hover {
+    background-color: var(--menu-item-hover);
+    color: var(--primary);
+  }
+  
+  /* Estilo para el ítem activo (temporal, ya que no hay lógica en el TS para manejarlo) */
+  .menu-button.active {
+    background-color: var(--primary);
+    color: white;
+    box-shadow: 0 4px 6px rgba(108, 99, 255, 0.1);
+  }
