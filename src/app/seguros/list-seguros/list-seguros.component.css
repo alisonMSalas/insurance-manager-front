@@ -1,186 +1,216 @@
 .content-area {
-    padding: 2rem;
-    flex-grow: 1;
-  }
-  
-  ::ng-deep .insurance-grid .p-card {
-    border-radius: 1rem !important;
-    box-shadow: none !important;
-    border: 1px solid var(--border-color) !important;
-  }
-  
-  ::ng-deep .insurance-grid .p-card .p-card-body {
-    padding: 1rem !important;
-  }
-  
-  ::ng-deep .insurance-grid .p-card .p-card-content {
-    padding: 0 !important;
-  }
-  /* Encabezado */
+  padding: 2rem;
+  flex-grow: 1;
+}
+
+::ng-deep .insurance-grid .p-card {
+  border-radius: 1rem !important;
+  box-shadow: none !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+::ng-deep .insurance-grid .p-card .p-card-body {
+  padding: 1rem !important;
+}
+
+::ng-deep .insurance-grid .p-card .p-card-content {
+  padding: 0 !important;
+}
+/* Encabezado */
+.insurance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.section-subtitle {
+  font-size: 0.9rem;
+  color: #a0aec0;
+  margin-top: 0.25rem;
+}
+
+/* Filtros */
+.filters-container {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-group label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4a5568;
+}
+
+/* Grid de tarjetas */
+.insurance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.insurance-card {
+  border-radius: 1rem;
+  background-color: #fff;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.insurance-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Encabezado del card */
+.insurance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.insurance-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* Estado */
+.insurance-status {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-badge {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.status-active {
+  background-color: #e6ffed;
+  color: #22543d;
+}
+
+.status-active .status-badge {
+  background-color: #48bb78;
+}
+
+.status-inactive {
+  background-color: #fff5f5;
+  color: #742a2a;
+}
+
+.status-inactive .status-badge {
+  background-color: #f56565;
+}
+
+/* Tipo de seguro */
+.insurance-type {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  background-color: #ebf4ff;
+  color: #5a67d8;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
+/* Detalles del seguro */
+.insurance-details {
+  margin: 0.75rem 0;
+  font-size: 0.875rem;
+  color: #4a5568;
+}
+
+.insurance-details p {
+  margin: 0.25rem 0;
+}
+
+/* Acciones */
+.insurance-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  border-top: 1px solid #edf2f7;
+  padding-top: 0.75rem;
+}
+
+.action-btn {
+  padding: 0.25rem 0.5rem !important;
+  height: auto !important;
+  font-size: 0.75rem !important;
+  border-radius: 0.5rem;
+}
+
+.action-btn.view {
+  color: #5a67d8;
+}
+
+.action-btn.edit {
+  color: #ed8936;
+}
+
+.action-btn.delete {
+  color: #f56565;
+}
+
+.action-btn:hover {
+  background-color: #f9fafb;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
   .insurance-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-  
-  .section-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #2d3748;
-  }
-  
-  .section-subtitle {
-    font-size: 0.9rem;
-    color: #a0aec0;
-    margin-top: 0.25rem;
-  }
-  
-  /* Grid de tarjetas */
-  .insurance-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-    gap: 1.5rem;
-  }
-  
-  
-  .insurance-card {
-    border-radius: 1rem;
-    background-color: #fff;
-    padding: 1rem;
-    display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    transition: all 0.2s ease-in-out;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); 
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 
-  
-  .insurance-card:hover {
-    transform: translateY(-2px);
+  .insurance-grid {
+    grid-template-columns: 1fr;
   }
-  
-  /* Encabezado del card */
-  .insurance-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 0.75rem;
-  }
-  
-  .insurance-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #1f2937;
-  }
-  
-  /* Estado */
-  .insurance-status {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-  
-  .status-badge {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    margin-right: 0.5rem;
-  }
-  
-  .status-active {
-    background-color: #e6ffed;
-    color: #22543d;
-  }
-  
-  .status-active .status-badge {
-    background-color: #48bb78;
-  }
-  
-  .status-inactive {
-    background-color: #fff5f5;
-    color: #742a2a;
-  }
-  
-  .status-inactive .status-badge {
-    background-color: #f56565;
-  }
-  
-  /* Tipo de seguro */
-  .insurance-type {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    background-color: #ebf4ff;
-    color: #5a67d8;
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-align: center;
-    margin-bottom: 0.75rem;
-  }
-  
-  /* Detalles del seguro */
-  .insurance-details {
-    margin: 0.75rem 0;
-    font-size: 0.875rem;
-    color: #4a5568;
-  }
-  
-  .insurance-details p {
-    margin: 0.25rem 0;
-  }
-  
-  /* Acciones */
+
   .insurance-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    margin-top: 1rem;
-    border-top: 1px solid #edf2f7;
-    padding-top: 0.75rem;
+    justify-content: center;
   }
-  
-  .action-btn {
-    padding: 0.25rem 0.5rem !important;
-    height: auto !important;
-    font-size: 0.75rem !important;
-    border-radius: 0.5rem;
+
+  .filters-container {
+    flex-direction: column;
   }
-  
-  .action-btn.view {
-    color: #5a67d8;
+
+  .filter-group {
+    width: 100%;
   }
-  
-  .action-btn.edit {
-    color: #ed8936;
+
+  ::ng-deep .filter-group .p-dropdown {
+    width: 100% !important;
   }
-  
-  .action-btn.delete {
-    color: #f56565;
-  }
-  
-  .action-btn:hover {
-    background-color: #f9fafb;
-  }
-  
-  /* Responsive */
-  @media (max-width: 768px) {
-    .insurance-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
-    }
-  
-    .insurance-grid {
-      grid-template-columns: 1fr;
-    }
-  
-    .insurance-actions {
-      justify-content: center;
-    }
-  }
+}
