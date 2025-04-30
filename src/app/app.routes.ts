@@ -1,10 +1,24 @@
 import { Routes } from '@angular/router';
-import { ListSegurosComponent } from './seguros/list-seguros/list-seguros.component';
+import { LoginComponent } from './core/components/login/login.component';
+import { MainComponent } from './core/components/main/main.component';
+import { ListUsersComponent } from './users/components/list-users/list-users.component';
 
 export const routes: Routes = [
     {
-        path: '',
-        component: ListSegurosComponent
-    }
+        path: 'login',
+        component: LoginComponent
+    },
 
+    {
+        path: '',
+        redirectTo: 'main',
+        pathMatch: 'full'
+    },
+    {
+        path: 'main',
+        component: MainComponent,
+        children: [
+            { path: 'users', component: ListUsersComponent }
+        ]
+    }
 ];

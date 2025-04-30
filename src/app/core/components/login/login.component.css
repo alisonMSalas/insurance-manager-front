@@ -1,0 +1,243 @@
+/* Estilos generales */
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #e4eae9, #bbd7d5); /* Gradiente de celeste medio verde */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Contenedor principal del login */
+.login-box {
+    position: relative;
+    width: 100%;
+    max-width: 900px; /* Se reduce para evitar que sea demasiado ancho */
+    height: 500px;
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    display: flex;
+}
+
+/* Contenedor de formularios */
+.forms-container {
+    display: flex;
+    transition: all 0.6s ease-in-out;
+    width: 100%;
+}
+
+/* Sección de formulario */
+.form-section {
+    width: 50%; /* Asegura que cada formulario ocupe el 50% */
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* Formulario de login */
+.login-form {
+    transform: translateX(0%);
+}
+
+/* Formulario de registro */
+.register-form {
+    transform: translateX(100%);
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    background: #f8f9fa;
+}
+
+/* Estados de los formularios */
+.login-active .login-form {
+    transform: translateX(0%);
+}
+
+.login-active .register-form {
+    transform: translateX(100%);
+}
+
+.register-active .login-form {
+    transform: translateX(-100%);
+}
+
+.register-active .register-form {
+    transform: translateX(0%);
+}
+
+/* Panel de bienvenida */
+/* Panel de bienvenida */
+/* Panel de bienvenida */
+.welcome-panel {
+    position: absolute;
+    top: 0;
+    left: 50%; /* Posición inicial */
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(to right, #18b8ab, #0ab6a7);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    transition: all 0.6s ease-in-out;
+    border-radius: 0 30px 30px 0;
+    z-index: 2;
+}
+
+/* Cuando está activo el login */
+.login-active .welcome-panel {
+    transform: translateX(0) ;
+    border-radius: 0 30px 30px 0;
+}
+
+/* Cuando está activo el registro */
+.register-active .welcome-panel {
+    transform: translateX(-100%) !important; /* Mueve el panel de bienvenida a la izquierda */
+    border-radius: 30px 0 0 30px;
+}
+
+
+
+/* Textos */
+.form-title,
+.welcome-title {
+    font-size: 1.75rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.welcome-title {
+    color: white !important;
+}
+
+.form-subtitle,
+.welcome-text {
+    color: #666;
+    font-size: 0.875rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.welcome-text {
+    color: rgba(255, 255, 255, 0.9) !important;
+
+}
+
+/* Inputs */
+.input-group {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.input-group input {
+    width: 100%;
+    max-width: 100%; /* Se asegura que los inputs no sobresalgan más allá del 50% */
+    padding: 0.75rem 1rem 0.75rem 2.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+    box-sizing: border-box; /* Asegura que el padding no cause desbordes */
+}
+
+.input-group input:focus {
+    border-color: #00bfae; /* Celeste medio verde para foco */
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 191, 174, 0.2); /* Sombra con color celeste medio verde */
+}
+
+.input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 1rem;
+}
+
+/* Botones */
+.button-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.submit-button {
+    background-color: #00bfae; /* Celeste medio verde */
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 12rem;
+}
+
+.submit-button:hover {
+    background-color: #009b89; /* Celeste más oscuro al hacer hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-button {
+    background: transparent;
+    color: white;
+    border: 1px solid white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin: 1rem auto 0;
+    width: 160px;
+    height: 40px; /* Altura fija para facilitar el centrado */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    text-align: center; /* Por si acaso el texto es largo */
+    line-height: normal; /* Asegura que no se desajuste por línea */
+}
+
+
+.toggle-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Media query para pantallas pequeñas */
+@media (max-width: 768px) {
+    .forms-container {
+        flex-direction: column;
+    }
+
+    .form-section, .welcome-panel {
+        width: 100%;
+    }
+
+    .login-box {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .input-group input {
+        padding: 0.75rem 1rem; /* Menos padding en pantallas pequeñas */
+    }
+
+    .toggle-button {
+        width: 100%; /* En pantallas pequeñas, el toggle ocupará el ancho completo */
+    }
+}

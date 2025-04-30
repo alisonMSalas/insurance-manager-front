@@ -1,16 +1,13 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-
 import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiClientService {
-
-  private baseUrl ="http://localhost:8080";
-
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
+  private baseUrl = "http://localhost:8080";
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token') ?? '';
