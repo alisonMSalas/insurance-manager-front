@@ -1,9 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MenuComponent } from './menu.component';  // Asegúrate de importarlo correctamente
+import { MenuComponent } from './menu.component';  
 import { MenuService } from '../../services/menu.service';
 import { MenubarModule } from 'primeng/menubar';
 import { CommonModule } from '@angular/common';
-import { of } from 'rxjs';  // Para devolver observables si es necesario
+import { of } from 'rxjs';  
 
 describe('MenuComponent', () => {
   let component: MenuComponent;
@@ -12,10 +12,10 @@ describe('MenuComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MenuComponent, MenubarModule, CommonModule],  // Importa el componente aquí
+      imports: [MenuComponent, MenubarModule, CommonModule],  
       providers: [
         {
-          provide: MenuService,  // Mock del servicio
+          provide: MenuService,  
           useValue: { getMenu: () => [{ title: 'Test Item', url: '/test', icon: 'test-icon', items: [] }] }
         }
       ]
@@ -25,7 +25,7 @@ describe('MenuComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(MenuComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();  // Detectar cambios para llamar ngOnInit()
+    fixture.detectChanges();  
   });
 
   it('should create', () => {
@@ -37,7 +37,6 @@ describe('MenuComponent', () => {
       { title: 'Test Item', url: '/test', icon: 'test-icon', items: [] }
     ];
 
-    // Verificamos que el menú es igual al mock
     expect(component.listMenu).toEqual(mockMenuItems);
   });
 });

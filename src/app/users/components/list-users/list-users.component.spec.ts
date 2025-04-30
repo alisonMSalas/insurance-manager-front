@@ -20,7 +20,6 @@ describe('ListUsersComponent (integración)', () => {
   ];
 
   beforeEach(async () => {
-    // Mockear localStorage globalmente
     spyOn(localStorage, 'getItem').and.returnValue(null);
   
     mockUserService = jasmine.createSpyObj<UsersService>('UsersService', ['getAll', 'create', 'update', 'delete']);
@@ -29,7 +28,7 @@ describe('ListUsersComponent (integración)', () => {
     mockMessageService = jasmine.createSpyObj<MessageService>('MessageService', ['add']);
     mockUserService.getAll.and.returnValue(of(mockUsers));
     await TestBed.configureTestingModule({
-      imports: [ListUsersComponent], // Asegúrate de que el componente está siendo importado correctamente
+      imports: [ListUsersComponent], 
       providers: [
         { provide: UsersService, useValue: mockUserService },
         { provide: ApiClientService, useValue: mockApiClientService },
@@ -46,7 +45,7 @@ describe('ListUsersComponent (integración)', () => {
     mockUserService.getAll.and.returnValue(of(mockUsers));
     mockApiClientService.getCurrentUserEmail.and.returnValue('juan@mail.com');
 
-    fixture.detectChanges(); // Trigger ngOnInit
+    fixture.detectChanges(); 
 
     expect(component.users.length).toBe(2);
     expect(component.filteredUsers.length).toBe(2);
@@ -155,100 +154,20 @@ describe('ListUsersComponent (integración)', () => {
     expect(component.mostrarModal).toBeTrue();
   });
 
-  
 
-  // it('debe evitar eliminar el usuario actual', fakeAsync(() => {
-  //   // Configuramos el email del usuario actual
-  //   component.currentUserEmail = 'juan@mail.com';
-  //   const user = { email: 'juan@mail.com', name: 'Juan', id: '1' } as User;
-  
-  //   // Llamamos al método deleteUser
-  //   component.deleteUser(user);
-  
-  //   // Verificamos que se haya mostrado el mensaje de error y no se haya llamado a confirmationService.confirm
-  //   expect(mockMessageService.add).toHaveBeenCalledWith({
-  //     severity: 'error',
-  //     summary: 'Error',
-  //     detail: 'No puedes eliminar tu propio usuario',
-  //   });
-  
-  //   // Verificamos que no se haya mostrado el diálogo de confirmación
-  //   expect(mockConfirmationService.confirm).not.toHaveBeenCalled();
-  // }));
-  
-  
-
-  // it('debe llamar a create si está en modo crear y los campos están completos', fakeAsync(() => {
-  //   const user = {
-  //     id: '1',
-  //     name: 'Nuevo Usuario',
-  //     email: 'nuevo@example.com',
-  //     rol: 'ADMIN',
-  //     password: '123456',
-  //     active: true,
-  //   };
-  
-  //   component.modo = 'crear';
-  //   component.usuario = { ...user };
-  
-  //   // Configurar mock para create
-  //   mockUserService.create.and.returnValue(of(user));
-  //   // Configurar mock para getAll (llamado en loadUsers)
-  //   mockUserService.getAll.and.returnValue(of([user]));
-  
-  //   component.guardarUsuario();
-  //   tick();
-  
-  //   expect(mockUserService.create).toHaveBeenCalledWith(jasmine.objectContaining({
-  //     name: user.name,
-  //     email: user.email,
-  //     rol: user.rol,
-  //     password: user.password,
-  //     active: user.active,
-  //   }));
-  //   expect(mockMessageService.add).toHaveBeenCalledWith({
-  //     severity: 'success',
-  //     summary: 'Éxito',
-  //     detail: 'Usuario creado correctamente',
-  //   });
-  //   expect(mockUserService.getAll).toHaveBeenCalled(); // Verificar que loadUsers se llamó
-  // }));  
-  
-  // it('debe manejar errores al cargar usuarios', fakeAsync(() => {
-  //   // Simulando un error en el servicio getAll
-  //   mockUserService.getAll.and.returnValue(throwError(() => new Error('Error al cargar usuarios')));
-  
-  //   // Llamar al método loadUsers
-  //   component.loadUsers();
-  //   tick(); // Espera a que los observables se resuelvan
-  
-  //   // Verificar que MessageService.add se haya llamado con el error esperado
-  //   expect(mockMessageService.add).toHaveBeenCalledWith({
-  //     severity: 'error',
-  //     summary: 'Error',
-  //     detail: 'No se pudieron cargar los usuarios',
-  //   });
-  
-  //   // Verificar que los usuarios no se hayan cargado
-  //   expect(component.users).toBeUndefined();
-  //   expect(component.filteredUsers).toBeUndefined();
-  // }));
   it('debe mostrar error si faltan campos requeridos al guardar', () => {
-    // Configuramos un usuario con campos vacíos para que se active la validación
     component.usuario = {
       name: '',
       email: '',
       rol: '',
-      password: '',  // Asegúrate de que la contraseña también esté vacía si es necesario
+      password: '', 
       active: true,
     };
   
-    spyOn(component.messageService, 'add'); // Es importante espiar el método add de MessageService
+    spyOn(component.messageService, 'add'); 
   
-    // Llamamos al método guardarUsuario, que debe validar los campos requeridos
     component.guardarUsuario();
   
-    // Comprobamos que el MessageService.add haya sido llamado con el mensaje correcto
     expect(component.messageService.add).toHaveBeenCalledWith({
       severity: 'error',
       summary: 'Error',
@@ -257,15 +176,12 @@ describe('ListUsersComponent (integración)', () => {
   });
   
   it('debe mostrar error si no se pueden cargar los usuarios', () => {
-    // Configurar el mock para que getAll() falle y devuelva un error
     mockUserService.getAll.and.returnValue(throwError(() => new Error('Error al cargar usuarios')));
   
-    spyOn(component.messageService, 'add'); // Es importante espiar el método add de MessageService
+    spyOn(component.messageService, 'add'); 
   
-    // Llamamos al método loadUsers
     component.loadUsers();
   
-    // Verificamos que el MessageService.add haya sido llamado con el mensaje de error esperado
     expect(component.messageService.add).toHaveBeenCalledWith({
       severity: 'error',
       summary: 'Error',
@@ -273,18 +189,14 @@ describe('ListUsersComponent (integración)', () => {
     });
   });
   it('debe mostrar error si intenta eliminar su propio usuario', () => {
-    // Configuramos el email del usuario actual
     component.currentUserEmail = 'juan@mail.com';
   
-    // Creamos un usuario con el mismo email
     const userToDelete: User = { email: 'juan@mail.com', name: 'Juan', id: '1' } as User;
   
-    spyOn(component.messageService, 'add'); // Espiamos el método add de MessageService
+    spyOn(component.messageService, 'add'); 
   
-    // Llamamos al método deleteUser
     component.deleteUser(userToDelete);
   
-    // Verificamos que MessageService.add haya sido llamado con el mensaje de error correcto
     expect(component.messageService.add).toHaveBeenCalledWith({
       severity: 'error',
       summary: 'Error',
@@ -292,7 +204,6 @@ describe('ListUsersComponent (integración)', () => {
     });
   });
   it('debe mostrar error si la contraseña está vacía al crear un usuario', () => {
-    // Creamos un usuario con la contraseña vacía
     const userToCreate: User = {
       id: '3',
       name: 'Nuevo Usuario',
@@ -302,17 +213,14 @@ describe('ListUsersComponent (integración)', () => {
       active: true,
     };
   
-    // Establecemos el modo a "crear"
+
     component.modo = 'crear';
     component.usuario = { ...userToCreate };
   
-    // Espiamos el método messageService.add para verificar que se llame con el mensaje de error
     spyOn(component.messageService, 'add');
   
-    // Llamamos al método guardarUsuario
     component.guardarUsuario();
   
-    // Verificamos que se haya mostrado el mensaje de error para la contraseña
     expect(component.messageService.add).toHaveBeenCalledWith({
       severity: 'error',
       summary: 'Error',
@@ -329,17 +237,14 @@ describe('ListUsersComponent (integración)', () => {
       active: true,
     };
   
-    spyOn(component.messageService, 'add'); // Espiar el método add de MessageService
+    spyOn(component.messageService, 'add'); 
   
-    // Llamar al método viewUser
     component.viewUser(user);
   
-    // Verificar que se haya llamado a console.log con el usuario correcto
     const consoleSpy = spyOn(console, 'log');
     component.viewUser(user);
     expect(consoleSpy).toHaveBeenCalledWith('Ver usuario:', user);
   
-    // Verificar que el mensaje fue añadido con los parámetros correctos
     expect(component.messageService.add).toHaveBeenCalledWith({
       severity: 'info',
       summary: 'Información',
@@ -366,7 +271,7 @@ describe('ListUsersComponent (integración)', () => {
       summary: 'Error',
       detail: 'No puedes cambiar el estado de tu propio usuario',
     });
-    expect(user.active).toBe(false); // El estado cambia de true a false
+    expect(user.active).toBe(false); 
     expect(mockUserService.update).not.toHaveBeenCalled();
   });
   it('debe cambiar el estado del usuario y mostrar mensaje de éxito si el usuario no es el actual', fakeAsync(() => {
@@ -390,14 +295,14 @@ describe('ListUsersComponent (integración)', () => {
       name: user.name,
       email: user.email,
       rol: user.rol,
-      active: false, // El estado permanece false
+      active: false, 
     }));
     expect(component.messageService.add).toHaveBeenCalledWith({
       severity: 'success',
       summary: 'Éxito',
       detail: 'Usuario desactivado correctamente',
     });
-    expect(user.active).toBe(false); // El estado permanece false
+    expect(user.active).toBe(false); 
   }));
 
   it('debe revertir el cambio y mostrar mensaje de error si el servicio update falla', fakeAsync(() => {
@@ -411,7 +316,7 @@ describe('ListUsersComponent (integración)', () => {
   
     component.currentUserEmail = 'juan@mail.com';
     spyOn(component.messageService, 'add');
-    spyOn(console, 'error'); // Espiar console.error para evitar mensajes en los logs
+    spyOn(console, 'error'); 
     mockUserService.update.and.returnValue(throwError(() => new Error('Error al actualizar')));
   
     component.toggleUserStatus(user);
@@ -422,13 +327,13 @@ describe('ListUsersComponent (integración)', () => {
       name: user.name,
       email: user.email,
       rol: user.rol,
-      active: false, // El estado permanece false en la llamada
+      active: false, 
     }));
     expect(component.messageService.add).toHaveBeenCalledWith({
       severity: 'error',
       summary: 'Error',
       detail: 'No se pudo actualizar el estado del usuario',
     });
-    expect(user.active).toBe(true); // El estado se cambia a true en el bloque de error
+    expect(user.active).toBe(true); 
   }));
 });

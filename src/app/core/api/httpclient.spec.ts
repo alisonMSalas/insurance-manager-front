@@ -6,7 +6,7 @@ import { PLATFORM_ID } from '@angular/core';
 describe('ApiClientService', () => {
   let service: ApiClientService;
   let httpMock: HttpTestingController;
-  let getItemSpy: jasmine.Spy; // Store the spy reference
+  let getItemSpy: jasmine.Spy; 
   const mockToken = 'mock.token.here';
 
   beforeEach(() => {
@@ -21,14 +21,12 @@ describe('ApiClientService', () => {
     service = TestBed.inject(ApiClientService);
     httpMock = TestBed.inject(HttpTestingController);
 
-    // Set up the spy once
     getItemSpy = spyOn(localStorage, 'getItem').and.returnValue(mockToken);
   });
 
   afterEach(() => {
-    // Verify HTTP requests and reset spies
     httpMock.verify();
-    getItemSpy.and.callThrough(); // Reset the spy to its original behavior
+    getItemSpy.and.callThrough(); 
   });
 
   it('should be created', () => {
@@ -106,21 +104,21 @@ describe('ApiClientService', () => {
   describe('getCurrentUserEmail', () => {
     it('should return email from token', () => {
       const validToken = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIn0.signature';
-      getItemSpy.and.returnValue(validToken); // Configure existing spy
+      getItemSpy.and.returnValue(validToken); 
 
       const email = service.getCurrentUserEmail();
       expect(email).toBe('test@example.com');
     });
 
     it('should return null when token is invalid', () => {
-      getItemSpy.and.returnValue('invalid-token'); // Configure existing spy
+      getItemSpy.and.returnValue('invalid-token'); 
 
       const email = service.getCurrentUserEmail();
       expect(email).toBeNull();
     });
 
     it('should return null when token is missing', () => {
-      getItemSpy.and.returnValue(null); // Configure existing spy
+      getItemSpy.and.returnValue(null); 
 
       const email = service.getCurrentUserEmail();
       expect(email).toBeNull();
