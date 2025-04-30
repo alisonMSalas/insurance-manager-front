@@ -30,8 +30,7 @@ export class HeaderComponent {
   };
 
   menuItems: MenuItem[] = [
-    { label: 'Perfil', icon: 'pi pi-user', command: () => this.navigateToProfile() },
-    { label: 'Configuración', icon: 'pi pi-cog', command: () => this.navigateToSettings() },
+    
     { label: 'Cerrar Sesión', icon: 'pi pi-sign-out', command: () => this.logout() }
   ];
 
