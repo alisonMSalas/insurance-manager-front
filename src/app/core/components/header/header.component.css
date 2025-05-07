@@ -1,0 +1,124 @@
+:host {
+  --primary: #6c63ff;
+  --primary-light: #a5a1ff;
+  --secondary: #4dccc6;
+  --accent: #7b88ff;
+  --light: #f9f7fe;
+  --dark: #2d3748;
+  --gray: #718096;
+  --success: #68d391;
+  --danger: #fc8181;
+  --warning: #f6ad55;
+  --sidebar-bg: #ffffff;
+  --menu-item-hover: #f0eeff;
+  --nav-bg: linear-gradient(135deg, #407f68 0%, #407f68 100%);
+}
+
+.top-navbar {
+  background: var(--nav-bg);
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: white;
+  font-family: "Montserrat", sans-serif; /* Aplica Montserrat */
+}
+
+.page-title h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-family: "Montserrat", sans-serif; /* Aplica Montserrat */
+}
+
+.page-title p {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin-top: 0.2rem;
+  font-family: "Montserrat", sans-serif; /* Aplica Montserrat */
+}
+
+.user-area {
+  display: flex;
+  align-items: center;
+}
+
+.search-wrapper i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray);
+}
+
+:host ::ng-deep .p-inputtext {
+  padding: 0.5rem 1rem 0.5rem 2.5rem;
+  border-radius: 8px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  min-width: 250px;
+  transition: all 0.3s ease;
+  font-family: "Montserrat", sans-serif; /* Aplica Montserrat */
+}
+
+:host ::ng-deep .p-inputtext:focus {
+  outline: none;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+:host ::ng-deep .p-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 0.75rem;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.user-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: white;
+  font-family: "Montserrat", sans-serif; /* Aplica Montserrat */
+}
+
+.user-role {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: "Montserrat", sans-serif; /* Aplica Montserrat */
+}
+
+.ml-2 {
+  margin-left: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .top-navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1rem;
+  }
+
+  .user-area {
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 1rem;
+  }
+
+  .search-wrapper {
+    flex-grow: 1;
+    margin-right: 0;
+  }
+
+  :host ::ng-deep .p-inputtext {
+    width: 100%;
+  }
+}

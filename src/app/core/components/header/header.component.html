@@ -1,0 +1,23 @@
+<div class="top-navbar">
+  <div class="page-title">
+    <h1>{{ pageTitle }}</h1>
+    <p>{{ pageSubtitle }}</p>
+  </div>
+
+  <div class="user-area">
+    <p-menu #menu [model]="menuItems" [popup]="true"></p-menu>
+
+    <div class="user-profile" (click)="menu.toggle($event)">
+      <p-avatar
+        [icon]="user.icon"
+        size="large"
+        shape="circle"
+        class="user-avatar"
+      ></p-avatar>
+      <div>
+        <div class="user-name">{{ user.name }}</div>
+      </div>
+      <i class="pi pi-chevron-down ml-2" style="color: white"></i>
+    </div>
+  </div>
+</div>

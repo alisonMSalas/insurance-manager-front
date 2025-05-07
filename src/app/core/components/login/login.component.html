@@ -1,0 +1,29 @@
+<div class="login-container">
+  <p-toast position="top-right"></p-toast>
+
+  <div class="login-box">
+    <div class="form-section">
+      <h1 class="form-title">Iniciar Sesión</h1>
+      <span class="form-subtitle">Use su email y contraseña</span>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+        <div class="input-group">
+          <input formControlName="email" type="email" placeholder="Email" />
+          <span class="input-icon pi pi-user"></span>
+        </div>
+        <div class="input-group">
+          <input
+            formControlName="password"
+            type="password"
+            placeholder="Password"
+          />
+          <span class="input-icon pi pi-lock"></span>
+        </div>
+
+        <div class="button-container">
+          <button type="submit" class="submit-button">INICIAR SESIÓN</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
