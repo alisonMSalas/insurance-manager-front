@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Input, Output, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AvatarModule } from 'primeng/avatar';
@@ -22,14 +22,15 @@ import { ApiClientService } from '../../api/httpclient';
 })
 export class HeaderComponent implements OnInit {
   private router = inject(Router);
-  @Input() pageTitle: string = 'Gestión de Seguros'; 
-  @Input() pageSubtitle: string = 'Administra y revisa todas las pólizas de seguros'; 
-  searchQuery: string = '';
+  @Input() pageTitle= 'Gestión de Seguros'; 
+  @Input() pageSubtitle = 'Administra y revisa todas las pólizas de seguros'; 
+  searchQuery= '';
   user = {
     name: 'Usuario',
     role: 'Agente de Seguros',
     icon: 'pi pi-user',
   };
+  
 
   menuItems: MenuItem[] = [
     { label: 'Cerrar Sesión', icon: 'pi pi-sign-out', command: () => this.logout() }
