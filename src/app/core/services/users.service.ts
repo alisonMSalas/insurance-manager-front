@@ -14,7 +14,7 @@ export interface User {
   providedIn: 'root',
 })
 export class UsersService {
-  constructor(private api: ApiClientService) {}
+  constructor(private readonly api: ApiClientService) {}
 
   create(user: any) {
     return this.api.post('auth/register', user);

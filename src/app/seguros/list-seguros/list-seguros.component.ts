@@ -75,9 +75,9 @@ export class ListSegurosComponent implements OnInit {
   selectedType: string | null = null;
 
   constructor(
-    private segurosService: SegurosService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private  readonly segurosService: SegurosService,
+    private readonly messageService: MessageService,
+    private readonly confirmationService: ConfirmationService
   ) { }
 
   ngOnInit(): void {
@@ -89,24 +89,29 @@ export class ListSegurosComponent implements OnInit {
     this.loadInsurances();
   }
 
-  loadInsurances(): void {
-    this.segurosService.getAll().subscribe({
-      next: (data: Insurance[]) => {
-        this.insurances = data.sort((a, b) => {
-          if (a.active === b.active) {
-            return (a.id || '').localeCompare(b.id || '');
-          }
-          return a.active ? -1 : 1;
-        });
-        this.applyFilters();
-        this.loading = false;
-      },
-      error: (error: HttpErrorResponse) => {
-        this.handleError(error);
-        this.loading = false;
-      }
-    });
-  }
+ loadInsurances(): void {
+  this.segurosService.getAll().subscribe({
+    next: (data: Insurance[]) => {
+      this.insurances = this.sortInsurances(data);
+      this.applyFilters();
+      this.loading = false;
+    },
+    error: (error: HttpErrorResponse) => {
+      this.handleError(error);
+      this.loading = false;
+    }
+  });
+}
+
+private sortInsurances(insurances: Insurance[]): Insurance[] {
+  return insurances.sort((a, b) => {
+    if (a.active === b.active) {
+      return (a.id ?? '').localeCompare(b.id ?? '');
+    }
+    return a.active ? -1 : 1;
+  });
+}
+
   openViewModal(insurance: Insurance) {
     this.selectedInsurance = insurance;
     this.displayViewModal = true;
@@ -276,7 +281,7 @@ export class ListSegurosComponent implements OnInit {
     this.isEditing = !!insuranceToEdit;
     
     if (this.isEditing && insuranceToEdit) {
-      this.currentInsuranceId = insuranceToEdit.id || null;
+      this.currentInsuranceId = insuranceToEdit.id ?? null;
       // Copiar los datos del seguro a editar
       this.insurance = {
         name: insuranceToEdit.name,

@@ -2,8 +2,7 @@ import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { CardModule } from 'primeng/card';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
-import { ReactiveFormsModule } from '@angular/forms';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule  } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
@@ -28,14 +27,14 @@ import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
   styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnInit {
-  private router = inject(Router);
-  private messageService = inject(MessageService);
+  private  readonly router = inject(Router);
+  private readonly messageService = inject(MessageService);
   loginForm!: FormGroup;
   authService = inject(AuthService);
-  private platformId = inject(PLATFORM_ID);
-  private jwtHelper = inject(JwtHelperService);
+  private readonly platformId = inject(PLATFORM_ID);
+  private  readonly jwtHelper = inject(JwtHelperService);
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private readonly fb: FormBuilder) { }
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -80,7 +79,7 @@ export class LoginComponent implements OnInit {
           headers: err.headers,
           status: err.status,
           statusText: err.statusText,
-          url: err.url || undefined
+          url: err.url ?? undefined
         });
         handleError(fakeError, this.messageService);
       }
