@@ -7,9 +7,9 @@ import { ApiClientService } from '../../core/api/httpclient';
   providedIn: 'root'
 })
 export class SegurosService {
-  private endpoint = 'insurance';
+  private readonly endpoint = 'insurance';
 
-  constructor(private apiClient: ApiClientService) { }
+  constructor(private readonly apiClient: ApiClientService) { }
 
   getAll(): Observable<Insurance[]> {
     return this.apiClient.get<Insurance[]>(this.endpoint);

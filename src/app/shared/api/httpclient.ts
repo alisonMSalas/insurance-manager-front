@@ -6,8 +6,8 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ApiClientService {
-  private http = inject(HttpClient);
-  private baseUrl = "http://localhost:8080";
+  private readonly http = inject(HttpClient);
+  private readonly baseUrl = "http://localhost:8080";
 
   private getHeaders(): HttpHeaders {
     const token = localStorage.getItem('token') ?? '';

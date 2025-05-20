@@ -74,14 +74,30 @@ describe('HeaderComponent', () => {
     expect(component.menuItems[0].icon).toBe('pi pi-sign-out');
   });
 
-  it('should call router.navigate when logout is triggered', () => {
-    component.logout();
-    expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
-  });
+ it('should call router.navigate and remove token from localStorage when logout is triggered', () => {
+  const removeItemSpy = spyOn(localStorage, 'removeItem');
+
+  component.logout();
+
+  expect(removeItemSpy).toHaveBeenCalledWith('token');
+  expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
+});
+
 
   it('should update search query when input changes', () => {
     const testQuery = 'test search';
     component.searchQuery = testQuery;
     expect(component.searchQuery).toBe(testQuery);
   });
+
+it('should call logout from menu item command', () => {
+  const removeItemSpy = spyOn(localStorage, 'removeItem');
+  const fakeEvent = { originalEvent: new Event('click'), item: component.menuItems[0] };
+  component.menuItems[0].command!(fakeEvent);
+  expect(removeItemSpy).toHaveBeenCalledWith('token');
+  expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
 });
+
+  
+});
+

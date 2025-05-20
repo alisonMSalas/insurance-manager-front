@@ -8,7 +8,7 @@ export interface IMenu {
   providedIn: 'root'
 })
 export class MenuService {
-  private listMenu: IMenu[] = [
+  private readonly listMenu: IMenu[] = [
     { title: 'Seguros', url: '/insurance', icon: 'pi pi-shield' },
     { title: 'Usuarios', url: '/users', icon: 'pi pi-user' },
   ];

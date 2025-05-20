@@ -3,7 +3,6 @@ import { MenuComponent } from './menu.component';
 import { MenuService } from '../../services/menu.service';
 import { MenubarModule } from 'primeng/menubar';
 import { CommonModule } from '@angular/common';
-import { of } from 'rxjs';  
 
 describe('MenuComponent', () => {
   let component: MenuComponent;

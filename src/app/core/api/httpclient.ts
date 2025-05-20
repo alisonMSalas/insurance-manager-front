@@ -1,18 +1,17 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable,PLATFORM_ID  } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
-import { PLATFORM_ID } from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ApiClientService {
-  private baseUrl = 'http://localhost:8080';
-  private token = '';
-  private platformId = inject(PLATFORM_ID);
+  private  readonly baseUrl = 'http://localhost:8080';
+  private readonly token = '';
+  private readonly platformId = inject(PLATFORM_ID);
 
-  constructor(private http: HttpClient) { }
+  constructor(private readonly  http: HttpClient) { }
 
   private getHeaders(): HttpHeaders {
     const token = isPlatformBrowser(this.platformId)

@@ -6,9 +6,9 @@ import { JwtHelperService } from '@auth0/angular-jwt';
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate {
-  private jwtHelper = new JwtHelperService();
+  private readonly jwtHelper = new JwtHelperService();
 
-  constructor(private router: Router) { }
+  constructor(private readonly router: Router) { }
 
   canActivate(): boolean {
     const token = localStorage.getItem('token');
