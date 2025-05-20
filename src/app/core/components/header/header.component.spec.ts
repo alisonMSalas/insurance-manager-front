@@ -17,7 +17,7 @@ describe('HeaderComponent', () => {
 
   beforeEach(async () => {
     mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-    mockApiClient = jasmine.createSpyObj('ApiClientService', ['getCurrentUserEmail']);
+    mockApiClient = jasmine.createSpyObj('ApiClientService', ['getCurrentUserEmail']);  
 
     await TestBed.configureTestingModule({
       imports: [

@@ -128,12 +128,14 @@
     <div class="form-row">
       <div class="form-field">
         <label for="coverage">Cobertura</label>
-        <input id="coverage" type="number" pInputText [(ngModel)]="insurance.coverage" />
+        <input id="coverage" type="number" pInputText min="0"
+        (keydown)="preventNegativeInput($event)" [(ngModel)]="insurance.coverage" />
       </div>
       
       <div class="form-field">
         <label for="deductible">Deducible</label>
-        <input id="deductible" type="number" pInputText [(ngModel)]="insurance.deductible" />
+        <input id="deductible" type="number" min="0"
+        (keydown)="preventNegativeInput($event)" pInputText [(ngModel)]="insurance.deductible" />
       </div>
     </div>
 
@@ -141,7 +143,8 @@
     <div class="form-row">
       <div class="form-field">
         <label for="paymentAmount">Monto de Pago</label>
-        <input id="paymentAmount" type="number" pInputText [(ngModel)]="insurance.paymentAmount" />
+        <input id="paymentAmount" type="number"  min="0"
+        (keydown)="preventNegativeInput($event)" pInputText [(ngModel)]="insurance.paymentAmount" />
       </div>
       
       <div class="form-field">

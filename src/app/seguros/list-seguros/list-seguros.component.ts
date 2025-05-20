@@ -201,15 +201,38 @@ export class ListSegurosComponent implements OnInit {
   paymentPeriods = getPaymentPeriodOptions();
   
   saveInsurance() {
+    if (!this.insurance) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se puede guardar porque el seguro no está definido.'
+      });
+      return;
+    }
+  
+    const nombreValido = this.insurance.name?.trim() !== '';
+    const numerosValidos =
+      this.insurance.coverage > 0 &&
+      this.insurance.deductible > 0 &&
+      this.insurance.paymentAmount > 0;
+  
+    if (!nombreValido || !numerosValidos) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'El nombre no puede estar vacío y los valores numéricos deben ser mayores que 0.'
+      });
+      return;
+    }
+  
     if (this.isEditing && this.currentInsuranceId) {
-      // Lógica de actualización
       const updatedInsurance: Insurance = {
         ...this.insurance,
         id: this.currentInsuranceId
       };
-      
-      this.segurosService.update(this.currentInsuranceId,updatedInsurance).subscribe({
-        next: (response) => {
+  
+      this.segurosService.update(this.currentInsuranceId, updatedInsurance).subscribe({
+        next: () => {
           this.messageService.add({
             severity: 'success',
             summary: 'Éxito',
@@ -224,9 +247,8 @@ export class ListSegurosComponent implements OnInit {
         }
       });
     } else {
-      // Lógica de creación (existente)
       this.segurosService.save(this.insurance).subscribe({
-        next: (response) => {
+        next: () => {
           this.messageService.add({
             severity: 'success',
             summary: 'Éxito',
@@ -242,6 +264,14 @@ export class ListSegurosComponent implements OnInit {
       });
     }
   }
+  preventNegativeInput(event: KeyboardEvent): void {
+    if (event.key === '-' || event.key === 'e') {
+      event.preventDefault();
+    }
+  }
+  
+  
+  
   openModal(insuranceToEdit?: Insurance) {
     this.isEditing = !!insuranceToEdit;
     
