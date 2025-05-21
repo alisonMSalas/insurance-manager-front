@@ -2,5 +2,5 @@ projectKey=insurance-manager-front
 serverUrl=http://localhost:9000
 serverVersion=25.4.0.105899
 dashboardUrl=http://localhost:9000/dashboard?id=insurance-manager-front
-ceTaskId=46e7b0f2-8bf5-40a5-b846-197ccfe5af1a
-ceTaskUrl=http://localhost:9000/api/ce/task?id=46e7b0f2-8bf5-40a5-b846-197ccfe5af1a
+ceTaskId=a80b49f9-5ee7-476a-b5fe-e3fdea3ee1df
+ceTaskUrl=http://localhost:9000/api/ce/task?id=a80b49f9-5ee7-476a-b5fe-e3fdea3ee1df

@@ -248,61 +248,279 @@ it('debe eliminar un cliente correctamente', () => {
     expect(mockMessageService.add).not.toHaveBeenCalled(); // No se debería mostrar mensaje de éxito
   });
 
-  it('debe mostrar el detalle del cliente y abrir el modal', () => {
-    spyOn(console, 'log'); // Espía console.log para verificar la llamada
-    const cliente = clientMock; // Usa el mock definido en tu setup
 
-    component.verDetalleCliente(cliente);
+  describe('validateForm', () => {
+    beforeEach(() => {
+      component.nuevoCliente = {
+        ...clientMock,
+        user: { ...clientMock.user, password: 'Password123' },
+      };
+    });
 
-    expect(console.log).toHaveBeenCalledWith('Ver detalle:', cliente);
-    expect(component.clienteSeleccionado).toBe(cliente);
-    expect(component.displayDetailModal).toBeTrue();
-  });
-  it('debe mostrar mensaje de error genérico al fallar la creación del cliente con error inesperado', () => {
-  component.nuevoCliente = { ...clientMock, user: { ...clientMock.user, password: '1234' } };
-  mockClientService.create.and.returnValue(throwError(() => new Error('Error inesperado')));
+    it('should return true for valid form', () => {
+      expect(component.validateForm()).toBeTrue();
+    });
 
-  component.guardarClienteNuevo();
+    it('should return false and show error for invalid name', () => {
+      component.nuevoCliente.name = 'A';
+      expect(component.validateForm()).toBeFalse();
+      expect(mockMessageService.add).toHaveBeenCalledWith({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'El nombre es requerido y debe tener al menos 2 caracteres.',
+      });
+    });
 
-  expect(mockClientService.create).toHaveBeenCalledWith(component.nuevoCliente);
-  expect(component.clientes.length).toBe(0); // No se agrega el cliente
-  expect(component.displayModal).toBeTrue(); // El modal no se cierra
-  expect(mockMessageService.add).toHaveBeenCalledWith({
-    severity: 'error',
-    summary: 'Error',
-    detail: 'Ocurrió un error inesperado.'
-  });
-});
-it('debe actualizar el estado del cliente correctamente y mostrar mensaje de éxito', () => {
-    const cliente = { ...clientMock, active: true }; // Cliente inicialmente activo
-    mockClientService.update.and.returnValue(of(cliente)); // Simula éxito retornando el cliente
+    it('should return false and show error for invalid identificationNumber', () => {
+      component.nuevoCliente.identificationNumber = '123';
+      expect(component.validateForm()).toBeFalse();
+      expect(mockMessageService.add).toHaveBeenCalledWith({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'El número de identificación debe tener exactamente 10 dígitos y no puede contener letras ni signos.',
+      });
+    });
 
-    component.toggleClientStatus(cliente);
+    it('should return false and show error for future birthDate', () => {
+      component.nuevoCliente.birthDate = '2026-01-01';
+      expect(component.validateForm()).toBeFalse();
+      expect(mockMessageService.add).toHaveBeenCalledWith({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'La fecha de nacimiento no puede ser futura.',
+      });
+    });
 
-    expect(mockClientService.update).toHaveBeenCalledWith(jasmine.objectContaining({ id: cliente.id, active: true }));
-    expect(mockMessageService.add).toHaveBeenCalledWith({
-      severity: 'success',
-      summary: 'Éxito',
-      detail: 'Cliente activado correctamente'
+    it('should return false and show error for invalid phoneNumber', () => {
+      component.nuevoCliente.phoneNumber = '123';
+      expect(component.validateForm()).toBeFalse();
+      expect(mockMessageService.add).toHaveBeenCalledWith({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'El teléfono debe tener exactamente 10 dígitos y no puede contener letras ni signos.',
+      });
+    });
+
+    it('should return false and show error for invalid address', () => {
+      component.nuevoCliente.address = '123';
+      expect(component.validateForm()).toBeFalse();
+      expect(mockMessageService.add).toHaveBeenCalledWith({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'La dirección es requerida y debe tener al menos 5 caracteres.',
+      });
+    });
+
+    it('should return false and show error for missing gender', () => {
+      component.nuevoCliente.gender = '';
+      expect(component.validateForm()).toBeFalse();
+      expect(mockMessageService.add).toHaveBeenCalledWith({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'El género es requerido.',
+      });
+    });
+
+    it('should return false and show error for invalid occupation', () => {
+      component.nuevoCliente.occupation = 'A';
+      expect(component.validateForm()).toBeFalse();
+      expect(mockMessageService.add).toHaveBeenCalledWith({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'La ocupación es requerida y debe tener al menos 2 caracteres.',
+      });
+    });
+
+    it('should return false and show error for invalid email', () => {
+      component.nuevoCliente.user.email = 'invalid-email';
+      expect(component.validateForm()).toBeFalse();
+      expect(mockMessageService.add).toHaveBeenCalledWith({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'El correo electrónico es requerido y debe ser válido.',
+      });
+    });
+
+    it('should return false and show error for invalid password in create mode', () => {
+      component.nuevoCliente.user.password = 'short';
+      expect(component.validateForm()).toBeFalse();
+      expect(mockMessageService.add).toHaveBeenCalledWith({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'La contraseña es requerida y debe tener al menos 8 caracteres, incluyendo letras y números.',
+      });
+    });
+
+    it('should allow empty password in edit mode', () => {
+      component.modoEdicion = true;
+      component.nuevoCliente.user.password = '';
+      expect(component.validateForm()).toBeTrue();
+    });
+
+    it('should return false and show error for invalid password in edit mode', () => {
+      component.modoEdicion = true;
+      component.nuevoCliente.user.password = 'short';
+      expect(component.validateForm()).toBeFalse();
+      expect(mockMessageService.add).toHaveBeenCalledWith({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'La nueva contraseña debe tener al menos 8 caracteres, incluyendo letras y números.',
+      });
     });
   });
 
-  it('debe manejar error al actualizar el estado del cliente, revertir el cambio y mostrar mensaje de error', () => {
-    spyOn(console, 'error'); // Espía console.error
-    const cliente = { ...clientMock, active: true }; // Cliente inicialmente activo
-    cliente.active = false; // Simula cambio local antes de la llamada al servicio
-    mockClientService.update.and.returnValue(throwError(() => new Error('Error al actualizar')));
+  describe('reloadClientes', () => {
+    it('should reload clients and apply filter on success', () => {
+      const mockClients = [clientMock];
+      mockClientService.getAll.and.returnValue(of(mockClients));
+      spyOn(component, 'filtrarClientes');
 
-    component.toggleClientStatus(cliente);
+      component['reloadClientes'](); // Access private method with bracket notation
 
-    expect(mockClientService.update).toHaveBeenCalledWith(jasmine.objectContaining({ id: cliente.id, active: false }));
-    expect(console.error).toHaveBeenCalledWith('Error al actualizar estado del cliente:', jasmine.any(Error));
-    expect(cliente.active).toBe(true); // Verifica que el estado se revierte
-    expect(mockMessageService.add).toHaveBeenCalledWith({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'No se pudo actualizar el estado del cliente'
+      expect(mockClientService.getAll).toHaveBeenCalled();
+      expect(component.clientes).toEqual(mockClients);
+      expect(component.clientesOriginales).toEqual(mockClients);
+      expect(component.filtrarClientes).toHaveBeenCalled();
+    });
+
+    it('should show error message on reload failure', () => {
+      spyOn(console, 'error');
+      mockClientService.getAll.and.returnValue(throwError(() => new Error('Reload failed')));
+
+      component['reloadClientes']();
+
+      expect(mockClientService.getAll).toHaveBeenCalled();
+      expect(console.error).toHaveBeenCalledWith('Error al recargar clientes:', jasmine.any(Error));
+      expect(mockMessageService.add).toHaveBeenCalledWith({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudieron recargar los clientes.',
+      });
     });
   });
 
+  describe('toggleClientStatus', () => {
+    it('should toggle client status and reload clients on success', () => {
+      const updatedClient = { ...clientMock, active: false };
+      mockClientService.update.and.returnValue(of(updatedClient));
+      mockClientService.getAll.and.returnValue(of([updatedClient]));
+      spyOn(component, 'filtrarClientes');
+
+      component.toggleClientStatus(clientMock);
+
+      expect(mockClientService.update).toHaveBeenCalledWith({ ...clientMock });
+      expect(mockMessageService.add).toHaveBeenCalledWith({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Cliente desactivado correctamente',
+      });
+      expect(mockClientService.getAll).toHaveBeenCalled();
+      expect(component.filtrarClientes).toHaveBeenCalled();
+    });
+
+    it('should revert status and show error on failure', () => {
+      mockClientService.update.and.returnValue(throwError(() => new Error('Update failed')));
+      spyOn(console, 'error');
+
+      const originalActive = clientMock.active;
+      component.toggleClientStatus(clientMock);
+
+      expect(mockClientService.update).toHaveBeenCalledWith({ ...clientMock });
+      expect(clientMock.active).toBe(originalActive);
+      expect(console.error).toHaveBeenCalledWith('Error al actualizar estado del cliente:', jasmine.any(Error));
+      expect(mockMessageService.add).toHaveBeenCalledWith({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudo actualizar el estado del cliente',
+      });
+    });
+  });
+
+  describe('verDetalleCliente', () => {
+    it('should set selected client and show detail modal', () => {
+      component.verDetalleCliente(clientMock);
+
+      expect(component.clienteSeleccionado).toEqual(clientMock);
+      expect(component.displayDetailModal).toBeTrue();
+    });
+  });
+
+  describe('guardarClienteNuevo edge cases', () => {
+    it('should not proceed if form validation fails', () => {
+      spyOn(component, 'validateForm').and.returnValue(false);
+      component.nuevoCliente = { ...clientMock, user: { ...clientMock.user, password: '1234' } };
+      mockClientService.create.and.returnValue(of(clientMock));
+
+      component.guardarClienteNuevo();
+
+      expect(mockClientService.create).not.toHaveBeenCalled();
+      expect(component.displayModal).toBeTrue();
+    });
+
+    it('should handle unexpected error during client creation', () => {
+      component.nuevoCliente = { ...clientMock, user: { ...clientMock.user, password: 'Password123' } };
+      mockClientService.create.and.returnValue(throwError(() => new Error('Unexpected error')));
+      spyOn(component, 'validateForm').and.returnValue(true);
+
+      component.guardarClienteNuevo();
+
+      expect(mockMessageService.add).toHaveBeenCalledWith({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Ocurrió un error inesperado.',
+      });
+    });
+  });
+
+  describe('actualizarCliente edge cases', () => {
+    it('should not proceed if form validation fails', () => {
+      spyOn(component, 'validateForm').and.returnValue(false);
+      component.nuevoCliente = { ...clientMock, user: { ...clientMock.user, password: '' } };
+      component.modoEdicion = true;
+      mockClientService.update.and.returnValue(of(clientMock));
+
+      component.actualizarCliente();
+
+      expect(mockClientService.update).not.toHaveBeenCalled();
+      expect(component.displayModal).toBeTrue();
+      expect(component.modoEdicion).toBeTrue();
+    });
+  });
+
+  describe('filtrarClientes edge cases', () => {
+    it('should return empty array when no clients match filter', () => {
+      component.clientesOriginales = [clientMock];
+      component.filtroCedula = '999';
+
+      component.filtrarClientes();
+
+      expect(component.clientes.length).toBe(0);
+    });
+
+    it('should handle case-insensitive filtering', () => {
+      component.clientesOriginales = [clientMock];
+      component.filtroCedula = '1234567890';
+
+      component.filtrarClientes();
+
+      expect(component.clientes.length).toBe(1);
+      expect(component.clientes[0]).toEqual(clientMock);
+    });
+  });
+
+  describe('calcularEdad edge cases', () => {
+    it('should handle same year but earlier month', () => {
+      const birthDate = `${new Date().getFullYear() - 1}-12-01`;
+      const age = component.calcularEdad(birthDate);
+      expect(age).toBe(0); // Not yet 1 year old
+    });
+
+    it('should handle same year and same month but earlier day', () => {
+      const today = new Date();
+      const birthDate = `${today.getFullYear()}-${today.getMonth() + 1}-01`;
+      const age = component.calcularEdad(birthDate);
+      expect(age).toBe(0); // Not yet 1 year old
+    });
+  });
+ 
 });
