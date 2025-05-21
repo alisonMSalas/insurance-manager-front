@@ -1,0 +1,56 @@
+import { Injectable } from '@angular/core';
+import { ApiClientService } from '../api/httpclient';
+import { Contract } from '../../shared/interfaces/contract';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ContratacionesService {
+  constructor(private readonly api: ApiClientService) { }
+
+  create(contract: Contract): Observable<Contract> {
+    return this.api.post('contract', contract);
+  }
+
+  getAll(): Observable<Contract[]> {
+    return this.api.get('contract');
+  }
+
+  getById(id: string): Observable<Contract> {
+    return this.api.get(`contract/${id}`);
+  }
+
+  update(contract: Contract): Observable<Contract> {
+    return this.api.put('contract', contract);
+  }
+
+  delete(id: string): Observable<void> {
+    return this.api.delete(`contract/${id}`);
+  }
+  savePayment(payment: any): Observable<any> {
+    return this.api.post('payment', payment);
+  }
+
+  uploadDocuments(documents: { fileName: string; fileData: File }[], contractId: string): Observable<any> {
+    const formData = new FormData();
+    documents.forEach(doc => formData.append('files', doc.fileData, doc.fileName));
+    formData.append('contractId', contractId);
+    return this.api.post('attachments/upload', formData);
+  }
+
+  saveBeneficiaries(beneficiaries: { name: string; relationship: string; percentage: number }[], contractId: string): Observable<any> {
+    return this.api.post(`beneficiaries/${contractId}`, beneficiaries);
+  }
+  saveSignature(signatureData: {
+    signature: ArrayBuffer;
+    expirationDate: string;
+    clientId: string;
+  }): Observable<any> {
+    return this.api.post('signature', {
+      ...signatureData,
+      signature: Array.from(new Uint8Array(signatureData.signature)) // convierte ArrayBuffer a byte[]
+    });
+  }
+
+}

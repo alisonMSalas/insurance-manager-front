@@ -287,3 +287,40 @@ ul li {
   justify-content: flex-end;
   grid-column: 1 / -1; /* ocupa toda la fila */
 }
+.resumen-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+.resumen-section {
+  background: #f9f9f9;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+}
+
+.resumen-section h3 {
+  margin-bottom: 1rem;
+  color: #3f51b5;
+  border-bottom: 2px solid #3f51b5;
+  padding-bottom: 0.25rem;
+}
+
+.resumen-list {
+  list-style: none;
+  padding-left: 0;
+}
+
+.resumen-list li {
+  padding: 0.3rem 0;
+  font-size: 1rem;
+}
+
+.navigation-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}

@@ -16,64 +16,57 @@
 
       <div class="form-group">
         <label for="cedula">Número de Documento</label>
-        <input id="cedula" type="text" pInputText formControlName="cedula" placeholder="Ingrese cédula" maxlength="10"
-          pattern="[0-9]*" inputmode="numeric" />
-        <small *ngIf="clienteForm.get('cedula')?.touched && clienteForm.get('cedula')?.errors?.['cedulaInvalida']"
-          class="p-error">Cédula inválida</small>
+        <input id="cedula" type="text" pInputText formControlName="cedula" [readonly]="true" />
       </div>
 
       <div class="form-group">
         <label for="nombres">Nombres</label>
-        <input type="text" pInputText formControlName="nombres" placeholder="Ingrese nombres">
+        <input id="nombres" type="text" pInputText formControlName="nombres" [readonly]="true" />
       </div>
 
       <div class="form-group">
         <label for="apellidos">Apellidos</label>
-        <input type="text" pInputText formControlName="apellidos" placeholder="Ingrese apellidos">
+        <input id="apellidos" type="text" pInputText formControlName="apellidos" [readonly]="true" />
       </div>
 
       <div class="form-group">
         <label for="fechaNacimiento">Fecha de Nacimiento</label>
         <p-calendar formControlName="fechaNacimiento" dateFormat="dd/mm/yy" [showIcon]="true" inputId="fechaNacimiento"
-          placeholder="dd/mm/aaaa"></p-calendar>
+          [readonlyInput]="true"></p-calendar>
       </div>
 
       <div class="form-group">
         <label for="genero">Género</label>
-        <p-dropdown [options]="generos" formControlName="genero" placeholder="Seleccione..."></p-dropdown>
+        <input id="genero" type="text" pInputText formControlName="genero" [readonly]="true" />
       </div>
 
       <div class="form-group">
-        <label for="estadoCivil">Estado Civil</label>
-        <p-dropdown [options]="estadosCiviles" formControlName="estadoCivil" placeholder="Seleccione..."></p-dropdown>
+        <label for="ocupacion">Ocupación</label>
+        <input id="ocupacion" type="text" pInputText formControlName="ocupacion" [readonly]="true" />
       </div>
 
       <div class="form-group">
         <label for="telefono">Teléfono</label>
-        <input type="text" pInputText formControlName="telefono" placeholder="Ingrese teléfono">
+        <input id="telefono" type="text" pInputText formControlName="telefono" [readonly]="true" />
       </div>
 
       <div class="form-group">
         <label for="correo">Correo Electrónico</label>
-        <input type="email" pInputText formControlName="correo" placeholder="Ingrese correo">
+        <input id="correo" type="email" pInputText formControlName="correo" [readonly]="true" />
       </div>
 
       <div class="form-group full-width">
         <label for="direccion">Dirección</label>
-        <input type="text" pInputText formControlName="direccion" placeholder="Ingrese dirección">
-      </div>
-
-      <div class="form-group full-width">
-        <label for="distrito">Ocupacion</label>
-        <p-dropdown [options]="distritos" formControlName="distrito" placeholder="Seleccione..."></p-dropdown>
+        <input id="direccion" type="text" pInputText formControlName="direccion" [readonly]="true" />
       </div>
 
       <div class="navigation-buttons single-button">
-        <button pButton label="Continuar" (click)="activeIndex = 1" class="p-button-primary"></button>
+        <button pButton label="Continuar" (click)="activeIndex = 1" (click)="siguientePaso()"
+          class="p-button-primary"></button>
       </div>
 
     </form>
-
+    <p-toast></p-toast>
 
   </p-tabPanel>
 
@@ -85,23 +78,28 @@
 
       <div class="form-group full-width" style="margin-bottom: 1.5rem;">
         <label for="tipoSeguro"><strong>Cobertura</strong></label><br>
-        <p-dropdown [options]="tiposSeguro" optionLabel="name" optionValue="id" formControlName="tipoSeguro"
-          placeholder="Seleccione...">
+        <p-dropdown [options]="tiposSeguro" optionLabel="name" formControlName="tipoSeguro" placeholder="Seleccione..."
+          (onChange)="onTipoSeguroSeleccionado($event.value)">
         </p-dropdown>
+
       </div>
 
       <div class="field" style="display: flex; gap: 1rem; margin-bottom: 2rem;">
         <div style="flex: 1;">
           <label for="fechaInicio">Fecha de inicio de cobertura</label><br>
           <div class="p-datepicker ">
-            <p-calendar formControlName="fechaInicio" dateFormat="dd/mm/yy" showIcon="true"></p-calendar>
+            <p-calendar formControlName="fechaInicio" placeholder="Fecha inicio"></p-calendar>
+            <div *ngIf="coberturasForm.get('fechaInicio')?.errors?.['fechaPasada']">
+              <small class="p-error">La fecha de inicio no puede ser anterior a hoy.</small>
+            </div>
           </div>
 
         </div>
 
         <div style="flex: 1;">
-          <label for="fechaFin">Fecha de finalización de cobertura</label><br>
-          <p-calendar formControlName="fechaFin" dateFormat="dd/mm/yy" showIcon="true"></p-calendar>
+          <label for="fechaFin">Periodo de Pago</label><br>
+          <input id="direccion" type="text" pInputText formControlName="periodicidad" [readonly]="true" />
+
         </div>
       </div>
 
@@ -127,8 +125,8 @@
         <tr>
           <td><input type="text" pInputText [(ngModel)]="benef.nombre" name="nombre"></td>
           <td>
-            <p-dropdown class="drop" #dropdownParentesco [options]="parentescos" [appendTo]="'body'"
-              [(ngModel)]="benef.parentesco" name="parentesco" [scrollHeight]="'100px'"></p-dropdown>
+            <p-dropdown class="drop" #dropdownParentesco [options]="parentescos" [(ngModel)]="benef.parentesco"
+              name="parentesco" [scrollHeight]="'100px'"></p-dropdown>
           </td>
           <td><input type="number" pInputText [(ngModel)]="benef.porcentaje" min="1" max="100" name="porcentaje"></td>
           <td><button pButton icon="pi pi-trash" (click)="eliminarBeneficiario(benef)"></button></td>
@@ -181,7 +179,8 @@
 
       <div class="navigation-buttons">
         <button pButton label="Regresar" (click)="activeIndex = 1" class="p-button-secondary"></button>
-        <button pButton label="Continuar" (click)="activeIndex = 3" (click)="validarDocumento()" class="p-button-primary"></button>
+        <button pButton label="Continuar" (click)="activeIndex = 3" (click)="validarDocumento()"
+          class="p-button-primary"></button>
       </div>
 
     </form>
@@ -191,34 +190,108 @@
 
   <!-- 4. Datos de Pago -->
   <p-tabPanel header="Datos de Pago">
-    <form [formGroup]="pagoForm">
-      <div class="p-field">
-        <label for="tipo-pago">Tipo de Pago</label>
-        <p-dropdown [options]="tiposPago" formControlName="tipoPago" placeholder="Seleccione...">
-        </p-dropdown>
-      </div>
-      <div class="p-field">
-        <label for="monto">Monto</label>
-        <input type="number" pInputText formControlName="monto" min="1">
-      </div>
-      <div class="p-field">
-        <label for="fecha">Fecha de Pago</label>
-        <p-calendar formControlName="fechaPago"></p-calendar>
-      </div>
-      <div class="navigation-buttons">
-        <button pButton type="button" label="Regresar" (click)="activeIndex = 2" class="p-button-secondary"></button>
-        <button pButton type="button" label="Continuar" (click)="activeIndex = 4" class="p-button-primary"></button>
+    <form [formGroup]="pagoForm" class="form-layout">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="tipo-pago">Tipo de Pago</label>
+          <p-dropdown [options]="tiposPago" formControlName="tipoPago" placeholder="Seleccione..."></p-dropdown>
+        </div>
+
+        <div class="form-group">
+          <label for="monto">Monto</label>
+          <input type="number" pInputText formControlName="monto" min="1" readOnly="true" />
+        </div>
+
+        <div class="form-group">
+          <label for="fecha">Fecha de Pago</label>
+          <p-calendar formControlName="fechaPago" dateFormat="dd/mm/yy" [readonlyInput]="true" (onFocus)="false"
+            (onClick)="false"></p-calendar>
+        </div>
+
+        <div class="navigation-buttons full-width">
+          <button pButton type="button" label="Regresar" (click)="activeIndex = 2" class="p-button-secondary"></button>
+          <button pButton type="button" label="Continuar" (click)="activeIndex = 4" class="p-button-primary"></button>
+        </div>
+
       </div>
     </form>
   </p-tabPanel>
 
+
   <!-- 5. Resumen -->
   <p-tabPanel header="Resumen">
-    <!-- Solo muestra datos, no uses formControlName aquí si no hay un formGroup -->
-    <p-dropdown [options]="tiposSeguro" [(ngModel)]="resumen.tipoSeguroSeleccionado" placeholder="Seleccione...">
-    </p-dropdown>
 
-    <button pButton label="Regresar" (click)="activeIndex = 3"></button>
-    <button pButton label="Finalizar" (click)="finalizarProceso()"></button>
+    <div class="resumen-container">
+
+      <section class="resumen-section">
+        <h3>Datos del Cliente</h3>
+        <ul class="resumen-list">
+          <li><strong>Cédula:</strong> {{ clienteForm.get('cedula')?.value || '-' }}</li>
+          <li><strong>Nombres:</strong> {{ clienteForm.get('nombres')?.value || '-' }}</li>
+          <li><strong>Apellidos:</strong> {{ clienteForm.get('apellidos')?.value || '-' }}</li>
+          <li><strong>Fecha de Nacimiento:</strong> {{ formatoFecha(clienteForm.get('fechaNacimiento')?.value) || '-' }}
+          </li>
+          <li><strong>Género:</strong> {{ clienteForm.get('genero')?.value || '-' }}</li>
+          <li><strong>Ocupación:</strong> {{ clienteForm.get('ocupacion')?.value || '-' }}</li>
+          <li><strong>Teléfono:</strong> {{ clienteForm.get('telefono')?.value || '-' }}</li>
+          <li><strong>Correo:</strong> {{ clienteForm.get('correo')?.value || '-' }}</li>
+          <li><strong>Dirección:</strong> {{ clienteForm.get('direccion')?.value || '-' }}</li>
+        </ul>
+      </section>
+
+      <section class="resumen-section">
+        <h3>Coberturas y Beneficiarios</h3>
+        <p><strong>Tipo de Seguro:</strong> {{ coberturasForm.get('tipoSeguro')?.value?.name || '-' }}</p>
+        <p><strong>Fecha Inicio:</strong> {{ formatoFecha(coberturasForm.get('fechaInicio')?.value) || '-' }}</p>
+        <p><strong>Periodicidad:</strong> {{ coberturasForm.get('periodicidad')?.value || '-' }}</p>
+
+        <h4>Beneficiarios</h4>
+        <p-table [value]="beneficiarios" [paginator]="true" [rows]="5" [responsiveLayout]="'scroll'">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Nombre Completo</th>
+              <th>Parentesco</th>
+              <th>Porcentaje</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-benef>
+            <tr>
+              <td>{{ benef.nombre }}</td>
+              <td>{{ benef.parentesco?.name || benef.parentesco }}</td>
+              <td>{{ benef.porcentaje }}%</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </section>
+
+      <section class="resumen-section">
+        <h3>Documentos</h3>
+        <p *ngIf="uploadedFiles.length; else sinArchivo">
+          <strong>Archivos cargados:</strong>
+        <ul>
+          <li *ngFor="let file of uploadedFiles">{{ file.name }}</li>
+        </ul>
+
+        <ng-template #sinArchivo>
+          <p>No se han cargado archivos.</p>
+        </ng-template>
+      </section>
+
+      <section class="resumen-section">
+        <h3>Datos de Pago</h3>
+        <p><strong>Tipo de Pago:</strong> {{ getLabelTipoPago() }}</p>
+
+        <p><strong>Monto:</strong> {{ pagoForm.get('monto')?.value || '-' }}</p>
+        <p><strong>Fecha de Pago:</strong> {{ formatoFecha(pagoForm.get('fechaPago')?.value) || '-' }}</p>
+      </section>
+
+    </div>
+
+    <div class="navigation-buttons">
+      <button pButton label="Regresar" (click)="activeIndex = 3" class="p-button-secondary"></button>
+      <button pButton label="Finalizar" (click)="finalizarProceso()" class="p-button-success"></button>
+    </div>
+
   </p-tabPanel>
+
 </p-tabView>
