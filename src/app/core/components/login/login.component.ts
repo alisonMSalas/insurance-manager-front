@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       const token = localStorage.getItem('token');
       if (token && !this.jwtHelper.isTokenExpired(token)) {
-        this.router.navigate(['/insurance']);
+        this.router.navigate(['/']);
         return;
       }
     }
@@ -58,7 +58,7 @@ export class LoginComponent implements OnInit {
       next: (token: string) => {
         localStorage.setItem('token', token);
         this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Inicio de sesión exitoso' });
-        this.router.navigate(['/insurance']);
+        this.router.navigate(['/']);
       },
       error: (err: HttpErrorResponse) => {
         let payload: any = err.error;
@@ -69,7 +69,7 @@ export class LoginComponent implements OnInit {
             if (err.status === 200) {
               localStorage.setItem('token', payload);
               this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Inicio de sesión exitoso' });
-              this.router.navigate(['/insurance']);
+              this.router.navigate(['/']);
               return;
             }
           }
