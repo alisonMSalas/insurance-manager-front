@@ -1,50 +1,74 @@
 import { TestBed } from '@angular/core/testing';
-import { MenuService } from './menu.service';
+import { MenuService, IMenu } from './menu.service';
 
 describe('MenuService', () => {
   let service: MenuService;
 
+  const mockToken = (role: string): string => {
+    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
+    const payload = btoa(JSON.stringify({ role }));
+    const signature = 'test-signature';
+    return `${header}.${payload}.${signature}`;
+  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({});
     service = TestBed.inject(MenuService);
+    localStorage.clear();
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+  describe('getMenu', () => {
+    it('debería retornar el menú para el rol ADMIN', () => {
+      localStorage.setItem('token', mockToken('ADMIN'));
 
-  it('should return a copy of the menu list', () => {
-    const menu = service.getMenu();
-    expect(menu).toBeDefined();
-    expect(Array.isArray(menu)).toBeTrue();
-    expect(menu.length).toBeGreaterThan(0);
-  
-    const originalMenu = service.getMenu();
-    expect(menu).not.toBe(originalMenu); 
-  
-    expect(menu[0].title).toBe(originalMenu[0].title);
+      const menu = service.getMenu();
+      const titles = menu.map(m => m.title);
+
+      expect(titles).toContain('Seguros');
+      expect(titles).toContain('Usuarios');
+      expect(titles).toContain('Clientes');
+    });
+
+    it('debería retornar el menú para el rol CLIENT', () => {
+      localStorage.setItem('token', mockToken('CLIENT'));
+
+      const menu = service.getMenu();
+      const titles = menu.map(m => m.title);
+
+      expect(titles).toContain('Usuarios');
+      expect(titles).toContain('Clientes');
+      expect(titles).not.toContain('Seguros');
+    });
+
+    it('debería retornar un array vacío si no hay token', () => {
+      const menu = service.getMenu();
+      expect(menu).toEqual([]);
+    });
+
+    it('debería retornar un array vacío si el token es inválido', () => {
+      localStorage.setItem('token', 'invalid.token.value');
+      const menu = service.getMenu();
+      expect(menu).toEqual([]);
+    });
   });
-  
 
   describe('getMenuByURL', () => {
-    // it('should return the correct menu item for a valid URL', () => {
-    //   const url = '/main/users';
-    //   const menuItem = service.getMenuByURL(url);
-    //   expect(menuItem).toBeDefined();
-    //   expect(menuItem.url.toLowerCase()).toBe(url.toLowerCase());
-    // });
+    it('debería retornar el menú correcto si la URL y rol coinciden', () => {
+      localStorage.setItem('token', mockToken('ADMIN'));
+      const menu = service.getMenuByURL('/insurance');
+      expect(menu).toBeTruthy();
+      expect(menu?.title).toBe('Seguros');
+    });
 
-    // it('should be case insensitive when searching by URL', () => {
-    //   const url = '/MAIN/USERS';
-    //   const menuItem = service.getMenuByURL(url);
-    //   expect(menuItem).toBeDefined();
-    //   expect(menuItem.url.toLowerCase()).toBe(url.toLowerCase());
-    // });
+    it('debería retornar undefined si el rol no tiene acceso a la URL', () => {
+      localStorage.setItem('token', mockToken('CLIENT'));
+      const menu = service.getMenuByURL('/insurance');
+      expect(menu).toBeUndefined();
+    });
 
-    it('should return undefined for non-existent URL', () => {
-      const url = '/non-existent-url';
-      const menuItem = service.getMenuByURL(url);
-      expect(menuItem).toBeUndefined();
+    it('debería retornar undefined si no hay token', () => {
+      const menu = service.getMenuByURL('/insurance');
+      expect(menu).toBeUndefined();
     });
   });
 });

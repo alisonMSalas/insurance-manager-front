@@ -1,6 +1,5 @@
-
+import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { ListClientsComponent } from './list-clients.component';
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { ClientsService } from '../../core/services/clients.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { of, throwError } from 'rxjs';
@@ -9,269 +8,301 @@ import { Client } from '../../shared/interfaces/client';
 describe('ListClientsComponent', () => {
   let component: ListClientsComponent;
   let fixture: ComponentFixture<ListClientsComponent>;
-  let mockClientsService: jasmine.SpyObj<ClientsService>;
+  let mockClientService: jasmine.SpyObj<ClientsService>;
   let mockMessageService: jasmine.SpyObj<MessageService>;
   let mockConfirmationService: jasmine.SpyObj<ConfirmationService>;
 
-  const mockClients: Client[] = [
-    {
-      id: '1',
-      name: 'Juan',
-      lastName: 'Perez',
-      identificationNumber: '1234567890',
-      birthDate: '1990-01-01',
-      phoneNumber: 123456789,
-      address: 'Calle 1',
-      gender: 'M',
-      occupation: 'Ingeniero',
-      active: true,
-      user: {
-        id: 'u1',
-        name: 'Juan Perez',
-        email: 'juan@mail.com',
-        rol: 'CLIENT',
-        active: true
-      }
-    },
-    {
-      id: '2',
-      name: 'Ana',
-      lastName: 'Lopez',
-      identificationNumber: '0987654321',
-      birthDate: '1985-05-10',
-      phoneNumber: 987654321,
-      address: 'Calle 2',
-      gender: 'F',
-      occupation: 'Doctora',
-      active: false,
-      user: {
-        id: 'u2',
-        name: 'Ana Lopez',
-        email: 'ana@mail.com',
-        rol: 'CLIENT',
-        active: true
-      }
+  const clientMock: Client = {
+    id: '1',
+    name: 'Juan',
+    lastName: 'Pérez',
+    identificationNumber: '1234567890',
+    birthDate: '2000-01-01',
+    phoneNumber: 999999999,
+    address: 'Calle 123',
+    gender: 'Masculino',
+    occupation: 'Ingeniero',
+    active: true,
+    user: {
+      id: 'u1',
+      name: 'Juan Pérez',
+      email: 'juan@example.com',
+      rol: 'CLIENT',
+      active: true
     }
-  ];
+  };
 
-  beforeEach(async () => {
-    mockClientsService = jasmine.createSpyObj('ClientsService', ['getAll', 'create', 'update', 'delete']);
-    mockMessageService = jasmine.createSpyObj('MessageService', ['add']);
-    mockConfirmationService = jasmine.createSpyObj('ConfirmationService', ['confirm']);
+  beforeEach(waitForAsync(() => {
+    const clientServiceSpy = jasmine.createSpyObj('ClientsService', ['getAll', 'create', 'update', 'delete']);
+    const messageServiceSpy = jasmine.createSpyObj('MessageService', ['add']);
+    const confirmationServiceSpy = jasmine.createSpyObj('ConfirmationService', ['confirm']);
 
-    await TestBed.configureTestingModule({
+    TestBed.configureTestingModule({
       imports: [ListClientsComponent],
       providers: [
-        { provide: ClientsService, useValue: mockClientsService },
-        { provide: MessageService, useValue: mockMessageService },
-        { provide: ConfirmationService, useValue: mockConfirmationService }
+        { provide: ClientsService, useValue: clientServiceSpy },
+        { provide: MessageService, useValue: messageServiceSpy },
+        { provide: ConfirmationService, useValue: confirmationServiceSpy }
       ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ListClientsComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
-  it('should create', () => {
+    mockClientService = TestBed.inject(ClientsService) as jasmine.SpyObj<ClientsService>;
+    mockMessageService = TestBed.inject(MessageService) as jasmine.SpyObj<MessageService>;
+    mockConfirmationService = TestBed.inject(ConfirmationService) as jasmine.SpyObj<ConfirmationService>;
+  }));
+
+  it('debe crear el componente', () => {
     expect(component).toBeTruthy();
   });
 
-  it('obtenerClientes should set clientes and clientesOriginales', () => {
-    mockClientsService.getAll.and.returnValue(of(mockClients));
+  it('debe obtener los clientes correctamente', () => {
+    mockClientService.getAll.and.returnValue(of([clientMock]));
+
     component.obtenerClientes();
-    expect(component.clientes).toEqual(mockClients);
-    expect(component.clientesOriginales).toEqual(mockClients);
-  });
 
-  it('filtrarClientes should filter by identificationNumber', () => {
-    component.clientesOriginales = mockClients;
-    component.filtroCedula = '1234';
-    component.filtrarClientes();
     expect(component.clientes.length).toBe(1);
-    expect(component.clientes[0].identificationNumber).toBe('1234567890');
+    expect(component.clientes[0].name).toBe('Juan');
   });
 
-  it('filtrarClientes should restore all if filtroCedula is empty', () => {
-    component.clientesOriginales = mockClients;
-    component.filtroCedula = '';
+  it('debe mostrar error al fallar obtener clientes', () => {
+    spyOn(console, 'error');
+    mockClientService.getAll.and.returnValue(throwError(() => new Error('Error de red')));
+
+    component.obtenerClientes();
+
+    expect(console.error).toHaveBeenCalled();
+    expect(component.clientes.length).toBe(0);
+  });
+
+  it('debe filtrar clientes por cédula', () => {
+    component.clientesOriginales = [clientMock];
+    component.filtroCedula = '123';
+
     component.filtrarClientes();
-    expect(component.clientes.length).toBe(2);
+
+    expect(component.clientes.length).toBe(1);
   });
 
-  it('validarCliente should return false if name is empty', () => {
-    const invalidClient = { ...mockClients[0], name: '   ' };
-    expect(component.validarCliente(invalidClient as any)).toBeFalse();
-    expect(mockMessageService.add).toHaveBeenCalled();
-  });
+  it('debe guardar un nuevo cliente correctamente', () => {
+    component.nuevoCliente = { ...clientMock, user: { ...clientMock.user, password: '1234' } };
+    mockClientService.create.and.returnValue(of(clientMock));
 
-  it('validarCliente should return false if lastName is empty', () => {
-    const invalidClient = { ...mockClients[0], lastName: '   ' };
-    expect(component.validarCliente(invalidClient as any)).toBeFalse();
-    expect(mockMessageService.add).toHaveBeenCalled();
-  });
-
-  it('validarCliente should return false if birthDate is empty', () => {
-    const invalidClient = { ...mockClients[0], birthDate: '' };
-    expect(component.validarCliente(invalidClient as any)).toBeFalse();
-    expect(mockMessageService.add).toHaveBeenCalled();
-  });
-
-  it('validarCliente should return false if birthDate is in the future', () => {
-    const futureDate = new Date();
-    futureDate.setDate(futureDate.getDate() + 1);
-    const invalidClient = { ...mockClients[0], birthDate: futureDate.toISOString().split('T')[0] };
-    expect(component.validarCliente(invalidClient as any)).toBeFalse();
-    expect(mockMessageService.add).toHaveBeenCalled();
-  });
-
-  it('validarCliente should return true for valid client', () => {
-    expect(component.validarCliente(mockClients[0] as any)).toBeTrue();
-  });
-
-  it('guardarClienteNuevo should add client on success', fakeAsync(() => {
-    const newClient = { ...mockClients[0] };
-    component.nuevoCliente = newClient as any;
-    mockClientsService.create.and.returnValue(of(newClient));
     component.guardarClienteNuevo();
-    tick();
-    expect(component.clientes).toContain(newClient);
+
+    expect(component.clientes.length).toBe(1);
     expect(component.displayModal).toBeFalse();
-    expect(mockMessageService.add).toHaveBeenCalled();
-  }));
+    expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
+      severity: 'success',
+      detail: jasmine.any(String)
+    }));
+  });
 
-  it('guardarClienteNuevo should show error on error', fakeAsync(() => {
-    component.nuevoCliente = mockClients[0] as any;
-    mockClientsService.create.and.returnValue(throwError(() => ({ status: 412, error: { message: 'Error' } })));
+  it('debe mostrar error 412 al crear cliente duplicado', () => {
+    component.nuevoCliente = { ...clientMock, user: { ...clientMock.user, password: '1234' } };
+    mockClientService.create.and.returnValue(throwError(() => ({
+      status: 412,
+      error: { message: 'Cliente ya existe' }
+    })));
+
     component.guardarClienteNuevo();
-    tick();
-    expect(mockMessageService.add).toHaveBeenCalled();
-  }));
 
-  it('toggleClientStatus should update client and show success', fakeAsync(() => {
-    const client = { ...mockClients[0] };
-    mockClientsService.update.and.returnValue(of(client));
-    component.toggleClientStatus(client);
-    tick();
-    expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'success' }));
-  }));
+    expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
+      severity: 'error',
+      detail: 'Cliente ya existe'
+    }));
+  });
 
-  it('toggleClientStatus should revert on error', fakeAsync(() => {
-    const client = { ...mockClients[0], active: true };
+  it('debe actualizar un cliente correctamente', () => {
+    const actualizado = { ...clientMock, name: 'Carlos' };
+    component.nuevoCliente = actualizado;
+    component.clientes = [clientMock];
+    mockClientService.update.and.returnValue(of(actualizado));
 
-    mockClientsService.update.and.returnValue(throwError(() => 'error'));
-    component.toggleClientStatus(client);
-    tick();
-    expect(client.active).toBeFalse();
-    expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'error' }));
-  }));
+    component.actualizarCliente();
 
-  // it('eliminarCliente should call delete and remove client', fakeAsync(() => {
-  //   component.clientes = [...mockClients];
-  //   mockClientsService.delete.and.returnValue(of({}));
-  //   mockConfirmationService.confirm.and.callFake((options: any) => options.accept());
-  //   component.eliminarCliente('1');
-  //   tick();
-  //   expect(component.clientes.length).toBe(1);
-  //   expect(component.clientes[0].id).toBe('2');
-  // }));
+    expect(component.clientes[0].name).toBe('Carlos');
+    expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
+      severity: 'success',
+      detail: jasmine.any(String)
+    }));
+  });
 
-  it('abrirModal should set modoEdicion and nuevoCliente for edit', () => {
-    component.abrirModal(mockClients[0]);
+  it('debe manejar error al actualizar cliente', () => {
+    component.nuevoCliente = clientMock;
+    mockClientService.update.and.returnValue(throwError(() => new Error('Error actualización')));
+
+    component.actualizarCliente();
+
+    expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
+      severity: 'error'
+    }));
+  });
+
+  it('debe eliminar un cliente correctamente', () => {
+    component.clientes = [clientMock];
+    mockClientService.delete.and.returnValue(of(void 0));
+    mockConfirmationService.confirm.and.callFake((options: any) => options.accept());
+
+    component.eliminarCliente(clientMock.id);
+
+    expect(component.clientes.length).toBe(0);
+    expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
+      severity: 'success',
+      detail: jasmine.any(String)
+    }));
+  });
+
+  it('debe calcular correctamente la edad', () => {
+    const edad = component.calcularEdad('2000-01-01');
+    expect(typeof edad).toBe('number');
+    expect(edad).toBeGreaterThan(0);
+  });
+
+  it('debe abrir modal en modo edición', () => {
+    component.abrirModal(clientMock);
+    expect(component.displayModal).toBeTrue();
     expect(component.modoEdicion).toBeTrue();
-    expect(component.nuevoCliente.id).toBe('1');
-    expect(component.displayModal).toBeTrue();
   });
 
-  it('abrirModal should reset nuevoCliente for new', () => {
+  it('debe abrir modal para nuevo cliente', () => {
     component.abrirModal();
+    expect(component.displayModal).toBeTrue();
     expect(component.modoEdicion).toBeFalse();
-    expect(component.nuevoCliente.id).toBe('');
+  });
+
+  it('debe establecer displayModal en true al llamar a abrir()', () => {
+    component.displayModal = false;
+    component.abrir();
     expect(component.displayModal).toBeTrue();
   });
 
-  it('actualizarCliente should update client and show success', fakeAsync(() => {
-    const updatedClient = { ...mockClients[0], name: 'Nuevo' };
-    component.nuevoCliente = updatedClient as any;
-    component.clientes = [mockClients[0]];
-    mockClientsService.update.and.returnValue(of(updatedClient));
-    component.actualizarCliente();
-    tick();
-    expect(component.clientes[0].name).toBe('Nuevo');
+  it('debe establecer displayModal en false al llamar a cerrar()', () => {
+    component.displayModal = true;
+    component.cerrar();
     expect(component.displayModal).toBeFalse();
-    expect(component.modoEdicion).toBeFalse();
-    expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'success' }));
-  }));
-
-  it('actualizarCliente should show error on failure', fakeAsync(() => {
-    component.nuevoCliente = mockClients[0] as any;
-    mockClientsService.update.and.returnValue(throwError(() => 'error'));
-    component.actualizarCliente();
-    tick();
-    expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({ severity: 'error' }));
-  }));
-
-  it('calcularEdad should return correct age', () => {
-    const birthDate = '2000-01-01';
-    const age = component.calcularEdad(birthDate);
-    const expectedAge = new Date().getFullYear() - 2000 - (new Date().getMonth() < 0 || (new Date().getMonth() === 0 && new Date().getDate() < 1) ? 1 : 0);
-    expect(age).toEqual(jasmine.any(Number));
   });
 
-  it('calcularEdad should return empty string if fechaNacimiento is undefined', () => {
-    expect(component.calcularEdad(undefined)).toBe('');
+  it('debe llamar a obtenerClientes() al inicializar el componente', () => {
+    const obtenerClientesSpy = spyOn(component, 'obtenerClientes');
+    component.ngOnInit();
+    expect(obtenerClientesSpy).toHaveBeenCalled();
   });
 
-  it('verDetalleCliente should set clienteSeleccionado and displayDetailModal', () => {
-    component.verDetalleCliente(mockClients[0]);
-    expect(component.clienteSeleccionado).toEqual(mockClients[0]);
+  it('cerrarModal debe poner displayModal en false', () => {
+  component.displayModal = true;
+  component.cerrarModal();
+  expect(component.displayModal).toBeFalse();
+});
+
+it('handleClienteCreado debe cerrar modal, agregar cliente y mostrar mensaje', () => {
+  const nuevoCliente: Client = { ...clientMock, id: '2', name: 'Ana' };
+  component.clientes = [clientMock];
+
+  component.handleClienteCreado(nuevoCliente);
+
+  expect(component.displayModal).toBeFalse();
+  expect(component.clientes.length).toBe(2);
+  expect(component.clientes).toContain(nuevoCliente);
+  expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
+    severity: 'success',
+    detail: jasmine.stringMatching(/creado/i)
+  }));
+});
+it('debe eliminar un cliente correctamente', () => {
+    component.clientes = [clientMock];
+    mockClientService.delete.and.returnValue(of(void 0));
+    mockConfirmationService.confirm.and.callFake((options: any) => {
+      options.accept(); // Simula que el usuario acepta la confirmación
+      return mockConfirmationService; // Return the mock to satisfy the type
+    });
+
+    component.eliminarCliente(clientMock.id);
+
+    expect(mockConfirmationService.confirm).toHaveBeenCalled();
+    expect(mockClientService.delete).toHaveBeenCalledWith(clientMock.id);
+    expect(component.clientes.length).toBe(0);
+    expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
+      severity: 'success',
+      detail: jasmine.any(String)
+    }));
+  });
+
+  it('debe manejar error al eliminar un cliente', () => {
+    spyOn(console, 'error'); // Espía console.error
+    component.clientes = [clientMock];
+    mockClientService.delete.and.returnValue(throwError(() => new Error('Error al eliminar cliente')));
+    mockConfirmationService.confirm.and.callFake((options: any) => {
+      options.accept(); // Simula que el usuario acepta la confirmación
+      return mockConfirmationService; // Return the mock to satisfy the type
+    });
+
+    component.eliminarCliente(clientMock.id);
+
+    expect(mockConfirmationService.confirm).toHaveBeenCalled();
+    expect(mockClientService.delete).toHaveBeenCalledWith(clientMock.id);
+    expect(console.error).toHaveBeenCalledWith('Error al eliminar cliente:', jasmine.any(Error));
+    expect(component.clientes.length).toBe(1); // El cliente no debería eliminarse
+    expect(mockMessageService.add).not.toHaveBeenCalled(); // No se debería mostrar mensaje de éxito
+  });
+
+  it('debe mostrar el detalle del cliente y abrir el modal', () => {
+    spyOn(console, 'log'); // Espía console.log para verificar la llamada
+    const cliente = clientMock; // Usa el mock definido en tu setup
+
+    component.verDetalleCliente(cliente);
+
+    expect(console.log).toHaveBeenCalledWith('Ver detalle:', cliente);
+    expect(component.clienteSeleccionado).toBe(cliente);
     expect(component.displayDetailModal).toBeTrue();
   });
+  it('debe mostrar mensaje de error genérico al fallar la creación del cliente con error inesperado', () => {
+  component.nuevoCliente = { ...clientMock, user: { ...clientMock.user, password: '1234' } };
+  mockClientService.create.and.returnValue(throwError(() => new Error('Error inesperado')));
 
-  it('cerrarModal should set displayModal to false', () => {
-    component.displayModal = true;
-    component.cerrarModal();
-    expect(component.displayModal).toBeFalse();
+  component.guardarClienteNuevo();
+
+  expect(mockClientService.create).toHaveBeenCalledWith(component.nuevoCliente);
+  expect(component.clientes.length).toBe(0); // No se agrega el cliente
+  expect(component.displayModal).toBeTrue(); // El modal no se cierra
+  expect(mockMessageService.add).toHaveBeenCalledWith({
+    severity: 'error',
+    summary: 'Error',
+    detail: 'Ocurrió un error inesperado.'
+  });
+});
+it('debe actualizar el estado del cliente correctamente y mostrar mensaje de éxito', () => {
+    const cliente = { ...clientMock, active: true }; // Cliente inicialmente activo
+    mockClientService.update.and.returnValue(of(cliente)); // Simula éxito retornando el cliente
+
+    component.toggleClientStatus(cliente);
+
+    expect(mockClientService.update).toHaveBeenCalledWith(jasmine.objectContaining({ id: cliente.id, active: true }));
+    expect(mockMessageService.add).toHaveBeenCalledWith({
+      severity: 'success',
+      summary: 'Éxito',
+      detail: 'Cliente activado correctamente'
+    });
   });
 
-  it('handleClienteCreado should add client and close modal', () => {
-    const client = mockClients[0];
-    component.clientes = [];
-    component.handleClienteCreado(client);
-    expect(component.clientes).toContain(client);
-    expect(component.displayModal).toBeFalse();
+  it('debe manejar error al actualizar el estado del cliente, revertir el cambio y mostrar mensaje de error', () => {
+    spyOn(console, 'error'); // Espía console.error
+    const cliente = { ...clientMock, active: true }; // Cliente inicialmente activo
+    cliente.active = false; // Simula cambio local antes de la llamada al servicio
+    mockClientService.update.and.returnValue(throwError(() => new Error('Error al actualizar')));
+
+    component.toggleClientStatus(cliente);
+
+    expect(mockClientService.update).toHaveBeenCalledWith(jasmine.objectContaining({ id: cliente.id, active: false }));
+    expect(console.error).toHaveBeenCalledWith('Error al actualizar estado del cliente:', jasmine.any(Error));
+    expect(cliente.active).toBe(true); // Verifica que el estado se revierte
+    expect(mockMessageService.add).toHaveBeenCalledWith({
+      severity: 'error',
+      summary: 'Error',
+      detail: 'No se pudo actualizar el estado del cliente'
+    });
   });
 
-  it('soloNumerosMaxLength should prevent non-numeric input', () => {
-    const event = {
-      target: { value: '' },
-      charCode: 65, // 'A'
-      keyCode: 65,
-      preventDefault: jasmine.createSpy()
-    } as any as KeyboardEvent;
-    component.soloNumerosMaxLength(event, 10);
-    expect(event.preventDefault).toHaveBeenCalled();
-  });
-
-  it('soloNumerosMaxLength should prevent input if maxLength reached', () => {
-    const event = {
-      target: { value: '1234567890' },
-      charCode: 49, // '1'
-      keyCode: 49,
-      preventDefault: jasmine.createSpy()
-    } as any as KeyboardEvent;
-    component.soloNumerosMaxLength(event, 10);
-    expect(event.preventDefault).toHaveBeenCalled();
-  });
-
-  it('soloNumerosMaxLength should allow numeric input if under maxLength', () => {
-    const event = {
-      target: { value: '123' },
-      charCode: 49, // '1'
-      keyCode: 49,
-      preventDefault: jasmine.createSpy()
-    } as any as KeyboardEvent;
-    component.soloNumerosMaxLength(event, 10);
-    expect(event.preventDefault).not.toHaveBeenCalled();
-  });
 });

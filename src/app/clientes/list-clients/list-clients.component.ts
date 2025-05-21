@@ -86,30 +86,7 @@ ngOnInit(): void {
   }
 }
 
-validarCliente(cliente: Client & { user: Partial<User> & { password?: string } }): boolean {
-  if (!cliente.name.trim()) {
-    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'El nombre no puede estar vacío o solo contener espacios.' });
-    return false;
-  }
-  if (!cliente.lastName.trim()) {
-    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'El apellido no puede estar vacío o solo contener espacios.' });
-    return false;
-  }
-  
-  if (!cliente.birthDate) {
-    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'La fecha de nacimiento es obligatoria.' });
-    return false;
-  }
-  // Validar que la fecha de nacimiento no sea mayor a hoy
-  const hoy = new Date();
-  const nacimiento = new Date(cliente.birthDate);
-  if (nacimiento > hoy) {
-    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'La fecha de nacimiento no puede ser futura.' });
-    return false;
-  }
- 
-  return true;
-}
+
 
 
 toggleClientStatus(cliente: Client) {
@@ -234,22 +211,7 @@ guardarClienteNuevo() {
 
   this.displayModal = true;
 }
-soloNumerosMaxLength(event: KeyboardEvent, maxLength: number) {
-  const input = event.target as HTMLInputElement;
-  const charCode = event.charCode || event.keyCode;
-  const char = String.fromCharCode(charCode);
 
-  // Permitir solo números
-  if (!/^\d$/.test(char)) {
-    event.preventDefault();
-    return;
-  }
-
-  // Validar longitud máxima
-  if (input.value.length >= maxLength) {
-    event.preventDefault();
-  }
-}
 
 
 actualizarCliente() {

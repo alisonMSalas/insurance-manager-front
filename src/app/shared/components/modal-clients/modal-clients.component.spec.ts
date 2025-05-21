@@ -20,4 +20,10 @@ describe('ModalClientsComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('debería emitir onClose al ejecutar cerrar()', () => {
+    spyOn(component.onClose, 'emit');
+    component.cerrar();
+    expect(component.onClose.emit).toHaveBeenCalled();
+  });
 });

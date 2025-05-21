@@ -98,6 +98,37 @@ it('should call logout from menu item command', () => {
   expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
 });
 
-  
+  it('debe llamar a menu.toggle y prevenir el comportamiento predeterminado al presionar Enter', () => {
+    const menuSpy = spyOn(component.menu, 'toggle'); // Espía el método toggle del menú
+    const event = new KeyboardEvent('keydown', { key: 'Enter' });
+    spyOn(event, 'preventDefault'); // Espía preventDefault
+
+    component.onKeydown(event);
+
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(menuSpy).toHaveBeenCalledWith(event);
+  });
+
+  it('debe llamar a menu.toggle y prevenir el comportamiento predeterminado al presionar Espacio', () => {
+    const menuSpy = spyOn(component.menu, 'toggle'); // Espía el método toggle del menú
+    const event = new KeyboardEvent('keydown', { key: ' ' });
+    spyOn(event, 'preventDefault'); // Espía preventDefault
+
+    component.onKeydown(event);
+
+    expect(event.preventDefault).toHaveBeenCalled();
+    expect(menuSpy).toHaveBeenCalledWith(event);
+  });
+
+  it('no debe llamar a menu.toggle ni prevenir el comportamiento predeterminado para otras teclas', () => {
+    const menuSpy = spyOn(component.menu, 'toggle'); // Espía el método toggle del menú
+    const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+    spyOn(event, 'preventDefault'); // Espía preventDefault
+
+    component.onKeydown(event);
+
+    expect(event.preventDefault).not.toHaveBeenCalled();
+    expect(menuSpy).not.toHaveBeenCalled();
+  });
 });
 

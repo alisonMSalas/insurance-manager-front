@@ -30,10 +30,6 @@ export class ModalClientsComponent {
     this.onClose.emit();
   }
 
-  guardarCliente() {
-    if(this.cliente) {
-      this.onSave.emit(this.cliente);
-    }
-  }
+
 
 }
