@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ApiClientService } from './httpclient';
-import { PLATFORM_ID } from '@angular/core';
+
 
 describe('ApiClientService', () => {
   let service: ApiClientService;
@@ -14,7 +14,7 @@ describe('ApiClientService', () => {
       imports: [HttpClientTestingModule],
       providers: [
         ApiClientService,
-        { provide: PLATFORM_ID, useValue: 'browser' }
+       
       ]
     });
 

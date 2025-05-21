@@ -1,0 +1,323 @@
+<div class="clientes-view p-4">
+  <p-confirmDialog></p-confirmDialog>
+  <p-toast></p-toast>
+
+  <div class="clientes-header flex justify-content-between align-items-center mb-5 p-3 bg-white border-round shadow-1">
+    <div>
+      <h2 class="m-0 text-2xl font-medium">Clientes</h2>
+      <p class="m-0 mt-2 text-gray-600">Listado general de los clientes registrados en el sistema</p>
+    </div>
+    <button pButton type="button" label="Nuevo Cliente" icon="pi pi-plus" class="p-button-primary py-2 px-3"
+      (click)="abrirModal()"></button>
+  </div>
+
+  <div class="filters-container mb-4 p-3 bg-white border-round shadow-1">
+    <p-floatlabel class="w-full">
+      <input id="search" pInputText class="w-full" [(ngModel)]="filtroCedula" (input)="filtrarClientes()" />
+      <label for="search">Buscar por cédula</label>
+    </p-floatlabel>
+  </div>
+
+  <div class="clientes-table-container p-3 bg-white border-round shadow-1">
+    <p-table [value]="clientes" [tableStyle]="{ 'min-width': '50rem', 'width': '100%' }" [scrollable]="true"
+      scrollHeight="400px" [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10, 20]"
+      [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} clientes">
+      <ng-template pTemplate="header">
+        <tr>
+          <th scope="col" pSortableColumn="name" style="width:25%" class="py-3 px-2">
+            Nombre <p-sortIcon field="name" />
+          </th>
+          <th  scope="col" pSortableColumn="identificationNumber" style="width:20%" class="py-3 px-2">
+            DNI <p-sortIcon field="identificationNumber" />
+          </th>
+          <th scope="col" pSortableColumn="active" style="width:20%" class="py-3 px-2">
+            Estado <p-sortIcon field="active" />
+          </th>
+          <th scope="col" style="width:35%" class="py-3 px-2">Opciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-cliente>
+        <tr>
+          <td class="py-3 px-2">{{ cliente.name }} {{ cliente.lastName }}</td>
+          <td class="py-3 px-2">{{ cliente.identificationNumber }}</td>
+          <td class="py-3 px-2">
+            <p-toggleswitch [(ngModel)]="cliente.active" (onChange)="toggleClientStatus(cliente)" />
+          </td>
+          <td class="py-3 px-2">
+            <div class="action-buttons flex gap-2">
+              <button pButton type="button" icon="pi pi-eye" class="p-button-outlined p-button-info p-button-sm"
+                title="Ver" (click)="verDetalleCliente(cliente)"></button>
+              <button pButton type="button" icon="pi pi-pencil" class="p-button-outlined p-button-warning p-button-sm"
+                title="Editar" (click)="abrirModal(cliente)"></button>
+              <button pButton type="button" icon="pi pi-trash" class="p-button-outlined p-button-danger p-button-sm"
+                title="Eliminar" (click)="eliminarCliente(cliente.id)"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <p-dialog [(visible)]="displayDetailModal" [modal]="true" [style]="{ width: '850px' }"
+    [breakpoints]="{ '960px': '75vw', '640px': '90vw' }" header="Detalles del Cliente">
+    <div class="flex gap-5">
+      <div class="w-1/2">
+        <div class="flex items-center mb-5">
+          <div class="bg-primary-100 p-3 rounded-full mr-4">
+            <i class="pi pi-user text-primary-600 text-xl"></i>
+          </div>
+          <div>
+            <h3 class="text-2xl font-semibold m-0">{{ clienteSeleccionado?.name }} {{ clienteSeleccionado?.lastName }}
+            </h3>
+            <p class="text-gray-500 m-0">Cliente desde: {{ today | date:'dd/MM/yyyy' }}</p>
+          </div>
+        </div>
+        <div class="space-y-3 mb-4">
+          <div class="bg-gray-50 p-3 rounded-lg flex items-center">
+            <div class="bg-primary-100 p-2 rounded-full mr-3">
+              <i class="pi pi-id-card text-primary-600"></i>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Documento</p>
+              <p class="font-medium">{{ clienteSeleccionado?.identificationNumber }}</p>
+            </div>
+          </div>
+          <div class="bg-gray-50 p-3 rounded-lg flex items-center">
+            <div class="bg-primary-100 p-2 rounded-full mr-3">
+              <i class="pi pi-calendar text-primary-600"></i>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Edad</p>
+              <p class="font-medium">{{ calcularEdad(clienteSeleccionado?.birthDate) }} años</p>
+            </div>
+          </div>
+          <div class="bg-gray-50 p-3 rounded-lg flex items-center">
+            <div class="bg-primary-100 p-2 rounded-full mr-3">
+              <i class="pi pi-users text-primary-600"></i>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Género</p>
+              <p class="font-medium">{{ clienteSeleccionado?.gender }}</p>
+            </div>
+          </div>
+          <div class="bg-gray-50 p-3 rounded-lg flex items-center">
+            <div class="bg-primary-100 p-2 rounded-full mr-3">
+              <i class="pi pi-star text-primary-600"></i>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Nacimiento</p>
+              <p class="font-medium">{{ clienteSeleccionado?.birthDate | date:'dd/MM/yyyy' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="w-1/2">
+        <div class="bg-gray-50 p-4 rounded-lg mb-4">
+          <h4 class="font-medium text-lg border-b border-gray-200 pb-2 mb-3 flex items-center">
+            <i class="pi pi-phone text-primary-500 mr-2"></i>Datos de Contacto
+          </h4>
+          <div class="space-y-3">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Teléfono</p>
+              <p class="font-medium">{{ clienteSeleccionado?.phoneNumber }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Correo</p>
+              <p class="font-medium">{{ clienteSeleccionado?.user?.email }}</p>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Dirección</p>
+              <p class="font-medium">{{ clienteSeleccionado?.address }}</p>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-lg">
+          <h4 class="font-medium text-lg border-b border-gray-200 pb-2 mb-3 flex items-center">
+            <i class="pi pi-briefcase text-primary-500 mr-2"></i>Información Adicional
+          </h4>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Estado</p>
+              <p-tag [severity]="clienteSeleccionado?.active ? 'success' : 'danger'"
+                [value]="clienteSeleccionado?.active ? 'Activo' : 'Inactivo'" class="font-medium"></p-tag>
+            </div>
+            <div>
+              <p class="text-sm text-gray-500 mb-1">Ocupación</p>
+              <p class="font-medium">{{ clienteSeleccionado?.occupation }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-end mt-4 pt-4 border-t border-gray-100">
+      <button pButton type="button" label="Cerrar" class="p-button-outlined p-button-primary"
+        (click)="displayDetailModal = false"></button>
+    </div>
+  </p-dialog>
+
+  <p-dialog [(visible)]="displayModal" [modal]="true" [header]="modoEdicion ? 'Editar Cliente' : 'Registrar Cliente'"
+    [style]="{ width: '950px', maxHeight: '90vh' }" [breakpoints]="{ '960px': '75vw', '640px': '90vw' }">
+    <form #clientForm="ngForm" (ngSubmit)="modoEdicion ? actualizarCliente() : guardarClienteNuevo()">
+      <div class="flex gap-6">
+        <!-- Columna Izquierda - Datos Personales -->
+        <div class="w-1/2">
+          <h3 class="text-xl font-semibold mb-4 pb-2 border-b-2 border-primary-100 flex items-center">
+            <i class="pi pi-user mr-3 text-primary-500"></i>
+            <span class="text-primary-700">Datos Personales</span>
+          </h3>
+          <div class="space-y-5">
+            <!-- Fila 1: Nombre + Apellido -->
+            <div class="flex gap-4">
+              <div class="field flex-1">
+                <label for="name" class="block text-sm font-medium text-gray-600 mb-1">
+                  <i class="pi pi-user mr-2 text-primary-500"></i>Nombre
+                </label>
+                <input id="name" pInputText type="text" class="w-full" [(ngModel)]="nuevoCliente.name" name="name"
+                  required minlength="2" #name="ngModel" />
+                <small *ngIf="name.touched && name.invalid" class="p-error">
+                  El nombre es requerido y debe tener al menos 2 caracteres.
+                </small>
+              </div>
+              <div class="field flex-1">
+                <label for="lastName" class="block text-sm font-medium text-gray-600 mb-1">
+                  <i class="pi pi-user-edit mr-2 text-primary-500"></i>Apellido
+                </label>
+                <input id="lastName" pInputText type="text" class="w-full" [(ngModel)]="nuevoCliente.lastName"
+                  name="lastName" required minlength="2" #lastName="ngModel" />
+                <small *ngIf="lastName.touched && lastName.invalid" class="p-error">
+                  El apellido es requerido y debe tener al menos 2 caracteres.
+                </small>
+              </div>
+            </div>
+            <!-- Identificación -->
+            <div class="field">
+              <label for="identificationNumber" class="block text-sm font-medium text-gray-600 mb-1">
+                <i class="pi pi-id-card mr-2 text-primary-500"></i>Número de Identificación
+              </label>
+              <input id="identificationNumber" pInputText type="text" class="w-full"
+                [(ngModel)]="nuevoCliente.identificationNumber" name="identificationNumber" required pattern="[0-9]{10}"
+                maxlength="10" (input)="restrictToNumbers($event, nuevoCliente, 'identificationNumber')"
+                #identificationNumber="ngModel" />
+
+              <small *ngIf="identificationNumber.touched && identificationNumber.invalid" class="p-error">
+                El número de identificación debe tener exactamente 10 dígitos y no puede contener letras ni signos.
+              </small>
+            </div>
+            <!-- Fila 2: Fecha Nacimiento + Teléfono -->
+            <div class="flex gap-4">
+              <div class="field flex-1">
+                <label for="birthDate" class="block text-sm font-medium text-gray-600 mb-1">
+                  <i class="pi pi-calendar mr-2 text-primary-500"></i>Fecha de Nacimiento
+                </label>
+                <input type="date" [(ngModel)]="nuevoCliente.birthDate" name="birthDate" class="w-full p-inputtext"
+                  required [max]="today | date:'yyyy-MM-dd'" #birthDate="ngModel" />
+                <small *ngIf="birthDate.touched && birthDate.invalid" class="p-error">
+                  La fecha de nacimiento es requerida y no puede ser futura.
+                </small>
+              </div>
+              <div class="field flex-1">
+                <label for="phoneNumber" class="block text-sm font-medium text-gray-600 mb-1">
+                  <i class="pi pi-phone mr-2 text-primary-500"></i>Teléfono
+                </label>
+                <input id="phoneNumber" pInputText type="text" class="w-full" [(ngModel)]="nuevoCliente.phoneNumber"
+                  name="phoneNumber" required maxlength="10" pattern="[0-9]{10}"
+                  (input)="restrictToNumbers($event, nuevoCliente, 'phoneNumber')" #phoneNumber="ngModel" />
+
+
+                <small *ngIf="phoneNumber.touched && phoneNumber.invalid" class="p-error">
+                  El teléfono debe tener exactamente 10 dígitos y no puede contener letras ni signos.
+                </small>
+              </div>
+            </div>
+            <!-- Dirección -->
+            <div class="field">
+              <label for="address" class="block text-sm font-medium text-gray-600 mb-1">
+                <i class="pi pi-map-marker mr-2 text-primary-500"></i>Dirección
+              </label>
+              <input id="address" pInputText type="text" class="w-full" [(ngModel)]="nuevoCliente.address"
+                name="address" required minlength="5" #address="ngModel" />
+              <small *ngIf="address.touched && address.invalid" class="p-error">
+                La dirección es requerida y debe tener al menos 5 caracteres.
+              </small>
+            </div>
+            <!-- Fila 3: Género + Ocupación -->
+            <div class="flex gap-4">
+              <div class="field flex-1">
+                <label for="gender" class="block text-sm font-medium text-gray-600 mb-1">
+                  <i class="pi pi-users mr-2 text-primary-500"></i>Género
+                </label>
+                <p-dropdown [options]="['Masculino', 'Femenino']" placeholder="Seleccione" class="w-full"
+                  [(ngModel)]="nuevoCliente.gender" name="gender" required #gender="ngModel"></p-dropdown>
+                <small *ngIf="gender.touched && gender.invalid" class="p-error">
+                  El género es requerido.
+                </small>
+              </div>
+              <div class="field flex-1">
+                <label for="occupation" class="block text-sm font-medium text-gray-600 mb-1">
+                  <i class="pi pi-briefcase mr-2 text-primary-500"></i>Ocupación
+                </label>
+                <input id="occupation" pInputText type="text" class="w-full" [(ngModel)]="nuevoCliente.occupation"
+                  name="occupation" required minlength="2" #occupation="ngModel" />
+                <small *ngIf="occupation.touched && occupation.invalid" class="p-error">
+                  La ocupación es requerida y debe tener al menos 2 caracteres.
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Columna Derecha - Datos Usuario -->
+        <div class="w-1/2 border-l-2 border-gray-100 pl-6">
+          <h3 class="text-xl font-semibold mb-4 pb-2 border-b-2 border-primary-100 flex items-center">
+            <i class="pi pi-lock mr-3 text-primary-500"></i>
+            <span class="text-primary-700">Datos de Acceso</span>
+          </h3>
+          <div class="space-y-5">
+            <!-- Email -->
+            <div class="field">
+              <label for="email" class="block text-sm font-medium text-gray-600 mb-1">
+                <i class="pi pi-envelope mr-2 text-primary-500"></i>Correo Electrónico
+              </label>
+              <input id="email" pInputText type="email" class="w-full" [(ngModel)]="nuevoCliente.user.email"
+                name="email" required email [disabled]="modoEdicion" #email="ngModel" />
+              <small *ngIf="email.touched && email.invalid" class="p-error">
+                El correo electrónico es requerido y debe ser válido.
+              </small>
+            </div>
+            <!-- Contraseña -->
+            <div class="field">
+              <label for="password" class="block text-sm font-medium text-gray-600 mb-1">
+                <i class="pi pi-key mr-2 text-primary-500"></i>{{ modoEdicion ? 'Nueva Contraseña (opcional)' :
+                'Contraseña' }}
+              </label>
+              <p-password id="password" [toggleMask]="true" class="w-full" [inputStyleClass]="'w-full'"
+                [(ngModel)]="nuevoCliente.user.password" name="password" [required]="!modoEdicion"
+                pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$" #password="ngModel" />
+              <small *ngIf="password.touched && password.invalid" class="p-error">
+                {{ modoEdicion ? 'La nueva contraseña debe tener al menos 8 caracteres, incluyendo letras y números.' :
+                'La contraseña es requerida y debe tener al menos 8 caracteres, incluyendo letras y números.' }}
+              </small>
+            </div>
+            <!-- Espacio para posibles campos adicionales -->
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+              <div class="flex items-start">
+                <i class="pi pi-info-circle text-blue-500 mt-1 mr-3"></i>
+                <div>
+                  <p class="text-sm text-blue-700 font-medium">Seguridad de la cuenta</p>
+                  <p class="text-xs text-blue-600">La contraseña debe contener al menos 8 caracteres, incluyendo números
+                    y letras.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Botones de acción -->
+      <div class="flex justify-end mt-6 pt-4 border-t border-gray-100">
+        <button pButton type="button" label="Cancelar" class="p-button-outlined p-button-secondary mr-3"
+          (click)="cerrar()"></button>
+        <button pButton type="submit" [label]="modoEdicion ? 'Guardar Cambios' : 'Registrar Cliente'"
+          class="p-button-primary" [disabled]="clientForm.invalid"></button>
+      </div>
+    </form>
+  </p-dialog>
+</div>

@@ -5,6 +5,7 @@ import { ListUsersComponent } from './users/components/list-users/list-users.com
 import { ListSegurosComponent } from './seguros/list-seguros/list-seguros.component';
 import { AuthGuard } from './core/guards/auth.guard';
 import { ContratacionSegurosComponent } from './seguros/contratacion-seguros/contratacion-seguros.component';
+import { ListClientsComponent } from './clientes/list-clients/list-clients.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -16,7 +17,7 @@ export const routes: Routes = [
             { path: 'users', component: ListUsersComponent },
             { path: 'insurance', component: ListSegurosComponent },
             { path: 'contratacion', component: ContratacionSegurosComponent },
-            { path: '', redirectTo: 'insurance', pathMatch: 'full' }
+            {path: 'clients',component: ListClientsComponent}
         ]
     },
 

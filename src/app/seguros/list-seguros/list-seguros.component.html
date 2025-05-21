@@ -8,7 +8,7 @@
       <h2 class="section-title">Todos los Seguros</h2>
       <p class="section-subtitle">Gestiona y revisa el estado de los seguros</p>
     </div>
-    <p-button icon="pi pi-plus" label="Nuevo Seguro" styleClass="p-button-primary" (click)="openModal()"></p-button>
+    <p-button icon="pi pi-plus" label="Nuevo Seguro" styleClass="p-button-primary"  (click)="openModal()"></p-button>
   </div>
 
   <!-- Filtros -->
@@ -44,7 +44,7 @@
     </div>
 
     <div class="filter-group">
-      <label>&nbsp;</label>
+      <!-- <label>&nbsp;</label> -->
       <p-button
         icon="pi pi-refresh"
         (onClick)="refreshData()"
@@ -113,8 +113,9 @@
     <!-- Fila 1 -->
     <div class="form-row">
       <div class="form-field">
-        <label for="name">Nombre del Seguro</label>
+        
         <input id="name" type="text" pInputText [(ngModel)]="insurance.name" />
+        <label for="name">Nombre del Seguro</label>
       </div>
       
       <div class="form-field">

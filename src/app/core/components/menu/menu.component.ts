@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { MenubarModule } from 'primeng/menubar';
-import { IMenu } from '../../services/menu.service';
-import { MenuService } from '../../services/menu.service';
+import { IMenu,  MenuService } from '../../services/menu.service';
 import { CommonModule } from '@angular/common';
 
 @Component({

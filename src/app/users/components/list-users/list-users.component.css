@@ -237,6 +237,11 @@
   color: #7c2d12;
 }
 
+.role-cliente {
+   background-color: #ffe5cc;
+  color: #7c2d12;
+}
+
 /* Estilos para los botones de acciones */
 .action-buttons {
   display: flex;
