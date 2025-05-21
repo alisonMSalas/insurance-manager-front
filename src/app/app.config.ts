@@ -6,12 +6,13 @@ import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideZoneChangeDetection({ eventCoalescing: true }), 
     provideRouter(routes), 
     provideHttpClient(),
-  
+    provideHttpClientTesting(),
     provideClientHydration(withEventReplay()),
     providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: 'darks', } } }),
     provideAnimations()
