@@ -11,6 +11,7 @@ export class MenuService {
   private listMenu: IMenu[] = [
     { title: 'Seguros', url: '/insurance', icon: 'pi pi-shield' },
     { title: 'Usuarios', url: '/users', icon: 'pi pi-user' },
+    { title: 'Contratación Seguros', url: '/contratacion', icon: 'pi pi-shield' }
   ];
 
   getMenu(): IMenu[] {

@@ -1,0 +1,224 @@
+<p-tabView [(activeIndex)]="activeIndex">
+  <!-- 1. Datos del Cliente -->
+  <p-tabPanel header="Datos del Cliente">
+    <form [formGroup]="clienteForm" class="form-grid">
+      <!-- Buscar Cliente (toda la fila) -->
+      <div class="form-group full-width">
+        <label for="buscar">Buscar Cliente</label>
+        <div class="p-inputgroup">
+          <input id="buscar" type="text" pInputText formControlName="buscar" placeholder="Ingrese cédula" maxlength="10"
+            pattern="[0-9]*" inputmode="numeric" />
+          <button pButton icon="pi pi-search" type="button" (click)="buscarCliente()"></button>
+        </div>
+        <small *ngIf="clienteForm.get('buscar')?.touched && clienteForm.get('buscar')?.errors?.['cedulaInvalida']"
+          class="p-error" style="color: red;">Cédula inválida</small>
+      </div>
+
+      <div class="form-group">
+        <label for="cedula">Número de Documento</label>
+        <input id="cedula" type="text" pInputText formControlName="cedula" placeholder="Ingrese cédula" maxlength="10"
+          pattern="[0-9]*" inputmode="numeric" />
+        <small *ngIf="clienteForm.get('cedula')?.touched && clienteForm.get('cedula')?.errors?.['cedulaInvalida']"
+          class="p-error">Cédula inválida</small>
+      </div>
+
+      <div class="form-group">
+        <label for="nombres">Nombres</label>
+        <input type="text" pInputText formControlName="nombres" placeholder="Ingrese nombres">
+      </div>
+
+      <div class="form-group">
+        <label for="apellidos">Apellidos</label>
+        <input type="text" pInputText formControlName="apellidos" placeholder="Ingrese apellidos">
+      </div>
+
+      <div class="form-group">
+        <label for="fechaNacimiento">Fecha de Nacimiento</label>
+        <p-calendar formControlName="fechaNacimiento" dateFormat="dd/mm/yy" [showIcon]="true" inputId="fechaNacimiento"
+          placeholder="dd/mm/aaaa"></p-calendar>
+      </div>
+
+      <div class="form-group">
+        <label for="genero">Género</label>
+        <p-dropdown [options]="generos" formControlName="genero" placeholder="Seleccione..."></p-dropdown>
+      </div>
+
+      <div class="form-group">
+        <label for="estadoCivil">Estado Civil</label>
+        <p-dropdown [options]="estadosCiviles" formControlName="estadoCivil" placeholder="Seleccione..."></p-dropdown>
+      </div>
+
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input type="text" pInputText formControlName="telefono" placeholder="Ingrese teléfono">
+      </div>
+
+      <div class="form-group">
+        <label for="correo">Correo Electrónico</label>
+        <input type="email" pInputText formControlName="correo" placeholder="Ingrese correo">
+      </div>
+
+      <div class="form-group full-width">
+        <label for="direccion">Dirección</label>
+        <input type="text" pInputText formControlName="direccion" placeholder="Ingrese dirección">
+      </div>
+
+      <div class="form-group full-width">
+        <label for="distrito">Ocupacion</label>
+        <p-dropdown [options]="distritos" formControlName="distrito" placeholder="Seleccione..."></p-dropdown>
+      </div>
+
+      <div class="navigation-buttons single-button">
+        <button pButton label="Continuar" (click)="activeIndex = 1" class="p-button-primary"></button>
+      </div>
+
+    </form>
+
+
+  </p-tabPanel>
+
+
+
+  <!-- 2. Coberturas -->
+  <p-tabPanel header="Coberturas y Beneficiarios">
+    <form [formGroup]="coberturasForm" class="form-layout">
+
+      <div class="form-group full-width" style="margin-bottom: 1.5rem;">
+        <label for="tipoSeguro"><strong>Cobertura</strong></label><br>
+        <p-dropdown [options]="tiposSeguro" optionLabel="name" optionValue="id" formControlName="tipoSeguro"
+          placeholder="Seleccione...">
+        </p-dropdown>
+      </div>
+
+      <div class="field" style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+        <div style="flex: 1;">
+          <label for="fechaInicio">Fecha de inicio de cobertura</label><br>
+          <div class="p-datepicker ">
+            <p-calendar formControlName="fechaInicio" dateFormat="dd/mm/yy" showIcon="true"></p-calendar>
+          </div>
+
+        </div>
+
+        <div style="flex: 1;">
+          <label for="fechaFin">Fecha de finalización de cobertura</label><br>
+          <p-calendar formControlName="fechaFin" dateFormat="dd/mm/yy" showIcon="true"></p-calendar>
+        </div>
+      </div>
+
+
+    </form>
+
+    <div style="margin-bottom: 1rem;">
+      <label><strong>Beneficiarios</strong></label><br>
+      <button pButton label="+ Agregar Beneficiario" (click)="agregarBeneficiario()" class="p-button-sm"
+        style="margin-top: 0.5rem;"></button>
+    </div>
+
+    <p-table [value]="beneficiarios" class="custom-table">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Nombre Completo</th>
+          <th>Parentesco</th>
+          <th>Porcentaje</th>
+          <th>Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-benef>
+        <tr>
+          <td><input type="text" pInputText [(ngModel)]="benef.nombre" name="nombre"></td>
+          <td>
+            <p-dropdown class="drop" #dropdownParentesco [options]="parentescos" [appendTo]="'body'"
+              [(ngModel)]="benef.parentesco" name="parentesco" [scrollHeight]="'100px'"></p-dropdown>
+          </td>
+          <td><input type="number" pInputText [(ngModel)]="benef.porcentaje" min="1" max="100" name="porcentaje"></td>
+          <td><button pButton icon="pi pi-trash" (click)="eliminarBeneficiario(benef)"></button></td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+    <div class="navigation-buttons">
+      <button pButton label="Regresar" (click)="activeIndex = 0" class="p-button-secondary"></button>
+      <button pButton label="Continuar" (click)="activeIndex = 2" class="p-button-primary"></button>
+    </div>
+
+  </p-tabPanel>
+
+  <!-- 4. Documentos -->
+  <p-tabPanel header="Documentos Requeridos">
+    <div class="p-mb-3">
+      <h3>Documentación Necesaria</h3>
+      <p class="instructions">
+        Para completar su solicitud, por favor adjunte su cédula de identidad (PDF, JPG o PNG – máximo 2MB).
+      </p>
+    </div>
+
+    <form [formGroup]="documentosForm">
+      <div class="p-field p-card p-p-3">
+        <i class="pi pi-file-pdf doc-icon"></i>
+        <label class="p-mb-2"><strong>Cédula de Identidad</strong></label>
+        <p class="doc-description">Copia legible de ambos lados</p>
+
+        <div class="card">
+          <p-toast></p-toast>
+          <p-fileupload #fileUpload name="cedula" url="https://www.primefaces.org/cdn/api/upload.php"
+            (onUpload)="onUpload($event)" [multiple]="false" accept=".pdf,.jpg,.png" [maxFileSize]="2000000"
+            mode="advanced" [auto]="true" chooseLabel="Seleccionar archivo">
+            <ng-template pTemplate="content">
+              <ul *ngIf="uploadedFiles.length">
+                <li *ngFor="let file of uploadedFiles">
+                  {{ file.name }} - {{ file.size }} bytes
+                  <button pButton icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text p-ml-2"
+                    (click)="removeFile(file)"></button>
+                </li>
+              </ul>
+            </ng-template>
+          </p-fileupload>
+        </div>
+        <small *ngIf="mostrarError" class="p-error">
+          <i class="pi pi-exclamation-triangle"></i> Documento requerido
+        </small>
+      </div>
+
+      <div class="navigation-buttons">
+        <button pButton label="Regresar" (click)="activeIndex = 1" class="p-button-secondary"></button>
+        <button pButton label="Continuar" (click)="activeIndex = 3" (click)="validarDocumento()" class="p-button-primary"></button>
+      </div>
+
+    </form>
+  </p-tabPanel>
+
+
+
+  <!-- 4. Datos de Pago -->
+  <p-tabPanel header="Datos de Pago">
+    <form [formGroup]="pagoForm">
+      <div class="p-field">
+        <label for="tipo-pago">Tipo de Pago</label>
+        <p-dropdown [options]="tiposPago" formControlName="tipoPago" placeholder="Seleccione...">
+        </p-dropdown>
+      </div>
+      <div class="p-field">
+        <label for="monto">Monto</label>
+        <input type="number" pInputText formControlName="monto" min="1">
+      </div>
+      <div class="p-field">
+        <label for="fecha">Fecha de Pago</label>
+        <p-calendar formControlName="fechaPago"></p-calendar>
+      </div>
+      <div class="navigation-buttons">
+        <button pButton type="button" label="Regresar" (click)="activeIndex = 2" class="p-button-secondary"></button>
+        <button pButton type="button" label="Continuar" (click)="activeIndex = 4" class="p-button-primary"></button>
+      </div>
+    </form>
+  </p-tabPanel>
+
+  <!-- 5. Resumen -->
+  <p-tabPanel header="Resumen">
+    <!-- Solo muestra datos, no uses formControlName aquí si no hay un formGroup -->
+    <p-dropdown [options]="tiposSeguro" [(ngModel)]="resumen.tipoSeguroSeleccionado" placeholder="Seleccione...">
+    </p-dropdown>
+
+    <button pButton label="Regresar" (click)="activeIndex = 3"></button>
+    <button pButton label="Finalizar" (click)="finalizarProceso()"></button>
+  </p-tabPanel>
+</p-tabView>
