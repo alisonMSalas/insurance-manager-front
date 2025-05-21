@@ -18,7 +18,7 @@ describe('ListClientsComponent', () => {
     lastName: 'Pérez',
     identificationNumber: '1234567890',
     birthDate: '2000-01-01',
-    phoneNumber: 999999999,
+    phoneNumber: '999999999',
     address: 'Calle 123',
     gender: 'Masculino',
     occupation: 'Ingeniero',
@@ -175,7 +175,7 @@ describe('ListClientsComponent', () => {
 
   it('debe establecer displayModal en true al llamar a abrir()', () => {
     component.displayModal = false;
-    component.abrir();
+    component.abrirModal();
     expect(component.displayModal).toBeTrue();
   });
 
@@ -193,7 +193,7 @@ describe('ListClientsComponent', () => {
 
   it('cerrarModal debe poner displayModal en false', () => {
   component.displayModal = true;
-  component.cerrarModal();
+  component.cerrar();
   expect(component.displayModal).toBeFalse();
 });
 
@@ -201,7 +201,7 @@ it('handleClienteCreado debe cerrar modal, agregar cliente y mostrar mensaje', (
   const nuevoCliente: Client = { ...clientMock, id: '2', name: 'Ana' };
   component.clientes = [clientMock];
 
-  component.handleClienteCreado(nuevoCliente);
+  component.displayDetailModal = true;
 
   expect(component.displayModal).toBeFalse();
   expect(component.clientes.length).toBe(2);

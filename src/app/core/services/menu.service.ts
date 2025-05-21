@@ -12,9 +12,8 @@ export class MenuService {
   private readonly listMenu: IMenu[] = [
 
     { title: 'Seguros', url: '/insurance', icon: 'pi pi-shield', roles: ['ADMIN', 'AGENT'] },
-
-    { title: 'Usuarios', url: '/users', icon: 'pi pi-user', roles: ['CLIENT', 'ADMIN'] },
-    { title: 'Clientes', url: '/clients', icon: 'pi pi-user-plus', roles: ['CLIENT', 'ADMIN'] },
+    { title: 'Usuarios', url: '/users', icon: 'pi pi-user', roles: ['ADMIN'] },
+    { title: 'Clientes', url: '/clients', icon: 'pi pi-user-plus', roles: ['ADMIN', 'AGENT'] },
 
   ];
 

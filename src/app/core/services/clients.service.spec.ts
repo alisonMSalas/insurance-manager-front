@@ -23,7 +23,7 @@ describe('ClientsService', () => {
     lastName: 'Pérez',
     identificationNumber: '1234567890',
     birthDate: '1990-01-01',
-    phoneNumber: 987654321,
+    phoneNumber: '987654321',
     address: 'Calle Falsa 123',
     gender: 'Masculino',
     occupation: 'Ingeniero',
