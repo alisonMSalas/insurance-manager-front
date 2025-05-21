@@ -28,4 +28,8 @@ export class ClientsService {
   delete(id: string): Observable<void> {
     return this.api.delete(`client/${id}`);
   }
+
+  getByIdentificationNumber(identificationNumber: string): Observable<Client> {
+    return this.api.get(`client/identification/${identificationNumber}`);
+  }
 }
