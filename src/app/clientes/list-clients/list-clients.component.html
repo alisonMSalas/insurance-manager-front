@@ -24,16 +24,16 @@
       [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} clientes">
       <ng-template pTemplate="header">
         <tr>
-          <th pSortableColumn="name" style="width:25%" class="py-3 px-2">
+          <th scope="col" pSortableColumn="name" style="width:25%" class="py-3 px-2">
             Nombre <p-sortIcon field="name" />
           </th>
-          <th pSortableColumn="identificationNumber" style="width:20%" class="py-3 px-2">
+          <th  scope="col" pSortableColumn="identificationNumber" style="width:20%" class="py-3 px-2">
             DNI <p-sortIcon field="identificationNumber" />
           </th>
-          <th pSortableColumn="active" style="width:20%" class="py-3 px-2">
+          <th scope="col" pSortableColumn="active" style="width:20%" class="py-3 px-2">
             Estado <p-sortIcon field="active" />
           </th>
-          <th style="width:35%" class="py-3 px-2">Opciones</th>
+          <th scope="col" style="width:35%" class="py-3 px-2">Opciones</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-cliente>

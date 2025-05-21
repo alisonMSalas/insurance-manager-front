@@ -6,9 +6,8 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { InputTextModule } from 'primeng/inputtext';
 import { FormsModule } from '@angular/forms';
-import { MessageService } from 'primeng/api';
+import { MessageService, ConfirmationService} from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
-import { ConfirmationService } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
 import { TagModule } from 'primeng/tag';
 import { ClientsService } from '../../core/services/clients.service';
@@ -297,21 +296,21 @@ export class ListClientsComponent {
         this.reloadClientes(); 
       },
       error: (error) => {
-        if (error.status === 412 && error.error && error.error.message) {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error al crear cliente',
-            detail: error.error.message,
-          });
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Ocurrió un error inesperado.',
-          });
-        }
-      },
-    });
+      if (error.status === 412 && error.error?.message) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error al crear cliente',
+          detail: error.error.message,
+        });
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Ocurrió un error inesperado.',
+        });
+      }
+    },
+  });
   }
 
   actualizarCliente(): void {
