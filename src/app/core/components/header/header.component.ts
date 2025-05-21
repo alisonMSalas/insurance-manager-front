@@ -52,8 +52,8 @@ export class HeaderComponent implements OnInit {
   }
   onKeydown(event: KeyboardEvent): void {
   if (event.key === 'Enter' || event.key === ' ') {
-    event.preventDefault(); // para evitar scroll con Espacio
-    this.menu.toggle(event); // abre/cierra el menú
+    event.preventDefault();
+    this.menu.toggle(event); 
   }
 }
 

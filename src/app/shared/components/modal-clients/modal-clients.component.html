@@ -1,0 +1,137 @@
+<p-dialog 
+  [(visible)]="displayModal" 
+  [modal]="true" 
+  [style]="{ width: '950px', maxHeight: '90vh' }" 
+  (onHide)="cerrar()" 
+  header="Registrar Cliente"
+  [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
+>
+  <form class="flex gap-6">
+    <!-- Columna Izquierda - Datos Personales -->
+    <div class="w-1/2">
+      <h3 class="text-xl font-semibold mb-4 pb-2 border-b-2 border-primary-100 flex items-center">
+        <i class="pi pi-user mr-3 text-primary-500"></i>
+        <span class="text-primary-700">Datos Personales</span>
+      </h3>
+      
+      <div class="space-y-5">
+        <!-- Fila 1: Nombre + Apellido -->
+        <div class="flex gap-4">
+          <div class="field flex-1">
+            <label for="name" class="block text-sm font-medium text-gray-600 mb-1">
+              <i class="pi pi-user mr-2 text-primary-500"></i>Nombre
+            </label>
+            <input id="name" pInputText type="text" class="w-full" />
+          </div>
+          
+          <div class="field flex-1">
+            <label for="lastName" class="block text-sm font-medium text-gray-600 mb-1">
+              <i class="pi pi-user-edit mr-2 text-primary-500"></i>Apellido
+            </label>
+            <input id="lastName" pInputText type="text" class="w-full" />
+          </div>
+        </div>
+
+        <!-- Identificación -->
+        <div class="field">
+          <label for="identificationNumber" class="block text-sm font-medium text-gray-600 mb-1">
+            <i class="pi pi-id-card mr-2 text-primary-500"></i>Número de Identificación
+          </label>
+          <input id="identificationNumber" pInputText type="text" class="w-full" />
+        </div>
+
+        <!-- Fila 2: Fecha Nacimiento + Teléfono -->
+        <div class="flex gap-4">
+          <div class="field flex-1">
+            <label for="birthDate" class="block text-sm font-medium text-gray-600 mb-1">
+              <i class="pi pi-calendar mr-2 text-primary-500"></i>Fecha de Nacimiento
+            </label>
+           <input type="date" 
+       
+       name="birthDate" 
+       class="w-full p-inputtext" />
+          </div>
+          
+          <div class="field flex-1">
+            <label for="phoneNumber" class="block text-sm font-medium text-gray-600 mb-1">
+              <i class="pi pi-phone mr-2 text-primary-500"></i>Teléfono
+            </label>
+            <input id="phoneNumber" pInputText type="text" class="w-full" />
+          </div>
+        </div>
+
+        <!-- Dirección -->
+        <div class="field">
+          <label for="address" class="block text-sm font-medium text-gray-600 mb-1">
+            <i class="pi pi-map-marker mr-2 text-primary-500"></i>Dirección
+          </label>
+          <input id="address" pInputText type="text" class="w-full" />
+        </div>
+
+        <!-- Fila 3: Género + Ocupación -->
+        <div class="flex gap-4">
+          <div class="field flex-1">
+            <label for="gender" class="block text-sm font-medium text-gray-600 mb-1">
+              <i class="pi pi-users mr-2 text-primary-500"></i>Género
+            </label>
+            <p-dropdown 
+              [options]="['Masculino', 'Femenino']" 
+              placeholder="Seleccione" 
+              class="w-full">
+            </p-dropdown>
+          </div>
+          
+          <div class="field flex-1">
+            <label for="occupation" class="block text-sm font-medium text-gray-600 mb-1">
+              <i class="pi pi-briefcase mr-2 text-primary-500"></i>Ocupación
+            </label>
+            <input id="occupation" pInputText type="text" class="w-full" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Columna Derecha - Datos Usuario -->
+    <div class="w-1/2 border-l-2 border-gray-100 pl-6">
+      <h3 class="text-xl font-semibold mb-4 pb-2 border-b-2 border-primary-100 flex items-center">
+        <i class="pi pi-lock mr-3 text-primary-500"></i>
+        <span class="text-primary-700">Datos de Acceso</span>
+      </h3>
+      
+      <div class="space-y-5">
+        <!-- Email -->
+        <div class="field">
+          <label for="email" class="block text-sm font-medium text-gray-600 mb-1">
+            <i class="pi pi-envelope mr-2 text-primary-500"></i>Correo Electrónico
+          </label>
+          <input id="email" pInputText type="email" class="w-full" />
+        </div>
+
+        <!-- Contraseña -->
+        <div class="field">
+          <label for="password" class="block text-sm font-medium text-gray-600 mb-1">
+            <i class="pi pi-key mr-2 text-primary-500"></i>Contraseña
+          </label>
+          <p-password id="password" [toggleMask]="true" class="w-full" [inputStyleClass]="'w-full'" />
+        </div>
+
+        <!-- Espacio para posibles campos adicionales -->
+        <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+          <div class="flex items-start">
+            <i class="pi pi-info-circle text-blue-500 mt-1 mr-3"></i>
+            <div>
+              <p class="text-sm text-blue-700 font-medium">Seguridad de la cuenta</p>
+              <p class="text-xs text-blue-600">La contraseña debe contener al menos 8 caracteres, incluyendo números y letras.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- Botones de acción -->
+  <div class="flex justify-end mt-6 pt-4 border-t border-gray-100">
+    <button pButton type="button" label="Cancelar" class="p-button-outlined p-button-secondary mr-3" (click)="cerrar()"></button>
+    <button pButton type="submit" label="Registrar Cliente" class="p-button-primary"></button>
+  </div>
+</p-dialog>
