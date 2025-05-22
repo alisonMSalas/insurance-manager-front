@@ -13,11 +13,11 @@ import { Insurance } from '../../shared/interfaces/insurance';
 import { formatDate } from '@angular/common';
 import { forkJoin, Observable } from 'rxjs';
 import { SegurosService } from '../service/seguros.service';
-
+import{ChipModule} from 'primeng/chip';
 @Component({
   selector: 'app-contrataciones-listado',
   standalone: true,
-  imports: [CommonModule, RouterModule, TableModule, ButtonModule, ToastModule],
+  imports: [CommonModule, RouterModule, TableModule, ButtonModule, ToastModule,ChipModule],
   templateUrl: './contrataciones-listado.component.html',
   styleUrls: ['./contrataciones-listado.component.css'],
   providers: [MessageService]
@@ -123,4 +123,18 @@ export class ContratacionesListadoComponent implements OnInit {
       return null;
     }
   }
+formatStatus(status: string): string {
+  switch (status) {
+    case 'PENDING': return 'Pendiente';
+    case 'APPROVED': return 'Aprobado';
+    case 'REJECTED': return 'Rechazado';
+    case 'REQUESTED': return 'Solicitado';
+    case 'ACTIVE': return 'Activo';
+    default: return status;
+  }
+}
+
+
+
+
 }

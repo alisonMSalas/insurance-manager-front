@@ -22,7 +22,13 @@
         <td>{{ (contrato.client?.lastName+' ' +contrato.client?.name) || '-' }}</td>
         <td>{{ contrato.insurance?.name || '-' }}</td>
         <td>{{ formatFecha(contrato.startDate) }}</td>
-        <td>{{ contrato.status || '-' }}</td>
+       <td>
+  <p-chip
+    [label]="formatStatus(contrato.status)"
+    [styleClass]="'status-' + contrato.status?.toLowerCase()"
+  ></p-chip>
+</td>
+
         <td>{{ contrato.amountPaid || '-' }}</td>
         <td>{{ contrato.beneficiary || '-' }}</td>
       </tr>

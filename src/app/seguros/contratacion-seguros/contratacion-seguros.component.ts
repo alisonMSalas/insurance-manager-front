@@ -173,16 +173,18 @@ export class ContratacionSegurosComponent {
   }
 
   async finalizarProceso() {
-    if (!this.clienteForm.valid || !this.coberturasForm.valid || !this.pagoForm.valid || this.uploadedFiles.length === 0) {
-      this.messageService.add({ severity: 'warn', summary: 'Error', detail: 'Complete todos los campos obligatorios y suba al menos un documento' });
+    if (!this.clienteForm.valid || !this.coberturasForm.valid || !this.pagoForm.valid ) {
+      this.messageService.add({ severity: 'warn', summary: 'Error', detail: 'Complete todos los campos obligatorios' });
       return;
     }
 
     try {
       const clientData = await firstValueFrom(this.clientService.getByIdentificationNumber(this.clienteForm.get('cedula')?.value));
+      const documentosRequeridos = 1;
+    const estadoInicial = this.uploadedFiles.length >= documentosRequeridos ? 'PENDING' : 'REQUESTED';
       const contractData: Contract = {
         startDate: this.formatoFecha(this.coberturasForm.get('fechaInicio')?.value),
-        status: 'ACTIVE',
+        status: estadoInicial,
         amountPaid: this.pagoForm.get('monto')?.value,
         beneficiary: this.coberturasForm.get('beneficiario')?.value,
         insuranceId: this.coberturasForm.get('tipoSeguro')?.value?.id,
@@ -195,11 +197,13 @@ export class ContratacionSegurosComponent {
         throw new Error('ID de contrato no recibido');
       }
 
+       if (this.uploadedFiles.length > 0) {
       const documentData = this.uploadedFiles.map(file => ({
         fileName: file.name,
         fileData: file
       }));
       await firstValueFrom(this.contractService.uploadDocuments(documentData, response.id));
+    }
 
       this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Contratación guardada con éxito' });
       this.resetForms();
@@ -242,10 +246,10 @@ export class ContratacionSegurosComponent {
       this.messageService.add({ severity: 'warn', summary: 'Error', detail: 'Complete las coberturas y el beneficiario' });
       return;
     }
-    if (this.activeIndex === 2 && this.uploadedFiles.length === 0) {
-      this.messageService.add({ severity: 'warn', summary: 'Error', detail: 'Suba al menos un documento' });
-      return;
-    }
+    // if (this.activeIndex === 2 && this.uploadedFiles.length === 0) {
+    //   this.messageService.add({ severity: 'warn', summary: 'Error', detail: 'Suba al menos un documento' });
+    //   return;
+    //}
     if (this.activeIndex === 3 && !this.pagoForm.valid) {
       this.messageService.add({ severity: 'warn', summary: 'Error', detail: 'Complete los datos de pago' });
       return;

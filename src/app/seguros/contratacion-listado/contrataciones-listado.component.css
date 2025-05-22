@@ -15,3 +15,28 @@
 .p-button-primary {
   margin-bottom: 1rem;
 }
+
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-approved {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-requested {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-active {
+  background-color: #e2e3ff;
+  color: #383d9d;
+}
