@@ -1,10 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { ClientsService } from './clients.service';
 import { ApiClientService } from '../api/httpclient';
-import { of } from 'rxjs';
 import { Client } from '../../shared/interfaces/client';
 import { User } from '../../core/services/users.service';
-
+import { of, throwError } from 'rxjs';
 describe('ClientsService', () => {
   let service: ClientsService;
   let apiClientSpy: jasmine.SpyObj<ApiClientService>;
@@ -95,4 +94,28 @@ describe('ClientsService', () => {
 
     expect(apiClientSpy.delete).toHaveBeenCalledWith('client/c1');
   });
+
+  describe('getByIdentificationNumber', () => {
+  it('debería obtener un cliente por número de identificación', () => {
+    apiClientSpy.get.and.returnValue(of(mockClient));
+
+    service.getByIdentificationNumber('1234567890').subscribe((result) => {
+      expect(result).toEqual(mockClient);
+    });
+
+    expect(apiClientSpy.get).toHaveBeenCalledWith('client/identification/1234567890');
+  });
+
+  it('debería manejar error al obtener un cliente por número de identificación', () => {
+    const error = new Error('Get by identification number failed');
+    apiClientSpy.get.and.returnValue(throwError(() => error));
+
+    service.getByIdentificationNumber('1234567890').subscribe({
+      error: (err) => {
+        expect(err).toEqual(error);
+        expect(apiClientSpy.get).toHaveBeenCalledWith('client/identification/1234567890');
+      },
+    });
+  });
+});
 });

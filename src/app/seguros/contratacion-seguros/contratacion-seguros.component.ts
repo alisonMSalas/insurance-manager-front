@@ -51,8 +51,8 @@ interface DocumentoRequerido {
 })
 export class ContratacionSegurosComponent {
   private segurosService = inject(SegurosService);
-  private messageService = inject(MessageService);
-  private clientService = inject(ClientsService);
+   messageService = inject(MessageService);
+   clientService = inject(ClientsService);
   private contractService = inject(ContratacionesService);
   clienteForm: FormGroup;
   coberturasForm: FormGroup;
