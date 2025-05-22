@@ -28,9 +28,7 @@ export class ContratacionesService {
   delete(id: string): Observable<void> {
     return this.api.delete(`contract/${id}`);
   }
-  savePayment(payment: any): Observable<any> {
-    return this.api.post('payment', payment);
-  }
+
 
   uploadDocuments(documents: { fileName: string; fileData: File }[], contractId: string): Observable<any[]> {
     const uploads = documents.map(doc => {
@@ -42,18 +40,5 @@ export class ContratacionesService {
   }
 
 
-  saveBeneficiaries(beneficiaries: { name: string; relationship: string; percentage: number }[], contractId: string): Observable<any> {
-    return this.api.post(`beneficiaries/${contractId}`, beneficiaries);
-  }
-  saveSignature(signatureData: {
-    signature: ArrayBuffer;
-    expirationDate: string;
-    clientId: string;
-  }): Observable<any> {
-    return this.api.post('signature', {
-      ...signatureData,
-      signature: Array.from(new Uint8Array(signatureData.signature)) // convierte ArrayBuffer a byte[]
-    });
-  }
 
 }
