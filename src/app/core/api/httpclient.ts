@@ -1,4 +1,4 @@
-import { inject, Injectable,PLATFORM_ID  } from '@angular/core';
+import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { isPlatformBrowser } from '@angular/common';
@@ -7,11 +7,11 @@ import { isPlatformBrowser } from '@angular/common';
   providedIn: 'root',
 })
 export class ApiClientService {
-  private  readonly baseUrl = 'http://localhost:8080';
+  private readonly baseUrl = 'http://localhost:8080';
   private readonly token = '';
   private readonly platformId = inject(PLATFORM_ID);
 
-  constructor(private readonly  http: HttpClient) { }
+  constructor(private readonly http: HttpClient) { }
 
   private getHeaders(): HttpHeaders {
     const token = isPlatformBrowser(this.platformId)
@@ -50,6 +50,19 @@ export class ApiClientService {
   delete<T>(endpoint: string): Observable<T> {
     return this.http.delete<T>(`${this.baseUrl}/${endpoint}`, { headers: this.getHeaders() });
   }
+  postForm<T>(endpoint: string, formData: FormData): Observable<T> {
+  const token = isPlatformBrowser(this.platformId)
+    ? localStorage.getItem('token')
+    : null;
+
+  const headers = token
+    ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+    : new HttpHeaders();
+
+  return this.http.post<T>(`${this.baseUrl}/${endpoint}`, formData, { headers });
+}
+
+
 
   getCurrentUserEmail(): string | null {
     try {

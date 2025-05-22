@@ -31,13 +31,34 @@ export class ContratacionesService {
 
 
   uploadDocuments(documents: { fileName: string; fileData: File }[], contractId: string): Observable<any[]> {
-    const uploads = documents.map(doc => {
-      const formData = new FormData();
-      formData.append('file', doc.fileData, doc.fileName);
-      return this.api.post(`contracts/${contractId}/attachment`, formData);
+  const uploads = documents.map(doc => {
+    return new Observable(observer => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const base64 = (reader.result as string).split(',')[1];
+
+        const payload = {
+          fileName: doc.fileName,
+          fileData: base64
+        };
+
+        this.api.post(`contract/${contractId}/attachment`, payload).subscribe({
+          next: res => {
+            observer.next(res);
+            observer.complete();
+          },
+          error: err => observer.error(err)
+        });
+      };
+
+      reader.onerror = error => observer.error(error);
+      reader.readAsDataURL(doc.fileData);
     });
-    return forkJoin(uploads);
-  }
+  });
+
+  return forkJoin(uploads);
+}
 
 
 
