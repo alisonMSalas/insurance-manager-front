@@ -122,8 +122,8 @@
         <label class="p-mb-2"><strong>Cédula de Identidad</strong></label>
         <p class="doc-description">Copia legible de ambos lados</p>
 
-        <p-fileUpload name="cedula" (onUpload)="onUpload($event)" [multiple]="true" accept=".pdf,.jpg,.png"
-          [maxFileSize]="2000000" mode="advanced" [auto]="true" chooseLabel="Seleccionar archivo">
+        <p-fileUpload name="cedula" [multiple]="true" accept=".pdf,.jpg,.png" [maxFileSize]="2000000" mode="advanced"
+          [customUpload]="true" (uploadHandler)="onUpload($event)" chooseLabel="Seleccionar archivo">
           <ng-template pTemplate="content">
             <ul *ngIf="uploadedFiles.length">
               <li *ngFor="let file of uploadedFiles">
@@ -200,12 +200,12 @@
 
       <section class="resumen-section">
         <h3>Documentos</h3>
-        <p *ngIf="uploadedFiles.length; else sinArchivo">
+        <ng-container *ngIf="uploadedFiles.length > 0; else sinArchivo">
           <strong>Archivos cargados:</strong>
-        <ul>
-          <li *ngFor="let file of uploadedFiles">{{ file.name }}</li>
-        </ul>
-
+          <ul>
+            <li *ngFor="let file of uploadedFiles">{{ file.name }}</li>
+          </ul>
+        </ng-container>
         <ng-template #sinArchivo>
           <p>No se han cargado archivos.</p>
         </ng-template>

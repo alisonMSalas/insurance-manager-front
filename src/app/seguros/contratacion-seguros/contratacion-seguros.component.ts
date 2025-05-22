@@ -43,8 +43,8 @@ import { validarCedulaEcuatoriana } from '../../shared/utils/cedula.util';
 })
 export class ContratacionSegurosComponent {
   private segurosService = inject(SegurosService);
-   messageService = inject(MessageService);
-   clientService = inject(ClientsService);
+  messageService = inject(MessageService);
+  clientService = inject(ClientsService);
   private contractService = inject(ContratacionesService);
 
   clienteForm: FormGroup;
@@ -214,13 +214,18 @@ export class ContratacionSegurosComponent {
   }
 
   onUpload(event: any) {
-    const archivo = event.files[0];
-    if (archivo) {
-      this.uploadedFiles.push(archivo);
-      this.documentosForm.patchValue({ documentos: this.uploadedFiles });
-      this.messageService.add({ severity: 'info', summary: 'Archivo subido', detail: archivo.name });
-    }
+    this.uploadedFiles.push(...event.files);
+
+    event.options.clear();
+
+    this.documentosForm.patchValue({ documentos: this.uploadedFiles });
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Archivo(s) añadido(s)',
+      detail: `${event.files.length} archivo(s) listo(s)`
+    });
   }
+
 
   removeFile(file: File) {
     this.uploadedFiles = this.uploadedFiles.filter(f => f !== file);
