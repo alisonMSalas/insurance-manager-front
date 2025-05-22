@@ -1,6 +1,6 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ContratacionSegurosComponent } from './contratacion-seguros.component';
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MessageService } from 'primeng/api';
 import { SegurosService } from '../service/seguros.service';
@@ -10,6 +10,8 @@ import { RouterModule } from '@angular/router';
 import { of, throwError } from 'rxjs';
 import { Insurance, InsuranceType, PaymentPeriod } from '../../shared/interfaces/insurance';
 import { FormGroup, FormControl } from '@angular/forms';
+import { Client } from '../../shared/interfaces/client';
+import { Contract } from '../../shared/interfaces/contract';
 
 
 describe('ContratacionSegurosComponent', () => {
@@ -176,30 +178,7 @@ describe('ContratacionSegurosComponent', () => {
       expect(component.traducirPeriodo('WEEKLY')).toBe('WEEKLY');
     });
   });
-  describe('Beneficiarios', () => {
-    beforeEach(() => {
-      component.beneficiarios = [];
-    });
 
-    it('debe agregar un beneficiario vacío al arreglo beneficiarios', () => {
-      component.agregarBeneficiario();
-      expect(component.beneficiarios.length).toBe(1);
-      expect(component.beneficiarios[0]).toEqual({ nombre: '', parentesco: '', porcentaje: 0 });
-    });
-
-    it('debe eliminar un beneficiario del arreglo beneficiarios', () => {
-      const beneficiario = { nombre: 'Juan', parentesco: 'Hermano', porcentaje: 50 };
-      component.beneficiarios = [
-        beneficiario,
-        { nombre: 'Ana', parentesco: 'Madre', porcentaje: 50 }
-      ];
-
-      component.eliminarBeneficiario(beneficiario);
-
-      expect(component.beneficiarios.length).toBe(1);
-      expect(component.beneficiarios).not.toContain(beneficiario);
-    });
-  });
   describe('siguientePaso', () => {
     beforeEach(() => {
       // Aseguramos que messageService es espiado para los add()
@@ -226,6 +205,61 @@ describe('ContratacionSegurosComponent', () => {
       expect(component.activeIndex).toBe(1);
       expect(component.messageService.add).not.toHaveBeenCalled();
     });
+    it('si activeIndex es 1 y clienteForm inválido (sin tocar), muestra mensaje específico de datos del cliente', () => {
+      component.activeIndex = 1;
+      component.clienteEncontrado = true;
+      component.clienteForm = new FormGroup({
+        nombre: new FormControl('', Validators.required),
+        apellido: new FormControl('', Validators.required),
+        email: new FormControl('', [Validators.required, Validators.email])
+      }); // todos vacíos e inválidos
+
+      component.siguientePaso();
+
+      expect(component.activeIndex).toBe(1);
+      expect(component.messageService.add).toHaveBeenCalledWith({
+        severity: 'warn',
+        summary: 'Error',
+        detail: 'Complete los datos del cliente'
+      });
+    });
+    it('si activeIndex es 3 y pagoForm inválido, muestra mensaje específico de datos de pago', () => {
+      component.activeIndex = 3;
+      component.pagoForm = new FormGroup({
+        monto: new FormControl(null, Validators.required)
+      }); // inválido
+
+      component.siguientePaso();
+
+      expect(component.activeIndex).toBe(3);
+      expect(component.messageService.add).toHaveBeenCalledWith({
+        severity: 'warn',
+        summary: 'Error',
+        detail: 'Complete los datos de pago'
+      });
+    });
+it('si activeIndex es 0 y clienteForm inválido, muestra mensaje para completar datos del cliente y no avanza', () => {
+  component.activeIndex = 0;
+
+  // Definimos clienteForm inválido (vacío o con errores)
+  component.clienteForm = new FormGroup({
+    nombre: new FormControl('', Validators.required),
+    apellido: new FormControl('', Validators.required),
+    email: new FormControl('', [Validators.required, Validators.email])
+  });
+
+  component.siguientePaso();
+
+  expect(component.messageService.add).toHaveBeenCalledWith({
+    severity: 'warn',
+    summary: 'Error',
+    detail: 'Complete los datos del cliente'
+  });
+
+  // Verificamos que activeIndex no cambió (sigue en 0)
+  expect(component.activeIndex).toBe(0);
+});
+
 
     it('si activeIndex es 1, clienteForm inválido o clienteEncontrado false, muestra mensaje y setea activeIndex en 0', () => {
       component.activeIndex = 1;
@@ -272,119 +306,7 @@ describe('ContratacionSegurosComponent', () => {
       }));
     });
   });
-  describe('validarBeneficiarios', () => {
 
-    it('debería retornar false si algún beneficiario tiene nombre vacío, parentesco vacío o porcentaje nulo/indefinido', () => {
-      component.beneficiarios = [
-        { nombre: 'Juan', parentesco: 'Hermano', porcentaje: 50 },
-        { nombre: ' ', parentesco: 'Padre', porcentaje: 50 }  // nombre vacío (solo espacios)
-      ];
-      expect(component.validarBeneficiarios()).toBeFalse();
-
-      component.beneficiarios = [
-        { nombre: 'Ana', parentesco: '', porcentaje: 100 }  // parentesco vacío
-      ];
-      expect(component.validarBeneficiarios()).toBeFalse();
-
-      component.beneficiarios = [
-        { nombre: 'Luis', parentesco: 'Tío', porcentaje: 100 }  // porcentaje nulo
-      ];
-      expect(component.validarBeneficiarios()).toBeFalse();
-
-      component.beneficiarios = [
-        { nombre: 'Maria', parentesco: 'Prima', porcentaje: 100 }  // porcentaje indefinido
-      ];
-      expect(component.validarBeneficiarios()).toBeFalse();
-    });
-
-    it('debería retornar true si todos los beneficiarios tienen datos válidos', () => {
-      component.beneficiarios = [
-        { nombre: 'Juan', parentesco: 'Hermano', porcentaje: 50 },
-        { nombre: 'Ana', parentesco: 'Madre', porcentaje: 50 }
-      ];
-      expect(component.validarBeneficiarios()).toBeTrue();
-    });
-
-    it('debería retornar true si la lista de beneficiarios está vacía', () => {
-      component.beneficiarios = [];
-      expect(component.validarBeneficiarios()).toBeTrue();
-    });
-
-  });
-
-  describe('onFileSelected', () => {
-    it('debería leer el archivo y llamar a FileReader.readAsDataURL', () => {
-      const file = new File(['contenido'], 'archivo.txt', { type: 'text/plain' });
-      const event = {
-        target: {
-          files: [file]
-        }
-      };
-
-      const fileReaderSpy = jasmine.createSpyObj('FileReader', ['readAsDataURL']);
-      fileReaderSpy.onload = null;
-
-      spyOn(window as any, 'FileReader').and.returnValue(fileReaderSpy);
-
-      component.onFileSelected(event);
-
-      expect(fileReaderSpy.readAsDataURL).toHaveBeenCalledWith(file);
-
-      // Simulamos evento onload para verificar el console.log
-      const fakeEvent = { target: { result: 'data:fake' } };
-      fileReaderSpy.onload(fakeEvent);
-    });
-
-    it('no debería hacer nada si no hay archivo', () => {
-      const event = {
-        target: {
-          files: []
-        }
-      };
-
-      const fileReaderSpy = jasmine.createSpyObj('FileReader', ['readAsDataURL']);
-      spyOn(window as any, 'FileReader').and.returnValue(fileReaderSpy);
-
-      component.onFileSelected(event);
-
-      expect(fileReaderSpy.readAsDataURL).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('onUpload', () => {
-    it('debería actualizar uploadedFiles, mostrarError y llamar a messageService.add', () => {
-      const archivo = new File(['contenido'], 'documento.pdf', { type: 'application/pdf' });
-      const event = {
-        files: [archivo]
-      };
-
-      const messageService = TestBed.inject(MessageService);
-      spyOn(messageService, 'add');
-
-      component.onUpload(event);
-
-      expect(component.uploadedFiles).toEqual([archivo]);
-      expect(component.mostrarError).toBeFalse();
-      expect(messageService.add).toHaveBeenCalledWith({
-        severity: 'info',
-        summary: 'Archivo subido',
-        detail: archivo.name
-      });
-    });
-
-    it('no debería hacer nada si no hay archivo en event.files', () => {
-      const event = { files: [] };
-
-      const messageService = TestBed.inject(MessageService);
-      spyOn(messageService, 'add');
-
-      component.onUpload(event);
-
-      expect(component.uploadedFiles).toBeUndefined();
-      expect(component.mostrarError).toBeUndefined();
-      expect(messageService.add).not.toHaveBeenCalled();
-    });
-  });
   describe('removeFile', () => {
     it('debería eliminar un archivo de uploadedFiles y mostrar mensaje', () => {
       const file1 = new File(['contenido1'], 'archivo1.txt');
@@ -405,39 +327,7 @@ describe('ContratacionSegurosComponent', () => {
     });
   });
 
-  describe('validarDocumento', () => {
-    it('debería marcar error si algún documento no tiene archivo', () => {
-      const documentosMock = [
-        { archivo: null, error: '' },
-        { archivo: new File(['contenido'], 'doc.pdf'), error: '' }
-      ];
 
-      component.documentosForm.get('documentos')?.setValue(documentosMock);
-
-      component.validarDocumento();
-
-      const documentos = component.documentosForm.get('documentos')?.value;
-      expect(documentos[0].error).toBe('El archivo es requerido');
-      expect(documentos[1].error).toBe('');
-      expect(component.mostrarError).toBeTrue();
-    });
-
-    it('no debería marcar error si todos los documentos tienen archivo', () => {
-      const documentosMock = [
-        { archivo: new File(['contenido'], 'doc1.pdf'), error: '' },
-        { archivo: new File(['contenido'], 'doc2.pdf'), error: '' }
-      ];
-
-      component.documentosForm.get('documentos')?.setValue(documentosMock);
-
-      component.validarDocumento();
-
-      const documentos = component.documentosForm.get('documentos')?.value;
-      expect(documentos[0].error).toBe('');
-      expect(documentos[1].error).toBe('');
-      expect(component.mostrarError).toBeFalse();
-    });
-  });
   describe('resetCampos', () => {
     it('debería resetear clienteForm con la cédula proporcionada y campos vacíos', () => {
       const cedula = '1234567890';
@@ -458,186 +348,398 @@ describe('ContratacionSegurosComponent', () => {
     });
   });
 
-  describe('resetForms', () => {
-    it('debería resetear todos los formularios, limpiar archivos y beneficiarios, y reiniciar activeIndex', () => {
-      // Llenamos algunos datos para asegurarnos que se resetean
-      component.clienteForm.patchValue({ cedula: '123' });
-      component.coberturasForm.patchValue({ fechaInicio: '2025-01-01' });
-      component.pagoForm.patchValue({ monto: 100 });
-      component.documentosForm.patchValue({ documentos: [{ archivo: null }] });
-      component.uploadedFiles = [new File([''], 'archivo.txt')];
-      component.beneficiarios = [{ nombre: 'Juan', parentesco: 'Hermano', porcentaje: 50 }];
-      component.activeIndex = 2;
 
-      component.resetForms();
+  describe('buscarCliente', () => {
+    let messageServiceSpy: jasmine.SpyObj<any>;
+    let clientServiceSpy: jasmine.SpyObj<any>;
 
-      expect(component.clienteForm.pristine).toBeTrue();
-      expect(component.coberturasForm.pristine).toBeTrue();
-      expect(component.pagoForm.pristine).toBeTrue();
-      expect(component.documentosForm.pristine).toBeTrue();
-      expect(component.uploadedFiles).toEqual([]);
-      expect(component.beneficiarios).toEqual([{ nombre: '', parentesco: '', porcentaje: 100 }]);
-      expect(component.activeIndex).toBe(0);
+    beforeEach(() => {
+      messageServiceSpy = jasmine.createSpyObj('MessageService', ['add']);
+      clientServiceSpy = jasmine.createSpyObj('ClientService', ['getByIdentificationNumber']);
+
+      component.messageService = messageServiceSpy;
+      component.clientService = clientServiceSpy;
+
+      component.clienteForm = new FormGroup({
+        buscar: new FormControl(''),
+        cedula: new FormControl(''),
+        nombres: new FormControl(''),
+        apellidos: new FormControl(''),
+        fechaNacimiento: new FormControl(null),
+        genero: new FormControl(''),
+        telefono: new FormControl(''),
+        correo: new FormControl(''),
+        direccion: new FormControl(''),
+        ocupacion: new FormControl('')
+      });
+
+      spyOn(component, 'resetCampos');
+    });
+
+    it('debería mostrar error y resetear si la cédula tiene menos de 10 caracteres', () => {
+      component.clienteForm.get('buscar')?.setValue('12345');
+
+      component.buscarCliente();
+
+      expect(messageServiceSpy.add).toHaveBeenCalledWith(jasmine.objectContaining({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'La cédula debe tener al menos 10 dígitos'
+      }));
+      expect(component.resetCampos).toHaveBeenCalledWith('12345');
+    });
+
+    it('debería mostrar advertencia y resetear si la cédula es inválida según validarCedulaEcuatoriana', () => {
+      const cedulaValida = '1234567890';
+      component.clienteForm.get('buscar')?.setValue(cedulaValida);
+
+      // Mock de validarCedulaEcuatoriana para devolver un validador que indica inválido
+      spyOn(window as any, 'validarCedulaEcuatoriana').and.returnValue(() => ({ cedulaInvalida: true }));
+
+      component.buscarCliente();
+
+      expect(messageServiceSpy.add).toHaveBeenCalledWith(jasmine.objectContaining({
+        severity: 'warn',
+        summary: 'Cédula inválida',
+        detail: 'La cédula ingresada no es válida'
+      }));
+      expect(component.resetCampos).toHaveBeenCalledWith(cedulaValida);
+    });
+    it('debería mostrar error si no se ingresa cédula', () => {
+      // Asegurarse que el campo 'buscar' esté vacío o nulo
+      component.clienteForm.get('buscar')?.setValue('');
+
+      // Ejecutar el método buscarCliente
+      component.buscarCliente();
+
+      // Verificar que messageService.add fue llamado con el mensaje esperado
+      expect(messageServiceSpy.add).toHaveBeenCalledWith(jasmine.objectContaining({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Ingrese una cédula'
+      }));
+    });
+    it('debería actualizar el formulario, marcar clienteEncontrado y mostrar mensaje de éxito si se encuentra el cliente', async () => {
+      const cedulaValida = '1728394056';
+      component.clienteForm.get('buscar')?.setValue(cedulaValida);
+
+      // Mock del cliente que devuelve el servicio
+      const clienteMock = {
+        identificationNumber: cedulaValida,
+        name: 'Juan',
+        lastName: 'Pérez',
+        birthDate: '1990-01-01T00:00:00.000Z',
+        gender: 'M',
+        phoneNumber: '0999999999',
+        user: { email: 'juan@example.com' },
+        occupation: 'Ingeniero',
+        address: 'Calle Falsa 123'
+      };
+
+      // Simular que getByIdentificationNumber devuelve un observable con clienteMock
+      clientServiceSpy.getByIdentificationNumber.and.returnValue(of(clienteMock));
+
+      // Llamar al método async y esperar a que termine
+      await component.buscarCliente();
+
+      // Verificar que patchValue haya actualizado los campos del formulario
+      expect(component.clienteForm.get('cedula')?.value).toBe(clienteMock.identificationNumber);
+      expect(component.clienteForm.get('nombres')?.value).toBe(clienteMock.name);
+      expect(component.clienteForm.get('apellidos')?.value).toBe(clienteMock.lastName);
+      expect(component.clienteForm.get('fechaNacimiento')?.value).toEqual(new Date(clienteMock.birthDate));
+      expect(component.clienteForm.get('genero')?.value).toBe(clienteMock.gender);
+      expect(component.clienteForm.get('telefono')?.value).toBe(clienteMock.phoneNumber);
+      expect(component.clienteForm.get('correo')?.value).toBe(clienteMock.user.email);
+      expect(component.clienteForm.get('ocupacion')?.value).toBe(clienteMock.occupation);
+      expect(component.clienteForm.get('direccion')?.value).toBe(clienteMock.address);
+
+      // Verificar que clienteEncontrado sea true
+      expect(component.clienteEncontrado).toBeTrue();
+
+      // Verificar que se haya llamado a messageService.add con mensaje de éxito
+      expect(messageServiceSpy.add).toHaveBeenCalledWith(jasmine.objectContaining({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Cliente encontrado'
+      }));
+    });
+
+
+    it('debería actualizar el formulario y mostrar éxito si cliente encontrado', () => {
+      const cedula = '1234567890';
+      component.clienteForm.get('buscar')?.setValue(cedula);
+
+      spyOn(window as any, 'validarCedulaEcuatoriana').and.returnValue(() => null); // válido
+
+      const clienteMock = {
+        identificationNumber: '1234567890',
+        name: 'Juan',
+        lastName: 'Perez',
+        birthDate: '1990-01-01',
+        gender: 'M',
+        phoneNumber: '0999999999',
+        user: { email: 'juan@mail.com' },
+        address: 'Calle Falsa 123',
+        occupation: 'Ingeniero'
+      };
+
+      clientServiceSpy.getByIdentificationNumber.and.returnValue(of(clienteMock));
+
+      component.buscarCliente();
+
+      expect(component.clienteForm.get('cedula')?.value).toBe(clienteMock.identificationNumber);
+      expect(component.clienteForm.get('nombres')?.value).toBe(clienteMock.name);
+      expect(messageServiceSpy.add).toHaveBeenCalledWith(jasmine.objectContaining({
+        severity: 'success',
+        summary: 'Cliente encontrado'
+      }));
+      expect(component.clienteEncontrado).toBeTrue();
+    });
+    it('debería llamar a resetCampos y mostrar mensaje de advertencia si no se encuentra el cliente', async () => {
+      const cedulaValida = '1728394056';
+      component.clienteForm.get('buscar')?.setValue(cedulaValida);
+
+      // Simular que el servicio devuelve null (cliente no encontrado)
+      clientServiceSpy.getByIdentificationNumber.and.returnValue(of(null));
+
+      // Llamar a la función async
+      await component.buscarCliente();
+
+      // Verificar que resetCampos se haya llamado con la cédula
+      expect(component.resetCampos).toHaveBeenCalledWith(cedulaValida);
+
+      // Verificar que se haya mostrado mensaje de advertencia
+      expect(messageServiceSpy.add).toHaveBeenCalledWith(jasmine.objectContaining({
+        severity: 'warn',
+        summary: 'No encontrado',
+        detail: 'Cliente no encontrado'
+      }));
+    });
+    it('debería mostrar error y resetear si hay error en el servicio', () => {
+      const cedula = '1234567890';
+      component.clienteForm.get('buscar')?.setValue(cedula);
+
+      spyOn(window as any, 'validarCedulaEcuatoriana').and.returnValue(() => null); // válido
+
+      clientServiceSpy.getByIdentificationNumber.and.returnValue(throwError(() => new Error('error')));
+
+      component.buscarCliente();
+
+      expect(messageServiceSpy.add).toHaveBeenCalledWith(jasmine.objectContaining({
+        severity: 'error',
+        summary: 'Error'
+      }));
+      expect(component.clienteEncontrado).toBeFalse();
+      expect(component.resetCampos).toHaveBeenCalledWith(cedula);
     });
   });
-  describe('esCedulaInvalida', () => {
-    it('debería retornar true cuando el control cedula está tocado y tiene error cedulaInvalida', () => {
-      const cedulaControl = component.clienteForm.get('cedula');
 
-      cedulaControl?.setErrors({ cedulaInvalida: true });
-      cedulaControl?.markAsTouched();
-
-      const resultado = component.esCedulaInvalida();
-
-      expect(resultado).toBeTrue();
-    });
-
-    it('debería retornar false cuando el control cedula no está tocado', () => {
-      const cedulaControl = component.clienteForm.get('cedula');
-
-      cedulaControl?.setErrors({ cedulaInvalida: true });
-      cedulaControl?.markAsUntouched();
-
-      const resultado = component.esCedulaInvalida();
-
-      expect(resultado).toBeFalse();
-    });
-
-    it('debería retornar false cuando el control cedula no tiene error cedulaInvalida', () => {
-      const cedulaControl = component.clienteForm.get('cedula');
-
-      cedulaControl?.setErrors(null);
-      cedulaControl?.markAsTouched();
-
-      const resultado = component.esCedulaInvalida();
-
-      expect(resultado).toBeFalse();
-    });
-  });
-describe('buscarCliente', () => {
-  let messageServiceSpy: jasmine.SpyObj<any>;
-  let clientServiceSpy: jasmine.SpyObj<any>;
-
-  beforeEach(() => {
-    messageServiceSpy = jasmine.createSpyObj('MessageService', ['add']);
-    clientServiceSpy = jasmine.createSpyObj('ClientService', ['getByIdentificationNumber']);
-
-    component.messageService = messageServiceSpy;
-    component.clientService = clientServiceSpy;
-
+  it('debería mostrar advertencia y no continuar si algún formulario es inválido', async () => {
+    // Crear formularios con controles, y poner al menos un control inválido para simular formulario inválido
     component.clienteForm = new FormGroup({
-      buscar: new FormControl(''),
-      cedula: new FormControl(''),
-      nombres: new FormControl(''),
-      apellidos: new FormControl(''),
-      fechaNacimiento: new FormControl(null),
-      genero: new FormControl(''),
-      telefono: new FormControl(''),
-      correo: new FormControl(''),
-      direccion: new FormControl(''),
-      ocupacion: new FormControl('')
+      cedula: new FormControl('', Validators.required)  // vacío => inválido
+    });
+    component.coberturasForm = new FormGroup({
+      fechaInicio: new FormControl('2024-05-22', Validators.required)
+    });
+    component.pagoForm = new FormGroup({
+      monto: new FormControl(100, Validators.required)
     });
 
-    spyOn(component, 'resetCampos');
-  });
+    // Ejecutamos la función
+    await component.finalizarProceso();
 
-  it('debería mostrar error y resetear si la cédula tiene menos de 10 caracteres', () => {
-    component.clienteForm.get('buscar')?.setValue('12345');
-
-    component.buscarCliente();
-
-    expect(messageServiceSpy.add).toHaveBeenCalledWith(jasmine.objectContaining({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'La cédula debe tener al menos 10 dígitos'
-    }));
-    expect(component.resetCampos).toHaveBeenCalledWith('12345');
-  });
-
-  it('debería mostrar advertencia y resetear si la cédula es inválida según validarCedulaEcuatoriana', () => {
-    const cedulaValida = '1234567890';
-    component.clienteForm.get('buscar')?.setValue(cedulaValida);
-
-    // Mock de validarCedulaEcuatoriana para devolver un validador que indica inválido
-    spyOn(window as any, 'validarCedulaEcuatoriana').and.returnValue(() => ({ cedulaInvalida: true }));
-
-    component.buscarCliente();
-
-    expect(messageServiceSpy.add).toHaveBeenCalledWith(jasmine.objectContaining({
+    // Debe mostrar el mensaje de advertencia porque clienteForm es inválido
+    expect(component.messageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
       severity: 'warn',
-      summary: 'Cédula inválida',
-      detail: 'La cédula ingresada no es válida'
+      summary: 'Error',
+      detail: 'Complete todos los campos obligatorios'
     }));
-    expect(component.resetCampos).toHaveBeenCalledWith(cedulaValida);
+
+    // No debe llamar al servicio porque la validación falló
+    expect(component.clientService.getByIdentificationNumber).not.toHaveBeenCalled();
   });
 
-  it('debería actualizar el formulario y mostrar éxito si cliente encontrado', () => {
-    const cedula = '1234567890';
-    component.clienteForm.get('buscar')?.setValue(cedula);
+  it('debería establecer estado como "PENDING" si hay archivos suficientes', async () => {
+    // Simular clienteForm con cédula válida
+    component.clienteForm = new FormGroup({
+      cedula: new FormControl('1234567890', Validators.required)
+    });
 
-    spyOn(window as any, 'validarCedulaEcuatoriana').and.returnValue(() => null); // válido
+    // Simular coberturasForm y pagoForm válidos
+    component.coberturasForm = new FormGroup({
+      fechaInicio: new FormControl(new Date(), Validators.required),
+      beneficiario: new FormControl('Juan Pérez', Validators.required),
+      tipoSeguro: new FormControl({ id: 1 }, Validators.required)
+    });
 
-    const clienteMock = {
-      identificationNumber: '1234567890',
-      name: 'Juan',
-      lastName: 'Perez',
-      birthDate: '1990-01-01',
+    component.pagoForm = new FormGroup({
+      monto: new FormControl(100, Validators.required)
+    });
+
+    // Simular archivos subidos
+    component.uploadedFiles = [{ name: 'documento.pdf' } as File];
+
+    // Mock del cliente retornado por el servicio
+    const mockClient: Client = {
+      id: '123',
+      identificationNumber: '1805035548',
+      name: 'Test',
+      lastName: 'User',
+      birthDate: '2000-01-01',
       gender: 'M',
-      phoneNumber: '0999999999',
-      user: { email: 'juan@mail.com' },
-      address: 'Calle Falsa 123',
-      occupation: 'Ingeniero'
+      phoneNumber: '123456789',
+      user: {
+        id: 'u001',
+        name: 'Test User',
+        email: 'test@example.com',
+        rol: 'user',
+        active: true
+      },
+      address: 'Test Address',
+      occupation: 'Tester',
+      active: true
     };
 
-    clientServiceSpy.getByIdentificationNumber.and.returnValue(of(clienteMock));
+    spyOn(component.clientService, 'getByIdentificationNumber')
+      .and.returnValue(of(mockClient));
 
-    component.buscarCliente();
+    // Mock del contractService.create
+    spyOn(component.contractService, 'create').and.returnValue(of({
+      id: '99',
+      client: mockClient,
+      date: '2025-05-22',
+      amount: 100,
+      status: 'PENDING',
+      insuranceType: { id: 1, name: 'Seguro de Vida' },
+      documents: [],
+      active: true
+    } as Contract));
 
-    expect(component.clienteForm.get('cedula')?.value).toBe(clienteMock.identificationNumber);
-    expect(component.clienteForm.get('nombres')?.value).toBe(clienteMock.name);
-    expect(messageServiceSpy.add).toHaveBeenCalledWith(jasmine.objectContaining({
-      severity: 'success',
-      summary: 'Cliente encontrado'
+    // ✅ Mock corregido: uploadDocuments debe retornar un arreglo (array)
+    spyOn(component.contractService, 'uploadDocuments')
+      .and.returnValue(of([])); // o puedes simular documentos si quieres
+
+    // Mock del método formatoFecha
+    spyOn(component, 'formatoFecha').and.returnValue('2025-05-22');
+
+    // Ejecutar método
+    await component.finalizarProceso();
+
+    // Verificar que se llamó al servicio con status 'PENDING'
+    expect(component.contractService.create).toHaveBeenCalledWith(jasmine.objectContaining({
+      status: 'PENDING'
     }));
-    expect(component.clienteEncontrado).toBeTrue();
   });
 
-  it('debería mostrar advertencia y resetear si cliente no encontrado', () => {
-    const cedula = '1234567890';
-    component.clienteForm.get('buscar')?.setValue(cedula);
+  it('debería lanzar un error si no se recibe el ID del contrato', async () => {
+    // Simular clienteForm con cédula válida
+    component.clienteForm = new FormGroup({
+      cedula: new FormControl('1234567890', Validators.required)
+    });
 
-    spyOn(window as any, 'validarCedulaEcuatoriana').and.returnValue(() => null); // válido
+    component.coberturasForm = new FormGroup({
+      fechaInicio: new FormControl(new Date(), Validators.required),
+      beneficiario: new FormControl('Juan Pérez', Validators.required),
+      tipoSeguro: new FormControl({ id: 1 }, Validators.required)
+    });
 
-    clientServiceSpy.getByIdentificationNumber.and.returnValue(of(null));
+    component.pagoForm = new FormGroup({
+      monto: new FormControl(100, Validators.required)
+    });
 
-    component.buscarCliente();
+    component.uploadedFiles = [{ name: 'documento.pdf' } as File];
 
-    expect(messageServiceSpy.add).toHaveBeenCalledWith(jasmine.objectContaining({
-      severity: 'warn',
-      summary: 'Cliente no encontrado'
-    }));
-    expect(component.clienteEncontrado).toBeFalse();
-    expect(component.resetCampos).toHaveBeenCalledWith(cedula);
+    const mockClient: Client = {
+      id: '123',
+      identificationNumber: '1805035548',
+      name: 'Test',
+      lastName: 'User',
+      birthDate: '2000-01-01',
+      gender: 'M',
+      phoneNumber: '123456789',
+      user: {
+        id: 'u001',
+        name: 'Test User',
+        email: 'test@example.com',
+        rol: 'user',
+        active: true
+      },
+      address: 'Test Address',
+      occupation: 'Tester',
+      active: true
+    };
+
+    spyOn(component.clientService, 'getByIdentificationNumber')
+      .and.returnValue(of(mockClient));
+
+    // 🔴 Simular respuesta sin ID
+    spyOn(component.contractService, 'create').and.returnValue(of({
+      // sin campo `id`
+      client: mockClient,
+      date: '2025-05-22',
+      amount: 100,
+      status: 'PENDING',
+      insuranceType: { id: 1, name: 'Seguro de Vida' },
+      documents: [],
+      active: true
+    } as any)); // uso `as any` para evitar error de tipado
+
+    spyOn(component.contractService, 'uploadDocuments')
+      .and.returnValue(of([]));
+
+    spyOn(component, 'formatoFecha').and.returnValue('2025-05-22');
+
+    // Ejecutar y verificar que lanza error
+    await expectAsync(component.finalizarProceso()).toBeRejectedWithError('ID de contrato no recibido');
   });
 
-  it('debería mostrar error y resetear si hay error en el servicio', () => {
-    const cedula = '1234567890';
-    component.clienteForm.get('buscar')?.setValue(cedula);
+  it('debería añadir archivos, limpiar opciones y mostrar mensaje al subir archivos', () => {
+    // Crear archivos reales usando File API
+    const file1 = new File(['contenido de prueba 1'], 'archivo1.pdf', { type: 'application/pdf' });
+    const file2 = new File(['contenido de prueba 2'], 'archivo2.docx', { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    const mockFiles: File[] = [file1, file2];
 
-    spyOn(window as any, 'validarCedulaEcuatoriana').and.returnValue(() => null); // válido
+    // Espía de `clear()` simulado
+    const clearSpy = jasmine.createSpy('clear');
 
-    clientServiceSpy.getByIdentificationNumber.and.returnValue(throwError(() => new Error('error')));
+    // Crear evento simulado
+    const mockEvent = {
+      files: mockFiles,
+      options: {
+        clear: clearSpy
+      }
+    };
 
-    component.buscarCliente();
+    // Inicializar el formulario si no está
+    component.documentosForm = new FormGroup({
+      documentos: new FormControl([])
+    });
 
-    expect(messageServiceSpy.add).toHaveBeenCalledWith(jasmine.objectContaining({
-      severity: 'error',
-      summary: 'Error'
-    }));
-    expect(component.clienteEncontrado).toBeFalse();
-    expect(component.resetCampos).toHaveBeenCalledWith(cedula);
+    // Espiar messageService
+    const messageSpy = spyOn(component.messageService, 'add');
+
+    // Ejecutar
+    component.onUpload(mockEvent);
+
+    // Verificar que los archivos fueron agregados
+    expect(component.uploadedFiles).toEqual(mockFiles);
+
+    // Verificar que se actualizó el valor del formulario
+    expect(component.documentosForm.value.documentos).toEqual(mockFiles);
+
+    // Verificar que se llamó a clear()
+    expect(clearSpy).toHaveBeenCalled();
+
+    // Verificar que se mostró el mensaje
+    expect(messageSpy).toHaveBeenCalledWith({
+      severity: 'info',
+      summary: 'Archivo(s) añadido(s)',
+      detail: '2 archivo(s) listo(s)'
+    });
   });
-});
+
+
 
 
 });

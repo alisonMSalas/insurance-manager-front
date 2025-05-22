@@ -75,9 +75,9 @@ export class ListSegurosComponent implements OnInit {
   selectedType: string | null = null;
 
   constructor(
-    private  readonly segurosService: SegurosService,
-    private readonly messageService: MessageService,
-    private readonly confirmationService: ConfirmationService
+    private segurosService: SegurosService,
+    private messageService: MessageService,
+    private confirmationService: ConfirmationService
   ) { }
 
   ngOnInit(): void {
@@ -89,29 +89,24 @@ export class ListSegurosComponent implements OnInit {
     this.loadInsurances();
   }
 
- loadInsurances(): void {
-  this.segurosService.getAll().subscribe({
-    next: (data: Insurance[]) => {
-      this.insurances = this.sortInsurances(data);
-      this.applyFilters();
-      this.loading = false;
-    },
-    error: (error: HttpErrorResponse) => {
-      this.handleError(error);
-      this.loading = false;
-    }
-  });
-}
-
-private sortInsurances(insurances: Insurance[]): Insurance[] {
-  return insurances.sort((a, b) => {
-    if (a.active === b.active) {
-      return (a.id ?? '').localeCompare(b.id ?? '');
-    }
-    return a.active ? -1 : 1;
-  });
-}
-
+  loadInsurances(): void {
+    this.segurosService.getAll().subscribe({
+      next: (data: Insurance[]) => {
+        this.insurances = data.sort((a, b) => {
+          if (a.active === b.active) {
+            return (a.id || '').localeCompare(b.id || '');
+          }
+          return a.active ? -1 : 1;
+        });
+        this.applyFilters();
+        this.loading = false;
+      },
+      error: (error: HttpErrorResponse) => {
+        this.handleError(error);
+        this.loading = false;
+      }
+    });
+  }
   openViewModal(insurance: Insurance) {
     this.selectedInsurance = insurance;
     this.displayViewModal = true;
@@ -206,38 +201,15 @@ private sortInsurances(insurances: Insurance[]): Insurance[] {
   paymentPeriods = getPaymentPeriodOptions();
   
   saveInsurance() {
-    if (!this.insurance) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No se puede guardar porque el seguro no está definido.'
-      });
-      return;
-    }
-  
-    const nombreValido = this.insurance.name?.trim() !== '';
-    const numerosValidos =
-      this.insurance.coverage > 0 &&
-      this.insurance.deductible > 0 &&
-      this.insurance.paymentAmount > 0;
-  
-    if (!nombreValido || !numerosValidos) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'El nombre no puede estar vacío y los valores numéricos deben ser mayores que 0.'
-      });
-      return;
-    }
-  
     if (this.isEditing && this.currentInsuranceId) {
+      // Lógica de actualización
       const updatedInsurance: Insurance = {
         ...this.insurance,
         id: this.currentInsuranceId
       };
-  
-      this.segurosService.update(this.currentInsuranceId, updatedInsurance).subscribe({
-        next: () => {
+      
+      this.segurosService.update(this.currentInsuranceId,updatedInsurance).subscribe({
+        next: (response) => {
           this.messageService.add({
             severity: 'success',
             summary: 'Éxito',
@@ -252,8 +224,9 @@ private sortInsurances(insurances: Insurance[]): Insurance[] {
         }
       });
     } else {
+      // Lógica de creación (existente)
       this.segurosService.save(this.insurance).subscribe({
-        next: () => {
+        next: (response) => {
           this.messageService.add({
             severity: 'success',
             summary: 'Éxito',
@@ -269,19 +242,11 @@ private sortInsurances(insurances: Insurance[]): Insurance[] {
       });
     }
   }
-  preventNegativeInput(event: KeyboardEvent): void {
-    if (event.key === '-' || event.key === 'e') {
-      event.preventDefault();
-    }
-  }
-  
-  
-  
   openModal(insuranceToEdit?: Insurance) {
     this.isEditing = !!insuranceToEdit;
     
     if (this.isEditing && insuranceToEdit) {
-      this.currentInsuranceId = insuranceToEdit.id ?? null;
+      this.currentInsuranceId = insuranceToEdit.id || null;
       // Copiar los datos del seguro a editar
       this.insurance = {
         name: insuranceToEdit.name,

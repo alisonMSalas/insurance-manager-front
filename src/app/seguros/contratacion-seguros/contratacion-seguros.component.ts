@@ -42,10 +42,10 @@ import { validarCedulaEcuatoriana } from '../../shared/utils/cedula.util';
   providers: [MessageService]
 })
 export class ContratacionSegurosComponent {
-  private segurosService = inject(SegurosService);
+   segurosService = inject(SegurosService);
   messageService = inject(MessageService);
   clientService = inject(ClientsService);
-  private contractService = inject(ContratacionesService);
+   contractService = inject(ContratacionesService);
 
   clienteForm: FormGroup;
   coberturasForm: FormGroup;

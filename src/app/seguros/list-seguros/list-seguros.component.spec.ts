@@ -333,19 +333,7 @@ it('debería manejar error al actualizar seguro', () => {
   expect(segurosServiceSpy.update).toHaveBeenCalled();
   expect(component.handleError).toHaveBeenCalledWith(error);
 });
-it('debería prevenir input negativo y letra "e"', () => {
-  const eventMinus = { key: '-', preventDefault: jasmine.createSpy() } as unknown as KeyboardEvent;
-  const eventE = { key: 'e', preventDefault: jasmine.createSpy() } as unknown as KeyboardEvent;
-  const eventOther = { key: 'a', preventDefault: jasmine.createSpy() } as unknown as KeyboardEvent;
 
-  component.preventNegativeInput(eventMinus);
-  component.preventNegativeInput(eventE);
-  component.preventNegativeInput(eventOther);
-
-  expect(eventMinus.preventDefault).toHaveBeenCalled();
-  expect(eventE.preventDefault).toHaveBeenCalled();
-  expect(eventOther.preventDefault).not.toHaveBeenCalled();
-});
 
 it('debería eliminar el seguro y mostrar mensaje de éxito cuando se acepta la confirmación', () => {
   const insurance = { id: '123', name: 'Seguro Test', active: true } as Insurance;

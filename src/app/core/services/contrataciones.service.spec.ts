@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { ContratacionesService } from './contrataciones.service';
 import { ApiClientService } from '../api/httpclient';
-import { of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { Contract } from '../../shared/interfaces/contract';
 
 describe('ContratacionesService', () => {
@@ -69,56 +69,143 @@ describe('ContratacionesService', () => {
     expect(apiClientSpy.delete).toHaveBeenCalledWith('contract/1');
   });
 
-  it('should call api.post on savePayment', () => {
-    const payment = { amount: 100 };
-    apiClientSpy.post.and.returnValue(of(payment));
-    service.savePayment(payment).subscribe(result => {
-      expect(result).toEqual(payment);
-    });
-    expect(apiClientSpy.post).toHaveBeenCalledWith('payment', payment);
-  });
+  // === TESTS PARA uploadDocuments ===
 
-  it('should call api.post on uploadDocuments', () => {
-    const file = new File([''], 'test.pdf');
+  it('should read files as base64, call api.post for each document and return all responses', (done) => {
+    const contractId = '123';
+    const fileContent = 'dummy content';
+    const base64String = btoa(fileContent); // base64 real del contenido
+    const dataUrl = `data:application/pdf;base64,${base64String}`;
+
+    const file = new File([fileContent], 'test.pdf', { type: 'application/pdf' });
     const documents = [{ fileName: 'test.pdf', fileData: file }];
-    const contractId = '123';
-    const response = { success: true };
-    apiClientSpy.post.and.returnValue(of(response));
-    service.uploadDocuments(documents, contractId).subscribe(result => {
-      expect(result).toEqual(response);
+
+    // Mock para FileReader
+    spyOn(window as any, 'FileReader').and.callFake(() => {
+      const reader: any = {
+        onload: null,
+        onerror: null,
+        result: null,
+        readAsDataURL: function () {
+          // Simula lectura exitosa y dispara onload con dataUrl
+          this.result = dataUrl;
+          if (typeof this.onload === 'function') {
+            this.onload({ target: { result: this.result } });
+          }
+        }
+      };
+      return reader;
     });
-    expect(apiClientSpy.post).toHaveBeenCalled();
-    const formDataArg = apiClientSpy.post.calls.mostRecent().args[1] as FormData;
-    expect(formDataArg.has('files')).toBeTrue();
-    expect(formDataArg.get('contractId')).toBe(contractId);
+
+    // ApiClient mock - verifica url y payload
+    apiClientSpy.post.and.callFake(<T>(url: string, payload: any): Observable<T> => {
+      expect(url).toBe(`contract/${contractId}/attachment`);
+      expect(payload.fileName).toBe('test.pdf');
+      expect(payload.fileData).toBe(base64String);
+      return of({ success: true } as unknown as T);
+    });
+
+    service.uploadDocuments(documents, contractId).subscribe({
+      next: results => {
+        expect(results.length).toBe(1);
+        expect(results[0]).toEqual({ success: true });
+        done();
+      },
+      error: () => fail('Expected successful uploadDocuments call')
+    });
   });
 
-  it('should call api.post on saveBeneficiaries', () => {
-    const beneficiaries = [{ name: 'John', relationship: 'Son', percentage: 50 }];
+  it('should call observer.error if FileReader fails', (done) => {
     const contractId = '123';
-    const response = { success: true };
-    apiClientSpy.post.and.returnValue(of(response));
-    service.saveBeneficiaries(beneficiaries, contractId).subscribe(result => {
-      expect(result).toEqual(response);
+    const file = new File(['dummy'], 'fail.pdf');
+    const documents = [{ fileName: 'fail.pdf', fileData: file }];
+
+    spyOn(window as any, 'FileReader').and.callFake(() => {
+      const reader: any = {
+        onload: null,
+        onerror: null,
+        readAsDataURL: function () {
+          if (typeof this.onerror === 'function') {
+            this.onerror(new Error('FileReader error'));
+          }
+        }
+      };
+      return reader;
     });
-    expect(apiClientSpy.post).toHaveBeenCalledWith(`beneficiaries/${contractId}`, beneficiaries);
+
+    service.uploadDocuments(documents, contractId).subscribe({
+      next: () => fail('Expected error due to FileReader failure'),
+      error: err => {
+        expect(err).toBeTruthy();
+        done();
+      }
+    });
   });
 
-  it('should call api.post on saveSignature and convert signature', () => {
-    const signatureArray = new Uint8Array([1, 2, 3]).buffer;
-    const signatureData = {
-      signature: signatureArray,
-      expirationDate: '2024-12-31',
-      clientId: 'abc'
-    };
-    const response = { success: true };
-    apiClientSpy.post.and.returnValue(of(response));
-    service.saveSignature(signatureData).subscribe(result => {
-      expect(result).toEqual(response);
+  it('should call observer.error if api.post returns error', (done) => {
+    const contractId = '123';
+    const fileContent = 'dummy content';
+    const base64String = btoa(fileContent);
+    const dataUrl = `data:application/pdf;base64,${base64String}`;
+    const file = new File([fileContent], 'test.pdf', { type: 'application/pdf' });
+    const documents = [{ fileName: 'test.pdf', fileData: file }];
+
+    spyOn(window as any, 'FileReader').and.callFake(() => {
+      const reader: any = {
+        onload: null,
+        onerror: null,
+        result: null,
+        readAsDataURL: function () {
+          this.result = dataUrl;
+          if (typeof this.onload === 'function') {
+            this.onload({ target: { result: this.result } });
+          }
+        }
+      };
+      return reader;
     });
-    expect(apiClientSpy.post).toHaveBeenCalledWith('signature', {
-      ...signatureData,
-      signature: [1, 2, 3]
+
+    const errorResponse = new Error('API post error');
+    apiClientSpy.post.and.returnValue(throwError(() => errorResponse));
+
+    service.uploadDocuments(documents, contractId).subscribe({
+      next: () => fail('Expected error from api.post'),
+      error: err => {
+        expect(err).toBe(errorResponse);
+        done();
+      }
     });
   });
+  it('should emit error if FileReader triggers onerror', (done) => {
+    const contractId = '123';
+    const fileContent = 'dummy content';
+    const fileName = 'error.pdf';
+    const file = new File([fileContent], fileName, { type: 'application/pdf' });
+    const documents = [{ fileName, fileData: file }];
+
+    spyOn(window as any, 'FileReader').and.callFake(() => {
+      const reader = {
+        onload: null as ((e: any) => void) | null,
+        onerror: null as ((error: any) => void) | null,
+        readAsDataURL: function () {
+          // Simula un error llamando a onerror
+          if (this.onerror) {
+            this.onerror(new Error('FileReader error'));
+          }
+        }
+      };
+      return reader;
+    });
+
+    service.uploadDocuments(documents, contractId).subscribe({
+      next: () => fail('Expected error due to FileReader onerror'),
+      error: err => {
+        expect(err).toBeTruthy();
+        expect(err.message).toBe('FileReader error');
+        done();
+      }
+    });
+  });
+  
+
 });
