@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { ApiClientService } from '../api/httpclient';
 import { Contract } from '../../shared/interfaces/contract';
-import { Observable } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -32,12 +32,15 @@ export class ContratacionesService {
     return this.api.post('payment', payment);
   }
 
-  uploadDocuments(documents: { fileName: string; fileData: File }[], contractId: string): Observable<any> {
-    const formData = new FormData();
-    documents.forEach(doc => formData.append('files', doc.fileData, doc.fileName));
-    formData.append('contractId', contractId);
-    return this.api.post('attachments/upload', formData);
+  uploadDocuments(documents: { fileName: string; fileData: File }[], contractId: string): Observable<any[]> {
+    const uploads = documents.map(doc => {
+      const formData = new FormData();
+      formData.append('file', doc.fileData, doc.fileName);
+      return this.api.post(`contracts/${contractId}/attachment`, formData);
+    });
+    return forkJoin(uploads);
   }
+
 
   saveBeneficiaries(beneficiaries: { name: string; relationship: string; percentage: number }[], contractId: string): Observable<any> {
     return this.api.post(`beneficiaries/${contractId}`, beneficiaries);

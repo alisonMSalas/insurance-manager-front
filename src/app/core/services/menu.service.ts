@@ -14,7 +14,7 @@ export class MenuService {
     { title: 'Seguros', url: '/insurance', icon: 'pi pi-shield', roles: ['ADMIN', 'AGENT'] },
     { title: 'Usuarios', url: '/users', icon: 'pi pi-user', roles: ['ADMIN'] },
     { title: 'Clientes', url: '/clients', icon: 'pi pi-user-plus', roles: ['ADMIN', 'AGENT'] },
-    { title: 'Contratación Seguros', url: '/contratacion', icon: 'pi pi-shield', roles: ['ADMIN', 'AGENT','CLIENT'] },
+    { title: 'Contratación Seguros', url: '/contrataciones', icon: 'pi pi-shield', roles: ['ADMIN', 'AGENT','CLIENT'] },
 
   ];
 

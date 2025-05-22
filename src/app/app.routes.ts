@@ -6,6 +6,7 @@ import { ListSegurosComponent } from './seguros/list-seguros/list-seguros.compon
 import { AuthGuard } from './core/guards/auth.guard';
 import { ContratacionSegurosComponent } from './seguros/contratacion-seguros/contratacion-seguros.component';
 import { ListClientsComponent } from './clientes/list-clients/list-clients.component';
+import { ContratacionesListadoComponent } from './seguros/contratacion-listado/contrataciones-listado.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -17,7 +18,8 @@ export const routes: Routes = [
             { path: 'users', component: ListUsersComponent },
             { path: 'insurance', component: ListSegurosComponent },
             { path: 'contratacion', component: ContratacionSegurosComponent },
-            {path: 'clients',component: ListClientsComponent}
+            {path: 'clients',component: ListClientsComponent},
+            { path: 'contrataciones', component: ContratacionesListadoComponent },
         ]
     },
 

@@ -1,0 +1,31 @@
+<p-toast></p-toast>
+<div class="contrataciones-container">
+  <h2>Listado de Contrataciones</h2>
+  <div class="actions" *ngIf="canCreateContract()">
+    <button pButton label="Nueva Contratación" icon="pi pi-plus" [routerLink]="['/contratacion']"
+      class="p-button-primary"></button>
+  </div>
+  <p-table [value]="contratos" [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'">
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Cliente</th>
+        <th>Nombre del Seguro</th>
+        <th>Fecha de Inicio</th>
+        <th>Estado</th>
+        <th>Monto Pagado</th>
+        <th>Beneficiarios</th>
+        <th *ngIf="canDeactivateContract()">Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-contrato>
+      <tr>
+        <td>{{ (contrato.client?.lastName+' ' +contrato.client?.name) || '-' }}</td>
+        <td>{{ contrato.insurance?.name || '-' }}</td>
+        <td>{{ formatFecha(contrato.startDate) }}</td>
+        <td>{{ contrato.status || '-' }}</td>
+        <td>{{ contrato.amountPaid || '-' }}</td>
+        <td>{{ contrato.beneficiary || '-' }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

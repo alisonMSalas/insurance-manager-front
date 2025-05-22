@@ -1,10 +1,12 @@
 export interface Contract {
-  id?: string; // UUID as string in TypeScript
-  startDate?: string; // LocalDate as ISO string
+  id?: string;
+  startDate?: string;
   status?: string;
-  amountPaid?: number; 
+  amountPaid?: number;
   beneficiary?: string;
-  insuranceId?: string; // UUID as string
-  clientId?: string; // UUID as string
+  insuranceId?: string;
+  clientId?: string;
   isActive?: boolean;
+  client?: { name: string, lastName: string };
+  insurance?: { name: string };
 }
