@@ -19,6 +19,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { DividerModule } from 'primeng/divider';
 
 interface StatusOption {
   label: string;
@@ -42,11 +43,12 @@ interface StatusOption {
     ReactiveFormsModule,
     SelectModule,
     ConfirmDialogModule,
-    TooltipModule
+    TooltipModule,
+    DividerModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './list-seguros.component.html',
-  styleUrls: ['./list-seguros.component.css']
+  styleUrls: ['./list-seguros.component.scss']
 })
 
 export class ListSegurosComponent implements OnInit {
@@ -277,5 +279,11 @@ export class ListSegurosComponent implements OnInit {
       paymentPeriod: PaymentPeriod.MONTHLY, // Valor por defecto del enum
       active: false,
     };
+  }
+
+  preventNegativeInput(event: KeyboardEvent): void {
+    if (event.key === '-' || event.key === 'e') {
+      event.preventDefault();
+    }
   }
 }

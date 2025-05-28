@@ -28,14 +28,10 @@ export class ApiClientService {
 
     const headers = new HttpHeaders(headersConfig);
 
-    console.log('→ Authorization header:', headers.get('Authorization'));
-    console.log('→ All header keys:', headers.keys());
-
     return headers;
   }
 
   get<T>(endpoint: string): Observable<T> {
-    console.log(this.getHeaders());
     return this.http.get<T>(`${this.baseUrl}/${endpoint}`, { headers: this.getHeaders() });
   }
 

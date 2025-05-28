@@ -11,12 +11,12 @@
   --warning: #f6ad55;
   --sidebar-bg: #ffffff;
   --menu-item-hover: #f0eeff;
-  --nav-bg: linear-gradient(135deg, #407f68 0%, #407f68 100%);
+  --nav-bg: #074a73;
 }
 
 .top-navbar {
   background: var(--nav-bg);
-  padding: 1rem 2rem;
+  padding: 0.7rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -27,6 +27,7 @@
 .page-title h1 {
   font-size: 1.5rem;
   font-weight: 600;
+  margin: 0.6rem;
   font-family: "Montserrat", sans-serif; /* Aplica Montserrat */
 }
 
@@ -56,7 +57,7 @@
   border: none;
   background-color: rgba(255, 255, 255, 0.9);
   font-size: 0.9rem;
-  min-width: 250px;
+  min-width: 200px;
   transition: all 0.3s ease;
   font-family: "Montserrat", sans-serif; /* Aplica Montserrat */
 }

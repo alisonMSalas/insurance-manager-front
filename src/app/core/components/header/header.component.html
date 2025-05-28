@@ -1,13 +1,14 @@
 <div class="top-navbar">
   <div class="page-title">
     <h1>{{ pageTitle }}</h1>
-    <p>{{ pageSubtitle }}</p>
   </div>
-
   <div class="user-area">
     <p-menu #menu [model]="menuItems" [popup]="true"></p-menu>
-
-    <div class="user-profile" (keydown)="onKeydown($event)" (click)="menu.toggle($event)">
+    <div
+      class="user-profile"
+      (keydown)="onKeydown($event)"
+      (click)="menu.toggle($event)"
+    >
       <p-avatar
         [icon]="user.icon"
         size="large"

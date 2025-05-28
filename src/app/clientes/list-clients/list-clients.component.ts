@@ -36,7 +36,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './list-clients.component.html',
-  styleUrls: ['./list-clients.component.css'],
+  styleUrls: ['./list-clients.component.scss'],
 })
 export class ListClientsComponent {
   clientes: Client[] = [];

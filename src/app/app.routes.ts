@@ -15,6 +15,7 @@ export const routes: Routes = [
         component: MainComponent,
         canActivate: [AuthGuard],
         children: [
+            { path: '', redirectTo: 'insurance', pathMatch: 'full' },
             { path: 'users', component: ListUsersComponent },
             { path: 'insurance', component: ListSegurosComponent },
             { path: 'contratacion', component: ContratacionSegurosComponent },
@@ -23,5 +24,5 @@ export const routes: Routes = [
         ]
     },
 
-    { path: '**', redirectTo: '' }
+    { path: '**', redirectTo: 'login' }
 ];

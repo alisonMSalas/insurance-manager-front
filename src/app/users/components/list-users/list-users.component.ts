@@ -26,14 +26,14 @@ import { ApiClientService } from '../../../core/api/httpclient';
     FormsModule,
     FloatLabelModule,
     InputTextModule,
-    DropdownModule, 
+    DropdownModule,
     DialogModule,
     ToastModule,
     ConfirmDialogModule,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './list-users.component.html',
-  styleUrls: ['./list-users.component.css'],
+  styleUrls: ['./list-users.component.scss'],
 })
 export class ListUsersComponent {
   users: User[] = [];
@@ -243,7 +243,6 @@ export class ListUsersComponent {
   }
 
   viewUser(user: User) {
-    console.log('Ver usuario:', user);
     this.messageService.add({
       severity: 'info',
       summary: 'Información',
