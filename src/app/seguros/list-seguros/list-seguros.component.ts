@@ -19,6 +19,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
+import { DividerModule } from 'primeng/divider';
 
 interface StatusOption {
   label: string;
@@ -42,7 +43,8 @@ interface StatusOption {
     ReactiveFormsModule,
     SelectModule,
     ConfirmDialogModule,
-    TooltipModule
+    TooltipModule,
+    DividerModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './list-seguros.component.html',

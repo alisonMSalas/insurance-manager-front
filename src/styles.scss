@@ -13,11 +13,13 @@ body {
   padding: 0;
   height: 100%;
   font-family: "Montserrat", sans-serif;
+  overflow: hidden;
 }
 
 app-root, app-main, .app-container {
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
   width: 100%;
 }
