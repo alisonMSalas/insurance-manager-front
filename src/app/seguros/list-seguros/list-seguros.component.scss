@@ -315,14 +315,14 @@ h2 {
 :host ::ng-deep .p-inputtext:enabled:hover,
 :host ::ng-deep .p-dropdown:not(.p-disabled):hover,
 :host ::ng-deep .p-inputtextarea:enabled:hover {
-  border-color: #4361ee;
+  border-color: #0069a9;
 }
 
 :host ::ng-deep .p-inputtext:enabled:focus,
 :host ::ng-deep .p-dropdown:not(.p-disabled).p-focus,
 :host ::ng-deep .p-inputtextarea:enabled:focus {
-  border-color: #4361ee;
-  box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.2);
+  border-color: #0069a9;
+  box-shadow: 0 0 0 0.2rem rgba(0, 105, 169, 0.2);
 }
 
 :host ::ng-deep .p-field-checkbox {
@@ -340,13 +340,14 @@ h2 {
 }
 
 :host ::ng-deep .p-button.p-button-primary {
-  background: #4361ee;
-  border: 1px solid #4361ee;
+  background: #0069a9;
+  border: 1px solid #0069a9;
+  padding: 12px 18px;
 }
 
 :host ::ng-deep .p-button.p-button-primary:hover {
-  background: #3a56d4;
-  border-color: #3a56d4;
+  background: #23a0ed;
+  border-color: #1d91da;
 }
 
 :host ::ng-deep .p-button.p-button-text {

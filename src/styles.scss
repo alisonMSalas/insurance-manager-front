@@ -1,5 +1,3 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import "primeicons/primeicons.css";
 @import "primeflex/primeflex.css";
 
@@ -16,10 +14,58 @@ body {
   overflow: hidden;
 }
 
-app-root, app-main, .app-container {
+app-root,
+app-main,
+.app-container {
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
   width: 100%;
+}
+
+.p-dialog {
+  border: none !important;
+
+  .p-dialog-header {
+    border-radius: 12px 12px 0 0;
+    background: none !important;
+    background-color: #0069a9 !important;
+  }
+
+  .p-button {
+    background-color: #0069a9 !important;
+    border: none !important;
+    color: #fff !important;
+
+    &.p-button-text:hover {
+      path {
+        transition: all 0.3s ease;
+        color: #d6d6d6 !important;
+      }
+    }
+  }
+}
+
+input:focus,
+.p-select {
+  border-color: #0485d5 !important;
+  outline: none !important;
+}
+
+.p-dropdown {
+  padding: 0.2rem 0.5rem !important;
+}
+
+.p-textarea:enabled:focus {
+  border-color: #0485d5 !important;
+}
+
+.p-checkbox-checked .p-checkbox-box {
+  background-color: #0485d5 !important;
+  border-color: #0485d5 !important;
+}
+
+.p-checkbox-checked .p-checkbox-box {
+  border-color: #0485d5 !important;
 }
