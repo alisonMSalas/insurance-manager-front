@@ -46,7 +46,7 @@ interface StatusOption {
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './list-seguros.component.html',
-  styleUrls: ['./list-seguros.component.css']
+  styleUrls: ['./list-seguros.component.scss']
 })
 
 export class ListSegurosComponent implements OnInit {
@@ -277,5 +277,11 @@ export class ListSegurosComponent implements OnInit {
       paymentPeriod: PaymentPeriod.MONTHLY, // Valor por defecto del enum
       active: false,
     };
+  }
+
+  preventNegativeInput(event: KeyboardEvent): void {
+    if (event.key === '-' || event.key === 'e') {
+      event.preventDefault();
+    }
   }
 }

@@ -19,7 +19,7 @@ import{ChipModule} from 'primeng/chip';
   standalone: true,
   imports: [CommonModule, RouterModule, TableModule, ButtonModule, ToastModule,ChipModule],
   templateUrl: './contrataciones-listado.component.html',
-  styleUrls: ['./contrataciones-listado.component.css'],
+  styleUrls: ['./contrataciones-listado.component.scss'],
   providers: [MessageService]
 })
 export class ContratacionesListadoComponent implements OnInit {

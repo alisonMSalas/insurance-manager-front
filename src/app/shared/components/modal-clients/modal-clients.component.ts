@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter,Input } from '@angular/core';
+import { Component, Output, EventEmitter, Input } from '@angular/core';
 import { DialogModule } from 'primeng/dialog';
 import { CalendarModule } from 'primeng/calendar';
 import { DropdownModule } from 'primeng/dropdown';
@@ -12,24 +12,17 @@ import { Client } from '../../interfaces/client';
 
 @Component({
   selector: 'app-modal-clients',
-  imports: [DialogModule,CalendarModule,DropdownModule,CommonModule,FormsModule,ButtonModule,InputIconModule,InputTextModule,PasswordModule],
+  imports: [DialogModule, CalendarModule, DropdownModule, CommonModule, FormsModule, ButtonModule, InputIconModule, InputTextModule, PasswordModule],
   templateUrl: './modal-clients.component.html',
-  styleUrl: './modal-clients.component.css'
+  styleUrls: ['./modal-clients.component.scss']
 })
 export class ModalClientsComponent {
   @Input() displayModal: boolean = false;
-
-  
   @Input() cliente: Client | null = null;
-
   @Output() onClose = new EventEmitter<void>();
-
   @Output() onSave = new EventEmitter<Client>();
 
   cerrar() {
     this.onClose.emit();
   }
-
-
-
 }

@@ -24,7 +24,7 @@ import { JWT_OPTIONS, JwtHelperService } from '@auth0/angular-jwt';
   providers: [MessageService, { provide: JWT_OPTIONS, useValue: JWT_OPTIONS },
     JwtHelperService],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css',
+  styleUrl: './login.component.scss',
 })
 export class LoginComponent implements OnInit {
   private  readonly router = inject(Router);

@@ -38,7 +38,7 @@ import { validarCedulaEcuatoriana } from '../../shared/utils/cedula.util';
     ToastModule
   ],
   templateUrl: './contratacion-seguros.component.html',
-  styleUrls: ['./contratacion-seguros.component.css'],
+  styleUrls: ['./contratacion-seguros.component.scss'],
   providers: [MessageService]
 })
 export class ContratacionSegurosComponent {

@@ -14,3 +14,10 @@ body {
   height: 100%;
   font-family: "Montserrat", sans-serif;
 }
+
+app-root, app-main, .app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
