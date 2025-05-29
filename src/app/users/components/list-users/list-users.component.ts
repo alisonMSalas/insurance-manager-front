@@ -1,35 +1,39 @@
-import { Component, inject } from '@angular/core';
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
+import { Component, inject, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
+import { TableModule } from 'primeng/table';
+import { DialogModule } from 'primeng/dialog';
+import { DropdownModule } from 'primeng/dropdown';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
-import { DropdownModule } from 'primeng/dropdown'; // Cambiado de SelectModule a DropdownModule
-import { DialogModule } from 'primeng/dialog';
+import { CheckboxModule } from 'primeng/checkbox';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DividerModule } from 'primeng/divider';
+import { MenuModule } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { UsersService, User } from '../../../core/services/users.service';
 import { ApiClientService } from '../../../core/api/httpclient';
-
 
 @Component({
   standalone: true,
   selector: 'app-list-users',
   imports: [
-    TableModule,
-    ButtonModule,
     CommonModule,
-    ToggleSwitchModule,
     FormsModule,
+    ButtonModule,
+    TableModule,
+    DialogModule,
+    DropdownModule,
     FloatLabelModule,
     InputTextModule,
-    DropdownModule,
-    DialogModule,
+    CheckboxModule,
     ToastModule,
     ConfirmDialogModule,
+    DividerModule,
+    MenuModule,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './list-users.component.html',
@@ -44,7 +48,10 @@ export class ListUsersComponent {
   confirmationService = inject(ConfirmationService);
   messageService = inject(MessageService);
 
+
   mostrarModal: boolean = false;
+  displayViewModal: boolean = false;
+  selectedUser: User | null = null;
   modo: 'crear' | 'editar' = 'crear';
   usuario: Partial<User> & { password?: string } = {
     name: '',
@@ -58,10 +65,8 @@ export class ListUsersComponent {
     { codigo: 'ADMIN', nombre: 'Administrador' },
     { codigo: 'REVIEWER', nombre: 'Revisor' },
     { codigo: 'AGENT', nombre: 'Agente' },
-    { codigo: 'CLIENT', nombre: 'Cliente' },
   ];
 
-  // Nueva propiedad para las opciones del dropdown de roles
   roleOptions: { label: string; value: string | null }[] = [
     { label: 'Todos los roles', value: null },
     ...this.roles.map((r) => ({ label: r.nombre, value: r.codigo })),
@@ -76,6 +81,7 @@ export class ListUsersComponent {
   searchQuery: string = '';
   selectedRole: string | null = null;
   selectedStatus: boolean | null = null;
+  menuItems: { [key: string]: MenuItem[] } = {};
 
   ngOnInit(): void {
     this.currentUserEmail = this.apiClientService.getCurrentUserEmail();
@@ -87,6 +93,7 @@ export class ListUsersComponent {
       next: (users: User[]) => {
         this.users = users;
         this.filteredUsers = users;
+        this.initializeMenuItems();
       },
       error: (err) => {
         console.error('Error al cargar usuarios:', err);
@@ -96,6 +103,32 @@ export class ListUsersComponent {
           detail: 'No se pudieron cargar los usuarios',
         });
       },
+    });
+  }
+
+  initializeMenuItems() {
+    this.menuItems = {};
+    this.users.forEach((user) => {
+      this.menuItems[user.id] = [
+        {
+          label: 'Ver',
+          icon: 'pi pi-eye',
+          command: () => this.viewUser(user),
+          styleClass: 'view',
+        },
+        {
+          label: 'Editar',
+          icon: 'pi pi-pencil',
+          command: () => this.abrirModalEditar(user),
+          styleClass: 'edit',
+        },
+        {
+          label: 'Eliminar',
+          icon: 'pi pi-trash',
+          command: () => this.deleteUser(user),
+          styleClass: 'delete',
+        },
+      ];
     });
   }
 
@@ -155,7 +188,7 @@ export class ListUsersComponent {
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
-              detail: 'No se pudo eliminar el usuario',
+              detail: err?.error?.message || err?.error?.detail || 'No se pudo eliminar el usuario',
             });
           },
         });
@@ -171,6 +204,7 @@ export class ListUsersComponent {
 
   abrirModalEditar(user: User) {
     this.modo = 'editar';
+    this.selectedUser = user;
     this.usuario = { ...user, password: '' };
     this.mostrarModal = true;
   }
@@ -181,15 +215,6 @@ export class ListUsersComponent {
         severity: 'error',
         summary: 'Error',
         detail: 'Por favor, completa todos los campos requeridos',
-      });
-      return;
-    }
-
-    if (this.modo === 'crear' && !this.usuario.password) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'La contraseña es requerida para crear un usuario',
       });
       return;
     }
@@ -215,7 +240,7 @@ export class ListUsersComponent {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'No se pudo crear el usuario',
+            detail: err?.error?.message || err?.error?.detail || 'No se pudo crear el usuario',
           });
         },
       });
@@ -235,7 +260,7 @@ export class ListUsersComponent {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
-            detail: 'No se pudo actualizar el usuario',
+            detail: err?.error?.message || err?.error?.detail || 'No se pudo actualizar el usuario',
           });
         },
       });
@@ -243,11 +268,13 @@ export class ListUsersComponent {
   }
 
   viewUser(user: User) {
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Información',
-      detail: `Visualizando usuario: ${user.name}`,
-    });
+    this.selectedUser = user;
+    this.displayViewModal = true;
+  }
+
+  getRoleLabel(role: string): string {
+    const roleObj = this.roles.find((r) => r.codigo === role);
+    return roleObj ? roleObj.nombre : role;
   }
 
   toggleUserStatus(user: User) {
@@ -280,4 +307,5 @@ export class ListUsersComponent {
       },
     });
   }
+
 }
