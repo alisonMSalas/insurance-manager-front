@@ -18,6 +18,7 @@ import { ClientsService } from '../../core/services/clients.service';
 import { Client } from '../../shared/interfaces/client';
 import { ApiClientService } from '../../core/api/httpclient';
 import { User } from '../../core/services/users.service';
+import {Tooltip} from 'primeng/tooltip';
 
 @Component({
   selector: 'app-list-clients',
@@ -36,6 +37,7 @@ import { User } from '../../core/services/users.service';
     ConfirmDialogModule,
     DividerModule,
     MenuModule,
+    Tooltip,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './list-clients.component.html',
@@ -48,6 +50,7 @@ export class ListClientsComponent {
   apiClientService = inject(ApiClientService);
   confirmationService = inject(ConfirmationService);
   messageService = inject(MessageService);
+  loading = false;
 
   @ViewChild('menu') menu: any;
 
@@ -443,5 +446,10 @@ export class ListClientsComponent {
 
   showActionsMenu(event: Event, cliente: Client): void {
     this.menu.toggle(event);
+  }
+
+  refreshData() {
+    this.loading = true;
+    this.obtenerClientes()
   }
 }

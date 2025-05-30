@@ -52,6 +52,9 @@
           <tr>
             <th scope="col">Nombre</th>
             <th scope="col">DNI</th>
+            <th scope="col">Género</th>
+            <th scope="col">Telefono</th>
+            <th scope="col">Correo</th>
             <th scope="col">Estado</th>
             <th scope="col">Acciones</th>
           </tr>
@@ -60,6 +63,9 @@
           <tr>
             <td>{{ cliente.name }} {{ cliente.lastName }}</td>
             <td>{{ cliente.identificationNumber }}</td>
+            <td>{{ cliente.gender}}</td>
+            <td>{{ cliente.phoneNumber }}</td>
+            <td>{{ cliente.user.email }}</td> 
             <td>
               <p-checkbox
                 [(ngModel)]="cliente.active"
