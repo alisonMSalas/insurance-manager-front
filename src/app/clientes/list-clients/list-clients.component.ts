@@ -36,8 +36,7 @@ import {Tooltip} from 'primeng/tooltip';
     ToastModule,
     ConfirmDialogModule,
     DividerModule,
-    MenuModule,
-    Tooltip,
+    MenuModule
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './list-clients.component.html',
