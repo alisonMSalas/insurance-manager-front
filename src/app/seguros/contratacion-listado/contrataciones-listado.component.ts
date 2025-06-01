@@ -14,10 +14,11 @@ import { formatDate } from '@angular/common';
 import { forkJoin, Observable } from 'rxjs';
 import { SegurosService } from '../service/seguros.service';
 import{ChipModule} from 'primeng/chip';
+import { DividerModule } from 'primeng/divider';
 @Component({
   selector: 'app-contrataciones-listado',
   standalone: true,
-  imports: [CommonModule, RouterModule, TableModule, ButtonModule, ToastModule,ChipModule],
+  imports: [CommonModule, RouterModule, TableModule, ButtonModule, ToastModule,ChipModule,DividerModule],
   templateUrl: './contrataciones-listado.component.html',
   styleUrls: ['./contrataciones-listado.component.scss'],
   providers: [MessageService]

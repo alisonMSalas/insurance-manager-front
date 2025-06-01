@@ -1,6 +1,6 @@
-<p-tabView [(activeIndex)]="activeIndex">
+<!--<p-tabView [(activeIndex)]="activeIndex">
   <!-- 1. Datos del Cliente -->
-  <p-tabPanel header="Datos del Cliente">
+  <!-- <p-tabPanel header="Datos del Cliente">
     <form [formGroup]="clienteForm" class="form-grid">
       <div class="form-group full-width">
         <label for="buscar">Buscar Cliente</label>
@@ -64,10 +64,10 @@
       </div>
     </form>
     <p-toast></p-toast>
-  </p-tabPanel>
+  </p-tabPanel>  -->
 
   <!-- 2. Coberturas -->
-  <p-tabPanel header="Coberturas y Beneficiario">
+  <!-- <p-tabPanel header="Coberturas y Beneficiario">
     <form [formGroup]="coberturasForm" class="form-layout">
       <div class="form-group full-width">
         <label for="tipoSeguro"><strong>Cobertura</strong></label>
@@ -105,10 +105,10 @@
       <button pButton label="Regresar" (click)="activeIndex = 0" class="p-button-secondary"></button>
       <button pButton label="Continuar" (click)="siguientePaso()" class="p-button-primary"></button>
     </div>
-  </p-tabPanel>
+  </p-tabPanel> -->
 
   <!-- 3. Documentos -->
-  <p-tabPanel header="Documentos Requeridos">
+  <!-- <p-tabPanel header="Documentos Requeridos">
     <div class="p-mb-3">
       <h3>Documentación Necesaria</h3>
       <p class="instructions">
@@ -141,10 +141,10 @@
         <button pButton label="Continuar" (click)="siguientePaso()" class="p-button-primary"></button>
       </div>
     </form>
-  </p-tabPanel>
+  </p-tabPanel> -->
 
   <!-- 4. Datos de Pago -->
-  <p-tabPanel header="Datos de Pago">
+  <!-- <p-tabPanel header="Datos de Pago">
     <form [formGroup]="pagoForm" class="form-layout">
       <div class="form-grid">
         <div class="form-group">
@@ -169,10 +169,10 @@
         </div>
       </div>
     </form>
-  </p-tabPanel>
+  </p-tabPanel> -->
 
   <!-- 5. Resumen -->
-  <p-tabPanel header="Resumen">
+  <!-- <p-tabPanel header="Resumen">
     <div class="resumen-container">
       <section class="resumen-section">
         <h3>Datos del Cliente</h3>
@@ -217,5 +217,409 @@
       <button pButton label="Regresar" (click)="activeIndex = 3" class="p-button-secondary"></button>
       <button pButton label="Finalizar" (click)="finalizarProceso()" class="p-button-success"></button>
     </div>
-  </p-tabPanel>
-</p-tabView>
+  </p-tabPanel> -->
+<!-- </p-tabView> -->
+
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+  <div class="content-area">
+
+    <div class="insurance-header">
+  <div class="header-content">
+    <div class="title-container">
+      <button pButton  icon="pi pi-arrow-left" [routerLink]="['/contrataciones']"
+              class="p-button-outlined back-button"></button>
+      <div class="text-2xl text-white">Contratación</div>
+      
+    </div>
+  </div>
+</div>
+
+    <p-divider></p-divider>
+    <div class="content-container">
+       <form [formGroup]="clienteForm" class="form-grid">
+      <div class="form-group full-width search-container">
+        <label for="buscar">Buscar Cliente</label>
+        <div class="p-inputgroup search-group">
+          <input id="buscar" type="text" pInputText formControlName="buscar" placeholder="Ingrese cédula" maxlength="10"
+            pattern="[0-9]*" inputmode="numeric"class="search-input" />
+          <button pButton icon="pi pi-search" type="button" class="boton-azul search-button" (click)="buscarCliente()"></button>
+        </div>
+        <small *ngIf="clienteForm.get('buscar')?.touched && clienteForm.get('buscar')?.errors?.['cedulaInvalida']"
+          class="p-error">Cédula inválida</small>
+      </div>
+
+      <div class="form-group">
+        <label for="cedula">Número de Documento</label>
+        <input id="cedula" type="text" pInputText formControlName="cedula" readonly />
+      </div>
+
+      <div class="form-group">
+        <label for="nombres">Nombres</label>
+        <input id="nombres" type="text" pInputText formControlName="nombres" readonly />
+      </div>
+
+      <div class="form-group">
+        <label for="apellidos">Apellidos</label>
+        <input id="apellidos" type="text" pInputText formControlName="apellidos" readonly />
+      </div>
+
+      <div class="form-group">
+        <label for="fechaNacimiento">Fecha de Nacimiento</label>
+        <p-calendar formControlName="fechaNacimiento" dateFormat="dd/mm/yy" [showIcon]="true" inputId="fechaNacimiento"
+          readonlyInput></p-calendar>
+      </div>
+
+      <div class="form-group">
+        <label for="genero">Género</label>
+        <input id="genero" type="text" pInputText formControlName="genero" readonly />
+      </div>
+
+      <div class="form-group">
+        <label for="ocupacion">Ocupación</label>
+        <input id="ocupacion" type="text" pInputText formControlName="ocupacion" readonly />
+      </div>
+
+      <div class="form-group">
+        <label for="telefono">Teléfono</label>
+        <input id="telefono" type="text" pInputText formControlName="telefono" readonly />
+      </div>
+
+      <div class="form-group">
+        <label for="correo">Correo Electrónico</label>
+        <input id="correo" type="email" pInputText formControlName="correo" readonly />
+      </div>
+
+      <div class="form-group full-width">
+        <label for="direccion">Dirección</label>
+        <input id="direccion" type="text" pInputText formControlName="direccion" readonly />
+      </div>
+
+    </form>
+    </div>
+   <div class="row-container">
+<div class="content-area half-width">
+  <div class="insurance-header">
+    <div>
+      <div class="text-2xl text-white">Beneficiarios</div>
+    </div>
+  </div>
+
+  <p-divider></p-divider>
+
+  <div class="content-container">
+    <!-- Botón para abrir el modal -->
+    <button pButton icon="pi pi-plus" label="Agregar Beneficiario" class="mb-3 boton-azul" (click)="mostrarModal()"></button>
+
+    <!-- Tabla de beneficiarios -->
+    <p-table [value]="beneficiarios" [responsiveLayout]="'scroll'" *ngIf="beneficiarios.length > 0">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Cédula</th>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Parentesco</th>
+          <th>Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-beneficiario>
+        <tr>
+          <td>{{ beneficiario.cedula }}</td>
+          <td>{{ beneficiario.nombre }}</td>
+          <td>{{ beneficiario.apellido }}</td>
+          <td>{{ beneficiario.parentesco }}</td>
+          <td>
+            <button pButton icon="pi pi-trash"  severity="danger" class="p-button-rounded  p-button-danger"
+                    (click)="eliminarBeneficiario(beneficiario)"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Modal para agregar beneficiario -->
+<p-dialog header="Agregar Beneficiario" [(visible)]="modalVisible" [modal]="true" [closable]="false" [style]="{width: '400px'}">
+    <form [formGroup]="beneficiarioForm" (ngSubmit)="agregarBeneficiario()">
+      <div class="p-fluid">
+        <div class="p-field">
+          <label for="cedula">Cédula</label>
+          <input id="cedula" type="text" pInputText formControlName="cedula" />
+        </div>
+        <div class="p-field">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" type="text" pInputText formControlName="nombre" />
+        </div>
+        <div class="p-field">
+          <label for="apellido">Apellido</label>
+          <input id="apellido" type="text" pInputText formControlName="apellido" />
+        </div>
+        <div class="p-field">
+          <label for="parentesco">Parentesco</label>
+          <input id="parentesco" type="text" pInputText formControlName="parentesco" />
+        </div>
+      </div>
+      <div class="p-dialog-footer">
+        <button pButton label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="cerrarModal()" type="button"></button>
+        <button pButton label="Agregar" icon="pi pi-check" type="submit" [disabled]="beneficiarioForm.invalid"></button>
+      </div>
+    </form>
+</p-dialog>
+</div>
+
+  <div class="content-area half-width">
+      <div class="insurance-header">
+      <div>
+        <div class="text-2xl text-white">Seguro</div>
+      </div>
+    </div>
+
+    <p-divider></p-divider>
+     <div class="content-container">
+        <form [formGroup]="coberturasForm" class="form-layout">
+      <div class="form-group full-width">
+        <label for="tipoSeguro"><strong>Cobertura</strong></label>
+        <p-dropdown [options]="tiposSeguro" optionLabel="name" formControlName="tipoSeguro" placeholder="Seleccione..."
+          (onChange)="onTipoSeguroSeleccionado($event.value)"></p-dropdown>
+      </div>
+
+      <div class="field" style="display: flex; gap: 1rem;">
+        <div style="flex: 1;">
+          <label for="fechaInicio">Fecha de inicio de cobertura</label>
+          <p-calendar formControlName="fechaInicio" dateFormat="dd/mm/yy" [showIcon]="true"
+            placeholder="Fecha inicio"></p-calendar>
+          <small *ngIf="coberturasForm.get('fechaInicio')?.errors?.['fechaPasada']" class="p-error">
+            La fecha de inicio no puede ser anterior a hoy.
+          </small>
+        </div>
+
+        <div style="flex: 1;">
+          <label for="periodicidad">Periodicidad</label>
+          <input id="periodicidad" type="text" pInputText formControlName="periodicidad" readonly />
+        </div>
+      </div>
+
+    </form>
+     </div>
+    
+  </div>
+</div>
+  </div>
+
+
+
+  <!-- MODAL CREAR CLIENTE -->
+    <p-dialog
+      header="Agregar Cliente"
+      [(visible)]="mostrarModal2"
+      [modal]="true"
+      [style]="{ width: '1000px'}"
+      [closable]="true"
+      [dismissableMask]="true"
+       class="add-client-dialog" 
+    >
+      <form #clientForm="ngForm" (ngSubmit)="guardarCliente()" class="add-client-form">
+        <div class="add-client-grid">
+          <div class="add-client-row">
+            <div class="fadd-client-field">
+              <label for="name">Nombre</label>
+              <input
+                id="name"
+                type="text"
+                pInputText
+                [(ngModel)]="nuevoCliente.name"
+                name="name"
+                placeholder="Ej: Juan"
+                required
+                minlength="2"
+                class="add-client-input"
+                #name="ngModel"
+              />
+              <small *ngIf="name.touched && name.invalid"class="add-client-error">
+                El nombre es requerido y debe tener al menos 2 caracteres.
+              </small>
+            </div>
+            <div class="form-field">
+              <label for="lastName">Apellido</label>
+              <input
+                id="lastName"
+                type="text"
+                pInputText
+                [(ngModel)]="nuevoCliente.lastName"
+                name="lastName"
+                placeholder="Ej: Pérez"
+                required
+                minlength="2"
+                 class="add-client-input"
+                #lastName="ngModel"
+              />
+              <small *ngIf="lastName.touched && lastName.invalid" class="p-error">
+                El apellido es requerido y debe tener al menos 2 caracteres.
+              </small>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="identificationNumber">Número de Identificación</label>
+              <input
+                id="identificationNumber"
+                type="text"
+                pInputText
+                [(ngModel)]="nuevoCliente.identificationNumber"
+                name="identificationNumber"
+                placeholder="Ej: 1234567890"
+                required
+                pattern="[0-9]{10}"
+                 class="add-client-input"
+                maxlength="10"
+                (input)="restrictToNumbers($event, nuevoCliente, 'identificationNumber')"
+                #identificationNumber="ngModel"
+              />
+              <small *ngIf="identificationNumber.touched && identificationNumber.invalid" class="p-error">
+                Debe tener exactamente 10 dígitos numéricos.
+              </small>
+            </div>
+            <div class="form-field">
+              <label for="birthDate">Fecha de Nacimiento</label>
+              <input
+                type="date"
+                [(ngModel)]="nuevoCliente.birthDate"
+                name="birthDate"
+                class="p-inputtext w-full"
+                required
+                 class="add-client-input"
+                [max]="today | date:'yyyy-MM-dd'"
+                #birthDate="ngModel"
+              />
+              <small *ngIf="birthDate.touched && birthDate.invalid" class="p-error">
+                La fecha de nacimiento es requerida y no puede ser futura.
+              </small>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="phoneNumber">Teléfono</label>
+              <input
+                id="phoneNumber"
+                type="text"
+                pInputText
+                [(ngModel)]="nuevoCliente.phoneNumber"
+                name="phoneNumber"
+                placeholder="Ej: 0987654321"
+                required
+                pattern="[0-9]{10}"
+                maxlength="10"
+                 class="add-client-input"
+                (input)="restrictToNumbers($event, nuevoCliente, 'phoneNumber')"
+                #phoneNumber="ngModel"
+              />
+              <small *ngIf="phoneNumber.touched && phoneNumber.invalid" class="p-error">
+                Debe tener exactamente 10 dígitos numéricos.
+              </small>
+            </div>
+            <div class="form-field">
+              <label for="address">Dirección</label>
+              <input
+                id="address"
+                type="text"
+                pInputText
+                [(ngModel)]="nuevoCliente.address"
+                name="address"
+                placeholder="Ej: Av. Principal 123"
+                required
+                 class="add-client-input"
+                minlength="5"
+                #address="ngModel"
+              />
+              <small *ngIf="address.touched && address.invalid" class="p-error">
+                La dirección debe tener al menos 5 caracteres.
+              </small>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="gender">Género</label>
+              <p-dropdown
+                id="gender"
+                [options]="['Masculino', 'Femenino']"
+                placeholder="Seleccione"
+                [(ngModel)]="nuevoCliente.gender"
+                name="gender"
+                required
+                 class="add-client-input"
+                #gender="ngModel"
+              ></p-dropdown>
+              <small *ngIf="gender.touched && gender.invalid" class="p-error">
+                El género es requerido.
+              </small>
+            </div>
+            <div class="form-field">
+              <label for="occupation">Ocupación</label>
+              <input
+                id="occupation"
+                type="text"
+                pInputText
+                [(ngModel)]="nuevoCliente.occupation"
+                name="occupation"
+                placeholder="Ej: Ingeniero"
+                required
+                 class="add-client-input"
+                minlength="2"
+                #occupation="ngModel"
+              />
+              <small *ngIf="occupation.touched && occupation.invalid" class="p-error">
+                La ocupación debe tener al menos 2 caracteres.
+              </small>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="email">Correo Electrónico</label>
+              <input
+                id="email"
+                type="email"
+                pInputText
+                [(ngModel)]="nuevoCliente.user.email"
+                name="email"
+                placeholder="Ej: cliente@dominio.com"
+                required
+                 class="add-client-input"
+                email
+                
+                #email="ngModel"
+              />
+              <small *ngIf="email.touched && email.invalid" class="p-error">
+                El correo debe ser válido.
+              </small>
+            </div>
+           
+          </div>
+          <div class="form-field-checkbox">
+            <p-checkbox
+              inputId="active"
+              [(ngModel)]="nuevoCliente.active"
+              name="active"
+              binary="true"
+              [disabled]="currentUserEmail === nuevoCliente.user.email"
+            ></p-checkbox>
+            <label for="active">Activo</label>
+          </div>
+        </div>
+      </form>
+      <ng-template pTemplate="footer" class="add-client-footer">
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          (onClick)="mostrarModal2 = false"
+          styleClass="p-button-text"
+       
+        ></p-button>
+        <p-button
+          label="Guardar"
+          icon="pi pi-check"
+          (onClick)="guardarCliente()"
+          styleClass="p-button-primary"
+             
+          [disabled]="clientForm?.invalid"
+        ></p-button>
+      </ng-template>
+    </p-dialog>

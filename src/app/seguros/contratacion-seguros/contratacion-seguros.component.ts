@@ -11,13 +11,20 @@ import { InputTextModule } from 'primeng/inputtext';
 import { CalendarModule } from 'primeng/calendar';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ToastModule } from 'primeng/toast';
-import { MessageService } from 'primeng/api';
+import { ConfirmationService, MessageService } from 'primeng/api';
 import { SegurosService } from '../service/seguros.service';
 import { ClientsService } from '../../core/services/clients.service';
 import { ContratacionesService } from '../../core/services/contrataciones.service';
 import { Contract } from '../../shared/interfaces/contract';
 import { firstValueFrom } from 'rxjs';
 import { validarCedulaEcuatoriana } from '../../shared/utils/cedula.util';
+import { DividerModule } from 'primeng/divider';
+import { Dialog } from 'primeng/dialog';
+import { Client } from '../../shared/interfaces/client';
+import { User } from '../../core/services/users.service';
+import { ApiClientService } from '../../core/api/httpclient';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { CheckboxModule } from 'primeng/checkbox';
 
 @Component({
   selector: 'app-contratacion-seguros',
@@ -35,18 +42,26 @@ import { validarCedulaEcuatoriana } from '../../shared/utils/cedula.util';
     InputTextModule,
     CalendarModule,
     FileUploadModule,
-    ToastModule
+    ToastModule,
+    DividerModule,
+    Dialog,
+    ConfirmDialogModule,
+    CheckboxModule
   ],
   templateUrl: './contratacion-seguros.component.html',
   styleUrls: ['./contratacion-seguros.component.scss'],
-  providers: [MessageService]
+  providers: [MessageService,ConfirmationService]
 })
 export class ContratacionSegurosComponent {
    segurosService = inject(SegurosService);
   messageService = inject(MessageService);
+  confirmationService = inject(ConfirmationService);
+   // Inyectamos los servicios necesarios
   clientService = inject(ClientsService);
    contractService = inject(ContratacionesService);
-
+     apiClientService = inject(ApiClientService);
+ currentUserEmail: string | null = null;
+ today: Date = new Date();
   clienteForm: FormGroup;
   coberturasForm: FormGroup;
   pagoForm: FormGroup;
@@ -99,10 +114,17 @@ export class ContratacionSegurosComponent {
     this.documentosForm = this.fb.group({
       documentos: [[]]
     });
+        this.beneficiarioForm = this.fb.group({
+      cedula: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      nombre: ['', Validators.required],
+      apellido: ['', Validators.required],
+      parentesco: ['', Validators.required],
+    });
   }
 
   ngOnInit(): void {
     this.cargarTiposSeguro();
+     this.currentUserEmail = this.apiClientService.getCurrentUserEmail();
     this.coberturasForm.get('fechaInicio')?.valueChanges.subscribe(fechaInicio => {
       this.pagoForm.patchValue({ fechaPago: fechaInicio });
     });
@@ -138,40 +160,131 @@ export class ContratacionSegurosComponent {
       default: return periodo;
     }
   }
+  mostrarModal2: boolean = false;
+  nuevoCliente: Client & { user: Partial<User> & { password?: string } } = {
+    id: '',
+    name: '',
+    lastName: '',
+    identificationNumber: '',
+    birthDate: '',
+    phoneNumber: '',
+    address: '',
+    gender: '',
+    occupation: '',
+    active: true,
+    user: {
+      id: '',
+      name: '',
+      email: '',
+      rol: 'CLIENT',
+      active: true,
+     
+    },
+  };
 
-  async buscarCliente() {
-    const cedula = this.clienteForm.get('buscar')?.value;
-    if (!cedula) {
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ingrese una cédula' });
-      return;
-    }
 
-    try {
-      const data = await firstValueFrom(this.clientService.getByIdentificationNumber(cedula));
-      if (data) {
-        this.clienteForm.patchValue({
-          cedula: data.identificationNumber,
-          nombres: data.name,
-          apellidos: data.lastName,
-          fechaNacimiento: new Date(data.birthDate),
-          genero: data.gender,
-          telefono: data.phoneNumber,
-          correo: data.user?.email,
-          ocupacion: data.occupation,
-          direccion: data.address
-        });
-        this.clienteEncontrado = true;
-        this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Cliente encontrado' });
-      } else {
-        this.resetCampos(cedula);
-        this.messageService.add({ severity: 'warn', summary: 'No encontrado', detail: 'Cliente no encontrado' });
-      }
-    } catch (error) {
-      this.resetCampos(cedula);
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al buscar cliente' });
-    }
+ async buscarCliente() {
+  const cedula = this.clienteForm.get('buscar')?.value;
+  if (!cedula) {
+    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ingrese una cédula' });
+    return;
   }
 
+  try {
+  const data = await firstValueFrom(this.clientService.getByIdentificationNumber(cedula));
+  
+  this.clienteForm.patchValue({
+    cedula: data.identificationNumber,
+    nombres: data.name,
+    apellidos: data.lastName,
+    fechaNacimiento: new Date(data.birthDate),
+    genero: data.gender,
+    telefono: data.phoneNumber,
+    correo: data.user?.email,
+    ocupacion: data.occupation,
+    direccion: data.address
+  });
+  
+  this.clienteEncontrado = true;
+  this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Cliente encontrado' });
+
+} catch (error) {
+   const err = error as any;
+  // Si error es 404, significa que no se encontró
+  if (err.status === 404) {
+    this.confirmationService.confirm({
+      message: 'El cliente no existe. ¿Desea registrarlo?',
+      header: 'Cliente no encontrado',
+      icon: 'pi pi-user-plus',
+      acceptLabel: 'Sí',
+      rejectLabel: 'No',
+      accept: () => {
+        this.nuevoCliente = {
+          id: '',
+          name: '',
+          lastName: '',
+          identificationNumber: cedula,
+          birthDate: '',
+          phoneNumber: '',
+          address: '',
+          gender: '',
+          occupation: '',
+          active: true,
+          user: {
+            id: '',
+            name: '',
+            email: '',
+            rol: 'CLIENT',
+            active: true,
+           
+          },
+        };
+        this.mostrarModal2 = true;
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se creó el cliente.' });
+      }
+    });
+  } else {
+    this.resetCampos(cedula);
+    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al buscar cliente' });
+  }
+}
+
+}
+ guardarCliente(): void {
+ 
+  this.nuevoCliente.user.name = this.nuevoCliente.name + ' ' + this.nuevoCliente.lastName;
+
+  const payload = { ...this.nuevoCliente };
+
+  this.clientService.create(payload).subscribe({
+    next: () => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Cliente creado correctamente',
+      });
+      this.mostrarModal2 = false;
+      
+    },
+    error: (err) => {
+      console.error('Error al crear cliente:', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: err?.error?.message || err?.error?.detail || 'No se pudo crear el cliente',
+      });
+    }
+  });
+}
+
+  restrictToNumbers(event: Event, client: any, field: string): void {
+    const input = event.target as HTMLInputElement;
+    const cleanValue = input.value.replace(/[^0-9]/g, '');
+    client[field] = cleanValue;
+    input.value = cleanValue;
+  }
   async finalizarProceso() {
     if (!this.clienteForm.valid || !this.coberturasForm.valid || !this.pagoForm.valid ) {
       this.messageService.add({ severity: 'warn', summary: 'Error', detail: 'Complete todos los campos obligatorios' });
@@ -292,5 +405,34 @@ export class ContratacionSegurosComponent {
     this.uploadedFiles = [];
     this.activeIndex = 0;
     this.clienteEncontrado = false;
+  }
+
+
+  // NUEVOS
+
+   beneficiarioForm: FormGroup;
+  beneficiarios: any[] = [];
+  modalVisible: boolean = false;
+
+
+
+  mostrarModal() {
+    this.modalVisible = true;
+    this.beneficiarioForm.reset();
+  }
+
+  cerrarModal() {
+    this.modalVisible = false;
+  }
+
+  agregarBeneficiario() {
+    if (this.beneficiarioForm.valid) {
+      this.beneficiarios.push(this.beneficiarioForm.value);
+      this.modalVisible = false;
+    }
+  }
+
+  eliminarBeneficiario(b: any) {
+    this.beneficiarios = this.beneficiarios.filter(ben => ben !== b);
   }
 }
