@@ -7,6 +7,7 @@ import { AuthGuard } from './core/guards/auth.guard';
 import { ContratacionSegurosComponent } from './seguros/contratacion-seguros/contratacion-seguros.component';
 import { ListClientsComponent } from './clientes/list-clients/list-clients.component';
 import { ContratacionesListadoComponent } from './seguros/contratacion-listado/contrataciones-listado.component';
+import { MainRevisionComponent } from './seguros/revision/main-revision/main-revision.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -21,6 +22,7 @@ export const routes: Routes = [
             { path: 'contratacion', component: ContratacionSegurosComponent },
             {path: 'clients',component: ListClientsComponent},
             { path: 'contrataciones', component: ContratacionesListadoComponent },
+            { path: 'main-revision', component:  MainRevisionComponent},
         ]
     },
 

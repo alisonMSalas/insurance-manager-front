@@ -326,3 +326,44 @@ p-table .p-dropdown {
   gap: 0.75rem;
 }
 
+.insurance-header {
+  display: flex;
+  margin: 0.75rem 0;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 1rem;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-content > p-button {
+  flex-shrink: 0;
+}
+:host ::ng-deep .p-button.p-button-primary {
+  background: #92c0dc;
+  border: 1px solid #0069a9;
+  padding: 12px 18px;
+}
+
+:host ::ng-deep .p-button.p-button-primary:hover {
+  background: #23a0ed;
+  border-color: #1d91da;
+}
+
+:host ::ng-deep .p-button.p-button-text {
+  color: #6c757d;
+}
+
+:host ::ng-deep .p-button.p-button-text:hover {
+  background: rgba(108, 117, 125, 0.1);
+  color: #495057;
+}
