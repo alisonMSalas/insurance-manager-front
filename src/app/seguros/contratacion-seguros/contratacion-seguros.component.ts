@@ -79,6 +79,7 @@ export class ContratacionSegurosComponent {
 
   constructor(private fb: FormBuilder) {
     this.clienteForm = this.fb.group({
+      id: [''],
       buscar: ['', [Validators.required, validarCedulaEcuatoriana()]],
       cedula: ['', [Validators.required, validarCedulaEcuatoriana()]],
       nombres: [''],
@@ -94,8 +95,8 @@ export class ContratacionSegurosComponent {
     this.coberturasForm = this.fb.group({
       tipoSeguro: ['', Validators.required],
       fechaInicio: [null, [Validators.required, this.fechaMinimaValidator()]],
-      periodicidad: ['', Validators.required],
-      beneficiario: ['', Validators.required]
+      periodicidad: ['', Validators.required]
+    
     });
 
     
@@ -175,6 +176,7 @@ export class ContratacionSegurosComponent {
       const data = await firstValueFrom(this.clientService.getByIdentificationNumber(cedula));
 
       this.clienteForm.patchValue({
+        id: data.id,
         cedula: data.identificationNumber,
         nombres: data.name,
         apellidos: data.lastName,
@@ -187,6 +189,7 @@ export class ContratacionSegurosComponent {
       });
 
       this.clienteEncontrado = true;
+      console.log('Cliente encontrado:', data);
       this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Cliente encontrado' });
 
     } catch (error) {
@@ -326,4 +329,52 @@ export class ContratacionSegurosComponent {
   eliminarBeneficiario(b: any) {
     this.beneficiarios = this.beneficiarios.filter(ben => ben !== b);
   }
+  registrarContratacion(): void {
+  if (this.coberturasForm.invalid || !this.clienteEncontrado) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Campos incompletos',
+      detail: 'Debe llenar todos los campos obligatorios y haber buscado un cliente válido'
+    });
+    return;
+  }
+
+  const contrato: Contract = {
+    id: '',
+    startDate: this.formatoFecha(this.coberturasForm.get('fechaInicio')?.value),
+    insuranceId: this.coberturasForm.get('tipoSeguro')?.value?.id,
+    clientId: this.clienteForm.get('id')?.value,
+    beneficiaries: this.beneficiarios.map(b => ({
+      name: b.nombre,
+      lastName: b.apellido,
+      identificationNumber: b.cedula,
+      phoneNumber: b.telefono || '' // opcional si deseas incluirlo
+    }))
+  };
+console.log('Contrato a registrar:', contrato);
+  this.contractService.create(contrato).subscribe({
+    next: () => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Contrato creado',
+        detail: 'El contrato ha sido registrado correctamente'
+      });
+      this.limpiarTodo();
+    },
+    error: (err) => {
+      console.error('Error al registrar contrato', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: err?.error?.message || 'No se pudo registrar el contrato'
+      });
+    }
+  });
+}
+limpiarTodo(): void {
+  this.coberturasForm.reset();
+  this.beneficiarios = [];
+  this.activeIndex = 0;
+}
+
 }

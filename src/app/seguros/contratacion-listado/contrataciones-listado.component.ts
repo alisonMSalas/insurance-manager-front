@@ -44,44 +44,52 @@ export class ContratacionesListadoComponent implements OnInit {
     }
   }
 
-  cargarContrataciones(): void {
-    this.contratacionesService.getAll().subscribe({
-      next: (contratos) => {
-        const observables: Observable<[Client, Insurance]>[] = contratos.map(contrato =>
-          forkJoin([
-            this.clientsService.getById(contrato.clientId!),
-            this.segurosService.getById(contrato.insuranceId!)
-          ])
-        );
-        forkJoin(observables).subscribe({
-          next: (results) => {
-            this.contratos = contratos.map((contrato, index) => ({
-              ...contrato,
-              isActive: contrato.status === 'ACTIVE',
-              client: { name: results[index][0].name, lastName: results[index][0].lastName },
-              insurance: { name: results[index][1].name }
-            }));
-          },
-          error: (err) => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'No se pudieron cargar los datos de clientes o seguros.'
-            });
-            console.error('Error al cargar datos adicionales:', err);
-          }
-        });
-      },
-      error: (err) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudieron cargar las contrataciones.'
-        });
-        console.error('Error al cargar contrataciones:', err);
-      }
-    });
+ cargarContrataciones(): void {
+  this.contratacionesService.getAll().subscribe({
+    next: (contratos) => {
+      const observables: Observable<[Client, Insurance]>[] = contratos.map(contrato =>
+        forkJoin([
+          this.clientsService.getById(contrato.clientId!),
+          this.segurosService.getById(contrato.insuranceId!)
+        ])
+      );
+      forkJoin(observables).subscribe({
+        next: (results) => {
+          this.contratos = contratos.map((contrato, index) => ({
+            ...contrato,
+            isActive: contrato.status === 'ACTIVE',
+            client: { name: results[index][0].name, lastName: results[index][0].lastName },
+            insurance: { name: results[index][1].name },
+            amountPaid: contrato.amountPaid ?? 0, // Usa 0 si amountPaid es undefined
+            beneficiaries: contrato.beneficiaries ?? [] // Asegura que beneficiaries sea un arreglo
+          }));
+        },
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudieron cargar los datos de clientes o seguros.'
+          });
+          console.error('Error al cargar datos adicionales:', err);
+        }
+      });
+    },
+    error: (err) => {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudieron cargar las contrataciones.'
+      });
+      console.error('Error al cargar contrataciones:', err);
+    }
+  });
+}
+formatBeneficiaries(beneficiaries: { name: string; lastName: string }[] | undefined): string {
+  if (!beneficiaries || beneficiaries.length === 0) {
+    return '-';
   }
+  return beneficiaries.map(b => `${b.name} ${b.lastName}`).join(', ');
+}
 
   desactivarContrato(contrato: Contract): void {
     if (this.userRole !== 'ADMIN' && this.userRole !== 'AGENT') {
