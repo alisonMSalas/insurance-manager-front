@@ -26,6 +26,7 @@ import { ApiClientService } from '../../core/api/httpclient';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { CheckboxModule } from 'primeng/checkbox';
 
+
 @Component({
   selector: 'app-contratacion-seguros',
   standalone: true,
@@ -60,6 +61,7 @@ export class ContratacionSegurosComponent {
   contractService = inject(ContratacionesService);
   apiClientService = inject(ApiClientService);
   currentUserEmail: string | null = null;
+
   today: Date = new Date();
   clienteForm: FormGroup;
   coberturasForm: FormGroup;
@@ -375,6 +377,7 @@ limpiarTodo(): void {
   this.coberturasForm.reset();
   this.beneficiarios = [];
   this.activeIndex = 0;
+  this.clienteForm.reset();
 }
 
 }
