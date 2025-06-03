@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { AccordionModule } from 'primeng/accordion';
 import { DocumentacionComponent } from "../documentacion/documentacion.component";
@@ -16,15 +16,26 @@ import { Subscription } from 'rxjs';
 export class MainRevisionComponent implements OnInit, OnDestroy {
   contratoId: string = '';
   contractService = inject(ContratacionesService);
+  esDesdeRuta: boolean = false;
   private subscription: Subscription | undefined;
+  private route = inject(ActivatedRoute);
 
   ngOnInit() {
-    // Nos suscribimos para recibir actualizaciones del contratoId
-    this.subscription = this.contractService.contratoId$.subscribe(id => {
-      this.contratoId = id;
-      // Aquí puedes hacer otras cosas cuando cambie el id
-      console.log('MainRevisionComponent recibió contratoId:', id);
-    });
+    const idFromRoute = this.route.snapshot.paramMap.get('id');
+    if (idFromRoute) {
+      this.contratoId = idFromRoute;
+      this.esDesdeRuta = true;
+      console.log('Contrato ID desde la URL:', this.contratoId);
+    } else {
+      // Nos suscribimos para recibir actualizaciones del contratoId
+      this.subscription = this.contractService.contratoId$.subscribe(id => {
+        this.contratoId = id;
+        this.esDesdeRuta = false;
+        // Aquí puedes hacer otras cosas cuando cambie el id
+        console.log('MainRevisionComponent recibió contratoId:', id);
+      });
+    }
+
   }
 
   ngOnDestroy() {

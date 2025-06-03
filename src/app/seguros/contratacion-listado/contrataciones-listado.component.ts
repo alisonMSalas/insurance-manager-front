@@ -147,7 +147,9 @@ export class ContratacionesListadoComponent implements OnInit {
     }
   }
 
-
+onEliminar(contrato: any) {
+  // Lógica para eliminar el contrato, posiblemente con confirmación
+}
 
 
 }

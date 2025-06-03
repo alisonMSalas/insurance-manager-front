@@ -25,6 +25,8 @@ export const routes: Routes = [
             { path: 'contrataciones', component: ContratacionesListadoComponent },
             { path: 'main-revision', component:  MainRevisionComponent},
             { path: 'summary-revision', component:  ResumenComponent},
+            { path: 'main-revision/:id', component: MainRevisionComponent }
+
 
         ]
     },
