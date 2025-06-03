@@ -13,12 +13,12 @@ import { Insurance } from '../../shared/interfaces/insurance';
 import { formatDate } from '@angular/common';
 import { forkJoin, Observable } from 'rxjs';
 import { SegurosService } from '../service/seguros.service';
-import{ChipModule} from 'primeng/chip';
+import { ChipModule } from 'primeng/chip';
 import { DividerModule } from 'primeng/divider';
 @Component({
   selector: 'app-contrataciones-listado',
   standalone: true,
-  imports: [CommonModule, RouterModule, TableModule, ButtonModule, ToastModule,ChipModule,DividerModule],
+  imports: [CommonModule, RouterModule, TableModule, ButtonModule, ToastModule, ChipModule, DividerModule],
   templateUrl: './contrataciones-listado.component.html',
   styleUrls: ['./contrataciones-listado.component.scss'],
   providers: [MessageService]
@@ -44,52 +44,56 @@ export class ContratacionesListadoComponent implements OnInit {
     }
   }
 
- cargarContrataciones(): void {
-  this.contratacionesService.getAll().subscribe({
-    next: (contratos) => {
-      const observables: Observable<[Client, Insurance]>[] = contratos.map(contrato =>
-        forkJoin([
-          this.clientsService.getById(contrato.clientId!),
-          this.segurosService.getById(contrato.insuranceId!)
-        ])
-      );
-      forkJoin(observables).subscribe({
-        next: (results) => {
-          this.contratos = contratos.map((contrato, index) => ({
-            ...contrato,
-            isActive: contrato.status === 'ACTIVE',
-            client: { name: results[index][0].name, lastName: results[index][0].lastName },
-            insurance: { name: results[index][1].name },
-            amountPaid: contrato.amountPaid ?? 0, // Usa 0 si amountPaid es undefined
-            beneficiaries: contrato.beneficiaries ?? [] // Asegura que beneficiaries sea un arreglo
-          }));
-        },
-        error: (err) => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'No se pudieron cargar los datos de clientes o seguros.'
-          });
-          console.error('Error al cargar datos adicionales:', err);
-        }
-      });
-    },
-    error: (err) => {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No se pudieron cargar las contrataciones.'
-      });
-      console.error('Error al cargar contrataciones:', err);
-    }
-  });
-}
-formatBeneficiaries(beneficiaries: { name: string; lastName: string }[] | undefined): string {
-  if (!beneficiaries || beneficiaries.length === 0) {
-    return '-';
+  cargarContrataciones(): void {
+    this.contratacionesService.getAll().subscribe({
+      next: (contratos) => {
+        const observables: Observable<[Client, Insurance]>[] = contratos.map(contrato =>
+          forkJoin([
+            this.clientsService.getById(contrato.clientId!),
+            this.segurosService.getById(contrato.insuranceId!)
+          ])
+        );
+        forkJoin(observables).subscribe({
+          next: (results) => {
+            this.contratos = contratos.map((contrato, index) => ({
+              ...contrato,
+              isActive: contrato.status === 'ACTIVE',
+              client: results[index][0], // <-- Cliente completo
+              insurance: {
+                ...results[index][1], // <-- Seguro completo
+                benefits: contrato.insurance?.benefits ?? [] // si necesitas asegurar esto
+              },
+              totalPaymentAmount: contrato.totalPaymentAmount ?? 0,
+              beneficiaries: contrato.beneficiaries ?? []
+            }));
+
+          },
+          error: (err) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'No se pudieron cargar los datos de clientes o seguros.'
+            });
+            console.error('Error al cargar datos adicionales:', err);
+          }
+        });
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'No se pudieron cargar las contrataciones.'
+        });
+        console.error('Error al cargar contrataciones:', err);
+      }
+    });
   }
-  return beneficiaries.map(b => `${b.name} ${b.lastName}`).join(', ');
-}
+  formatBeneficiaries(beneficiaries: { name: string; lastName: string }[] | undefined): string {
+    if (!beneficiaries || beneficiaries.length === 0) {
+      return '-';
+    }
+    return beneficiaries.map(b => `${b.name} ${b.lastName}`).join(', ');
+  }
 
   desactivarContrato(contrato: Contract): void {
     if (this.userRole !== 'ADMIN' && this.userRole !== 'AGENT') {
@@ -101,7 +105,7 @@ formatBeneficiaries(beneficiaries: { name: string; lastName: string }[] | undefi
       return;
     }
 
-    
+
   }
 
   formatFecha(fecha: string | undefined): string {
@@ -132,18 +136,20 @@ formatBeneficiaries(beneficiaries: { name: string; lastName: string }[] | undefi
       return null;
     }
   }
-formatStatus(status: string): string {
-  switch (status) {
-    case 'PENDING': return 'Pendiente';
-    case 'APPROVED': return 'Aprobado';
-    case 'REJECTED': return 'Rechazado';
-    case 'REQUESTED': return 'Solicitado';
-    case 'ACTIVE': return 'Activo';
-    default: return status;
+  formatStatus(status: string): string {
+    switch (status) {
+      case 'PENDING': return 'Pendiente';
+      case 'APPROVED': return 'Aprobado';
+      case 'REJECTED': return 'Rechazado';
+      case 'REQUESTED': return 'Solicitado';
+      case 'ACTIVE': return 'Activo';
+      default: return status;
+    }
   }
+
+onEliminar(contrato: any) {
+  // Lógica para eliminar el contrato, posiblemente con confirmación
 }
-
-
 
 
 }

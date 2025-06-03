@@ -1,0 +1,88 @@
+<div class="document-upload-container">
+    <p-card header="Carga de Documentación para Contratación" class="card-documentacion">
+        <div class="card-content">
+            <p class="upload-description">
+                <i class="pi pi-cloud-upload"></i> Sube tu documentación requerida (PDF, JPG, PNG)
+            </p>
+
+            <!-- Pestañas -->
+            <div class="document-tabs">
+                <span class="tab-item" [class.active]="activeTab === 'upload'" (click)="activeTab = 'upload'">
+                    <i class="pi pi-upload"></i> Subir documento
+                </span>
+                <span class="tab-item" [class.active]="activeTab === 'view'" (click)="activeTab = 'view'">
+                    <i class="pi pi-folder-open"></i> Ver documentos
+                </span>
+            </div>
+
+            <!-- Contenido pestaña subida -->
+            <div *ngIf="activeTab === 'upload'" class="upload-section">
+                <div class="upload-area" (click)="triggerFileInput()" [class.active-drop]="isDragging"
+                    (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+                    <i class="pi pi-cloud-upload upload-icon"></i>
+                    <p>Arrastra tus archivos aquí o haz clic para seleccionar</p>
+                    <small>Formatos soportados: PDF, JPG, PNG (Máx. 5MB)</small>
+
+                    <!-- Input file oculto pero accesible -->
+                    <input #fileInput type="file" accept=".pdf,.jpg,.jpeg,.png" (change)="onFileSelected($event)"
+                        style="display: none" />
+                </div>
+
+                <!-- Vista archivo seleccionado -->
+                <div *ngIf="archivoSeleccionado" class="file-preview">
+                    <div class="file-info">
+                        <i class="pi pi-file" [ngClass]="{
+                'pi-file-pdf': archivoSeleccionado.type === 'application/pdf',
+                'pi-image': archivoSeleccionado.type.includes('image/')
+              }"></i>
+                        <div class="file-details">
+                            <strong>{{ archivoSeleccionado.name }}</strong>
+                            <div class="file-meta">
+                                <span>{{ (archivoSeleccionado.size / 1024).toFixed(2) }} KB</span>
+                                <span class="file-type">{{ getFileType(archivoSeleccionado.type) }}</span>
+                            </div>
+                            <div class="progress-bar" *ngIf="uploadProgress > 0">
+                                <div class="progress" [style.width.%]="uploadProgress"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button pButton icon="pi pi-times" class="p-button-rounded p-button-text p-button-danger close-btn"
+                        (click)="eliminarArchivo()"></button>
+                </div>
+            </div>
+
+            <!-- Contenido pestaña vista documentos -->
+            <div *ngIf="activeTab === 'view'" class="documents-list">
+                <div *ngIf="documentosCargados.length === 0" class="empty-state">
+                    <i class="pi pi-inbox"></i>
+                    <p>No hay documentos cargados</p>
+                </div>
+
+                <div *ngFor="let doc of documentosCargados" class="document-item">
+                    <i class="pi" [ngClass]="{
+              'pi-file-pdf': doc.type === 'pdf',
+              'pi-image': doc.type === 'image'
+            }"></i>
+                    <div class="doc-details">
+                        <strong>{{ doc.name }}</strong>
+                        <span>{{ doc.size }} KB - {{ doc.date | date: 'shortDate' }}</span>
+                    </div>
+                    <div class="doc-actions">
+                        <button pButton icon="pi pi-eye" class="p-button-rounded p-button-text p-button-info"
+                            (click)="verDocumento(doc)"></button>
+                        <button pButton icon="pi pi-download" class="p-button-rounded p-button-text p-button-success"
+                            (click)="descargarDocumento(doc)"></button>
+                        <button pButton icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger"
+                            (click)="eliminarDocumento(doc)"></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón guardar -->
+            <div class="actions">
+                <button pButton label="Guardar documento" icon="pi pi-save" class="save-btn"
+                    [disabled]="!archivoSeleccionado" (click)="guardar()"></button>
+            </div>
+        </div>
+    </p-card>
+</div>

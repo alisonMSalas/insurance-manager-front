@@ -1,15 +1,24 @@
+import { Client } from "./client";
+import { Insurance } from "./insurance";
+
 export interface Contract {
   id?: string;
   startDate?: string;
   status?: string;
-  amountPaid?: number;
- 
+  totalPaymentAmount?: number;
   insuranceId?: string;
   clientId?: string;
-  isActive?: boolean;
-  client?: { name: string; lastName: string };
-  insurance?: { name: string };
+  active?: boolean;
+  client?: Client;
+  insurance?: Insurance & {
+    benefits: {
+      id: string;
+      name: string;
+      description: string;
+    }[];
+  };
   beneficiaries?: {
+    id?: string;
     name: string;
     lastName: string;
     identificationNumber: string;

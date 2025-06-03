@@ -25,7 +25,7 @@ import { User } from '../../core/services/users.service';
 import { ApiClientService } from '../../core/api/httpclient';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { CheckboxModule } from 'primeng/checkbox';
-
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-contratacion-seguros',
@@ -61,17 +61,17 @@ export class ContratacionSegurosComponent {
   contractService = inject(ContratacionesService);
   apiClientService = inject(ApiClientService);
   currentUserEmail: string | null = null;
-
+  router = inject(Router);
   today: Date = new Date();
   clienteForm: FormGroup;
   coberturasForm: FormGroup;
- 
+
   tiposSeguro: any[] = [];
   uploadedFiles: File[] = [];
   clienteEncontrado: boolean = false;
   activeIndex = 0;
 
- 
+
 
   periodicidades = [
     { label: 'Mensual', value: 'mensual' },
@@ -98,10 +98,10 @@ export class ContratacionSegurosComponent {
       tipoSeguro: ['', Validators.required],
       fechaInicio: [null, [Validators.required, this.fechaMinimaValidator()]],
       periodicidad: ['', Validators.required]
-    
+
     });
 
-    
+
     this.beneficiarioForm = this.fb.group({
       cedula: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       nombre: ['', Validators.required],
@@ -114,7 +114,7 @@ export class ContratacionSegurosComponent {
     this.cargarTiposSeguro();
     this.currentUserEmail = this.apiClientService.getCurrentUserEmail();
     this.coberturasForm.get('fechaInicio')?.valueChanges.subscribe(fechaInicio => {
-     
+
     });
   }
 
@@ -132,7 +132,7 @@ export class ContratacionSegurosComponent {
     if (seguroSeleccionado && seguroSeleccionado.paymentPeriod) {
       const periodoTraducido = this.traducirPeriodo(seguroSeleccionado.paymentPeriod);
       this.coberturasForm.patchValue({ periodicidad: periodoTraducido });
-      
+
     }
   }
 
@@ -272,13 +272,13 @@ export class ContratacionSegurosComponent {
     input.value = cleanValue;
   }
 
- 
+
 
   formatoFecha(fecha: Date | null | undefined): string | undefined {
     return fecha ? fecha.toISOString().split('T')[0] : undefined;
   }
 
- 
+
 
   fechaMinimaValidator() {
     return (control: any) => {
@@ -332,52 +332,63 @@ export class ContratacionSegurosComponent {
     this.beneficiarios = this.beneficiarios.filter(ben => ben !== b);
   }
   registrarContratacion(): void {
-  if (this.coberturasForm.invalid || !this.clienteEncontrado) {
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Campos incompletos',
-      detail: 'Debe llenar todos los campos obligatorios y haber buscado un cliente válido'
+    if (this.coberturasForm.invalid || !this.clienteEncontrado) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Campos incompletos',
+        detail: 'Debe llenar todos los campos obligatorios y haber buscado un cliente válido'
+      });
+      return;
+    }
+
+    const contrato: Contract = {
+      id: '',
+      startDate: this.formatoFecha(this.coberturasForm.get('fechaInicio')?.value),
+      insuranceId: this.coberturasForm.get('tipoSeguro')?.value?.id,
+      clientId: this.clienteForm.get('id')?.value,
+      beneficiaries: this.beneficiarios.map(b => ({
+        name: b.nombre,
+        lastName: b.apellido,
+        identificationNumber: b.cedula,
+        phoneNumber: b.telefono || ''
+      }))
+    };
+
+    console.log('Contrato a registrar:', contrato);
+
+    this.contractService.create(contrato).subscribe({
+      next: (contratoCreado: Contract) => {
+        // ⚠️ GUARDAR EL ID AQUÍ
+        this.contractService.setContratoId(contratoCreado.id!);
+        console.log('ID guardado en el servicio:', this.contractService.getContratoId());
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Contrato creado',
+          detail: 'El contrato ha sido registrado correctamente'
+        });
+
+        this.limpiarTodo();
+
+        // opcional: navegar al resumen o tab
+        this.router.navigate(['/main-revision']);
+      },
+      error: (err) => {
+        console.error('Error al registrar contrato', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: err?.error?.message || 'No se pudo registrar el contrato'
+        });
+      }
     });
-    return;
   }
 
-  const contrato: Contract = {
-    id: '',
-    startDate: this.formatoFecha(this.coberturasForm.get('fechaInicio')?.value),
-    insuranceId: this.coberturasForm.get('tipoSeguro')?.value?.id,
-    clientId: this.clienteForm.get('id')?.value,
-    beneficiaries: this.beneficiarios.map(b => ({
-      name: b.nombre,
-      lastName: b.apellido,
-      identificationNumber: b.cedula,
-      phoneNumber: b.telefono || '' // opcional si deseas incluirlo
-    }))
-  };
-console.log('Contrato a registrar:', contrato);
-  this.contractService.create(contrato).subscribe({
-    next: () => {
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Contrato creado',
-        detail: 'El contrato ha sido registrado correctamente'
-      });
-      this.limpiarTodo();
-    },
-    error: (err) => {
-      console.error('Error al registrar contrato', err);
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: err?.error?.message || 'No se pudo registrar el contrato'
-      });
-    }
-  });
-}
-limpiarTodo(): void {
-  this.coberturasForm.reset();
-  this.beneficiarios = [];
-  this.activeIndex = 0;
-  this.clienteForm.reset();
-}
+  limpiarTodo(): void {
+    this.coberturasForm.reset();
+    this.beneficiarios = [];
+    this.activeIndex = 0;
+    this.clienteForm.reset();
+  }
 
 }

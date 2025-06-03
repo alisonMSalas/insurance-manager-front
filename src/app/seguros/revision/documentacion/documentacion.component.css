@@ -1,0 +1,299 @@
+/* Estilos SCSS para el componente */
+.document-upload-container {
+  max-width: none; 
+  
+  .card-documentacion {
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 1, 1);
+    border: none;
+    overflow: hidden;
+    
+    .p-card-header {
+      background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+      color: rgb(178, 163, 163);
+      padding: 1.5rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      border-bottom: none;
+    }
+    
+    .p-card-body {
+      padding: 0;
+    }
+  }
+  
+  .card-content {
+    padding: 2rem;
+    
+    .upload-description {
+      display: flex;
+      align-items: center;
+      color: #4361ee;
+      font-size: 1.1rem;
+      margin-top: -20px;
+      margin-bottom: 1.5rem;
+      
+      i {
+        margin-right: 0.5rem;
+        font-size: 1.3rem;
+      }
+    }
+  }
+  
+  .document-tabs {
+    display: flex;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 1.5rem;
+    
+    .tab-item {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      color: #6c757d;
+      font-weight: 500;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      
+      i {
+        margin-right: 0.5rem;
+      }
+      
+      &:hover {
+        color: #4361ee;
+      }
+      
+      &.active {
+        color: #4361ee;
+        border-bottom-color: #4361ee;
+        background-color: rgba(67, 97, 238, 0.05);
+      }
+    }
+  }
+  
+  .upload-section {
+    width: 100%; /* para asegurar que ocupe todo el ancho disponible */
+
+    .upload-area {
+      width: 100%; /* ocupa todo el ancho del contenedor padre */
+      box-sizing: border-box; /* para que padding y borde estén dentro del ancho */
+      border: 2px dashed #adb5bd;
+      border-radius: 8px;
+      padding: 3rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 1.5rem;
+      background-color: #f8f9fa;
+      
+      &:hover, &.active-drop {
+        border-color: #4361ee;
+        background-color: rgba(67, 97, 238, 0.05);
+        
+        .upload-icon {
+          color: #4361ee;
+        }
+      }
+      
+      .upload-icon {
+        font-size: 3rem;
+        color: #adb5bd;
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+      }
+      
+      p {
+        margin-bottom: 0.5rem;
+        color: #495057;
+        font-weight: 500;
+      }
+      
+      small {
+        color: #6c757d;
+        font-size: 0.85rem;
+      }
+    }
+    
+    .hidden-upload {
+      display: none;
+    }
+  }
+  
+  .file-preview {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+    margin-bottom: 1.5rem;
+    
+    .file-info {
+      display: flex;
+      align-items: center;
+      
+      i {
+        font-size: 2rem;
+        margin-right: 1rem;
+        color: #6c757d;
+        
+        &.pi-file-pdf {
+          color: #e63946;
+        }
+        
+        &.pi-image {
+          color: #4361ee;
+        }
+      }
+      
+      .file-details {
+        strong {
+          display: block;
+          margin-bottom: 0.25rem;
+          color: #2b2d42;
+        }
+        
+        .file-meta {
+          display: flex;
+          gap: 1rem;
+          font-size: 0.85rem;
+          color: #6c757d;
+          
+          .file-type {
+            background-color: #e9ecef;
+            padding: 0.15rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+          }
+        }
+      }
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background-color: #e9ecef;
+      border-radius: 2px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+      
+      .progress {
+        height: 100%;
+        background: linear-gradient(90deg, #4361ee 0%, #3a0ca3 100%);
+        transition: width 0.3s ease;
+      }
+    }
+    
+    .close-btn {
+      margin-left: 1rem;
+    }
+  }
+  
+  .documents-list {
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #6c757d;
+      
+      i {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #e9ecef;
+      }
+      
+      p {
+        margin-bottom: 0;
+      }
+    }
+    
+    .document-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      border-radius: 8px;
+      background-color: white;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 0.75rem;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      
+      i {
+        font-size: 1.75rem;
+        margin-right: 1rem;
+        color: #6c757d;
+        
+        &.pi-file-pdf {
+          color: #e63946;
+        }
+        
+        &.pi-image {
+          color: #4361ee;
+        }
+      }
+      
+      .doc-details {
+        flex-grow: 1;
+        
+        strong {
+          display: block;
+          margin-bottom: 0.25rem;
+          color: #2b2d42;
+        }
+        
+        span {
+          font-size: 0.85rem;
+          color: #6c757d;
+        }
+      }
+      
+      .doc-actions {
+        display: flex;
+        gap: 0.5rem;
+      }
+    }
+  }
+  
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 2rem;
+    
+    .save-btn {
+      background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+      border: none;
+      padding: 0.75rem 2rem;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+      }
+      
+      &:disabled {
+        background: #e9ecef;
+        color: #6c757d;
+        transform: none;
+        box-shadow: none;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.file-preview, .document-item {
+  animation: fadeIn 0.3s ease-out;
+}
