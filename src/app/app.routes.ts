@@ -8,6 +8,7 @@ import { ContratacionSegurosComponent } from './seguros/contratacion-seguros/con
 import { ListClientsComponent } from './clientes/list-clients/list-clients.component';
 import { ContratacionesListadoComponent } from './seguros/contratacion-listado/contrataciones-listado.component';
 import { MainRevisionComponent } from './seguros/revision/main-revision/main-revision.component';
+import { ResumenComponent } from './seguros/revision/resumen/resumen.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -23,6 +24,8 @@ export const routes: Routes = [
             {path: 'clients',component: ListClientsComponent},
             { path: 'contrataciones', component: ContratacionesListadoComponent },
             { path: 'main-revision', component:  MainRevisionComponent},
+            { path: 'summary-revision', component:  ResumenComponent},
+
         ]
     },
 
