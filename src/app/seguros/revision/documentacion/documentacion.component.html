@@ -81,7 +81,10 @@
             <!-- Botón guardar -->
             <div class="actions">
                 <button pButton label="Guardar documento" icon="pi pi-save" class="save-btn"
-                    [disabled]="!archivoSeleccionado" (click)="guardar()"></button>
+                    [disabled]="
+        !( (activeTab === 'upload' && archivoSeleccionado) || (activeTab === 'view' && documentosCargados.length > 0) )
+    "
+    (click)="guardar()"></button>
             </div>
         </div>
     </p-card>
