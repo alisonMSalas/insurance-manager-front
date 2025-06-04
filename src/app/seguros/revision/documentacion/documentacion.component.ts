@@ -8,6 +8,8 @@ import { CardModule } from 'primeng/card';
 import { MessageService } from 'primeng/api';
 import { Attachment, AttachmentType } from '../../../shared/interfaces/attachment';
 import { AttachmentService } from '../../../core/services/attachment.service';
+import { FileUploadModule } from 'primeng/fileupload';
+import { Toast } from 'primeng/toast';
 
 @Component({
   selector: 'app-documentacion',
@@ -19,6 +21,8 @@ import { AttachmentService } from '../../../core/services/attachment.service';
     ButtonModule,
     PasswordModule,
     CardModule,
+    Toast,
+    FileUploadModule
   ],
   templateUrl: './documentacion.component.html',
   styleUrls: ['./documentacion.component.css'],
@@ -178,9 +182,10 @@ const documentos: Promise<Attachment>[] = this.documentosCargados.map((doc) => {
         });
         // Opcional: Limpiar documentosCargados después de guardar
         this.documentosCargados = [];
+       
       },
       error: (err) => {
-        console.error('Error al guardar documentos:', err);
+        console.error('Error al guardar documentos:', err.message);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
@@ -226,4 +231,7 @@ const documentos: Promise<Attachment>[] = this.documentosCargados.map((doc) => {
       }
     }
   }
+
+
+  
 }
