@@ -23,12 +23,12 @@ import { AttachmentService } from '../../../core/services/attachment.service';
   templateUrl: './documentacion.component.html',
   styleUrls: ['./documentacion.component.css'],
   providers: [MessageService],
-  
+
 })
-export class DocumentacionComponent implements OnChanges{
+export class DocumentacionComponent implements OnChanges {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @Input() clienteId: string = '';
-
+  @Input() clientAttachments?: Attachment[] = [];
 
   activeTab: 'upload' | 'view' = 'upload';
   archivoSeleccionado: File | null = null;
@@ -45,6 +45,22 @@ export class DocumentacionComponent implements OnChanges{
         console.error('Client ID no proporcionado');
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Client ID no proporcionado' });
       }
+
+       if (changes['clientAttachments']) {
+      const newAttachments = changes['clientAttachments'].currentValue;
+      console.log('>> Attachments actualizados desde el padre:', newAttachments);
+
+      // Opcional: si quieres cargarlos en documentosCargados
+      if (Array.isArray(newAttachments)) {
+        this.documentosCargados = newAttachments.map((att) => ({
+          name: att.fileName,
+          size: 0, // No tienes el tamaño original desde backend
+          type: att.attachmentType === 'IDENTIFICATION' ? 'pdf' : 'image', // Ajusta si necesario
+          date: new Date(), // Puedes usar una fecha ficticia si no viene
+          file: new File([""], att.fileName), // Fake file, para mostrar info
+        }));
+      }
+    }
     }
   }
 
@@ -129,57 +145,68 @@ export class DocumentacionComponent implements OnChanges{
   }
 
   guardar() {
-  console.log('Guardar fue clickeado');
-  console.log('Documentos cargados:', this.documentosCargados);
-  console.log('Client ID:', this.clienteId);
+    console.log('Guardar fue clickeado');
+    console.log('Documentos cargados:', this.documentosCargados);
+    console.log('Client ID:', this.clienteId);
 
-  if (!this.documentosCargados.length) {
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Advertencia',
-      detail: 'No hay documentos para guardar',
-    });
-    return;
-  }
-
-const documentos: Promise<Attachment>[] = this.documentosCargados.map((doc) => {
-  return new Promise<Attachment>((resolve) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64Content = (reader.result as string).split(',')[1];
-      resolve({
-        content: base64Content,
-        fileName: doc.name,
-        attachmentType: AttachmentType.IDENTIFICATION,
+    if (!this.documentosCargados.length) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'No hay documentos para guardar',
       });
-    };
-    reader.readAsDataURL(doc.file);
-  });
-});
+      return;
+    }
 
-  Promise.all(documentos).then((docs) => {
-    this.docService.uploadDocument(this.clienteId, docs).subscribe({
-      next: () => {
-        console.log('Documentos guardados exitosamente', docs);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Se han guardado los documentos',
-        });
-        // Opcional: Limpiar documentosCargados después de guardar
-        this.documentosCargados = [];
-      },
-      error: (err) => {
-        console.error('Error al guardar documentos:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error al guardar los documentos',
-        });
-      },
+    const documentos: Promise<Attachment>[] = this.documentosCargados.map((doc) => {
+      return new Promise<Attachment>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64Content = (reader.result as string).split(',')[1];
+
+          let attachmentType: AttachmentType;
+          if (doc.file.type.startsWith('image/')) {
+            attachmentType = AttachmentType.PORTRAIT_PHOTO;
+          } else if (doc.file.type === 'application/pdf') {
+            attachmentType = AttachmentType.IDENTIFICATION;
+          } else {
+            attachmentType = AttachmentType.IDENTIFICATION;
+          }
+
+          resolve({
+            content: base64Content,
+            fileName: doc.name,
+            attachmentType,
+          });
+        };
+        reader.readAsDataURL(doc.file);
+      });
     });
-  });
-}
+
+
+    Promise.all(documentos).then((docs) => {
+      this.docService.uploadDocument(this.clienteId, docs).subscribe({
+        next: () => {
+          console.log('Documentos guardados exitosamente', docs);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Se han guardado los documentos',
+          });
+          // Opcional: Limpiar documentosCargados después de guardar
+          this.documentosCargados = [];
+        },
+        error: (err) => {
+          console.error('Error al guardar documentos:', err);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error al guardar los documentos',
+          });
+        },
+      });
+    });
+  }
 
   getFileType(mimeType: string): string {
     if (mimeType.includes('pdf')) return 'PDF';

@@ -8,6 +8,7 @@ import { ContratacionesService } from '../../../core/services/contrataciones.ser
 import { Subscription } from 'rxjs';
 import { Contract } from '../../../shared/interfaces/contract';
 import { CommonModule } from '@angular/common';
+import { Attachment } from '../../../shared/interfaces/attachment';
 
 @Component({
   selector: 'app-main-revision',
@@ -24,7 +25,7 @@ export class MainRevisionComponent implements OnInit, OnDestroy {
   esDesdeRuta: boolean = false;
   private subscription: Subscription | undefined;
   private route = inject(ActivatedRoute);
-
+  attatchments:Attachment[] = [];
   ngOnInit() {
     const idFromRoute = this.route.snapshot.paramMap.get('id');
     if (idFromRoute) {
@@ -47,8 +48,7 @@ export class MainRevisionComponent implements OnInit, OnDestroy {
       next: (contrato) => {
         this.contractInfo = contrato;
         this.clientId = contrato.clientId || ''; 
-        console.log('Contrato cargado:', this.contractInfo);
-        console.log('Contrato Cliente ID:', this.clientId);
+        this.attatchments = contrato.clientAttachments ||  [];
       },
       error: (err) => {
         console.error('Error al cargar contrato:', err);
