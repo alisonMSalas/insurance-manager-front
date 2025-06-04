@@ -2,13 +2,13 @@ import { Component, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TabsModule } from 'primeng/tabs';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule, FormControl } from '@angular/forms';
 import { DropdownModule } from 'primeng/dropdown';
 import { TabViewModule } from 'primeng/tabview';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { CalendarModule } from 'primeng/calendar';
+import { DatePickerModule } from 'primeng/datepicker';
 import { FileUploadModule } from 'primeng/fileupload';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -41,7 +41,7 @@ import { Router } from '@angular/router';
     TableModule,
     ButtonModule,
     InputTextModule,
-    CalendarModule,
+    DatePickerModule,
     FileUploadModule,
     ToastModule,
     DividerModule,
@@ -103,7 +103,7 @@ export class ContratacionSegurosComponent {
 
 
     this.beneficiarioForm = this.fb.group({
-      cedula: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      cedula: ['', [Validators.required, Validators.pattern(/^\d{10}$/), validarCedulaEcuatoriana()]],
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       parentesco: ['', Validators.required],
@@ -145,6 +145,7 @@ export class ContratacionSegurosComponent {
     }
   }
   mostrarModal2: boolean = false;
+ 
   nuevoCliente: Client & { user: Partial<User> & { password?: string } } = {
     id: '',
     name: '',
@@ -164,6 +165,7 @@ export class ContratacionSegurosComponent {
       active: true,
 
     },
+    
   };
 
 
@@ -264,13 +266,20 @@ export class ContratacionSegurosComponent {
       }
     });
   }
+   cedulaError: string | null = null;
 
-  restrictToNumbers(event: Event, client: any, field: string): void {
+    restrictToNumbers(event: Event, client: any, field: string): void {
     const input = event.target as HTMLInputElement;
-    const cleanValue = input.value.replace(/[^0-9]/g, '');
+    const cleanValue = input.value.replace(/[^0-9]/g, '').slice(0, 10);
     client[field] = cleanValue;
     input.value = cleanValue;
+
+    // Crear un FormControl temporal para usar el validador
+    const tempControl = new FormControl(cleanValue);
+    const validationResult = validarCedulaEcuatoriana()(tempControl);
+    this.cedulaError = validationResult ? 'Cédula inválida' : null;
   }
+
 
 
 

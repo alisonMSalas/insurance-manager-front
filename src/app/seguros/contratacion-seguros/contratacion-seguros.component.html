@@ -48,8 +48,8 @@
 
       <div class="form-group">
         <label for="fechaNacimiento">Fecha de Nacimiento</label>
-        <p-calendar formControlName="fechaNacimiento" dateFormat="dd/mm/yy" [showIcon]="true" inputId="fechaNacimiento"
-          readonlyInput></p-calendar>
+        <p-date-picker formControlName="fechaNacimiento" dateFormat="dd/mm/yy" [showIcon]="true" inputId="fechaNacimiento"
+          readonlyInput></p-date-picker>
       </div>
 
       <div class="form-group">
@@ -127,7 +127,12 @@
           <div class="p-fluid">
             <div class="p-field">
               <label for="cedula">Cédula</label>
-              <input id="cedula" type="text" pInputText formControlName="cedula" />
+              <input id="cedula" type="text" pInputText formControlName="cedula" maxlength="10" inputmode="numeric" />
+              <small
+                *ngIf="beneficiarioForm.get('cedula')?.touched && beneficiarioForm.get('cedula')?.errors?.['cedulaInvalida']"
+                class="p-error">Cédula inválida</small>
+
+
             </div>
             <div class="p-field">
               <label for="nombre">Nombre</label>
@@ -171,8 +176,8 @@
           <div class="field" style="display: flex; gap: 1rem;">
             <div style="flex: 1;">
               <label for="fechaInicio">Fecha de inicio de cobertura</label>
-              <p-calendar formControlName="fechaInicio" dateFormat="dd/mm/yy" [showIcon]="true"
-                placeholder="Fecha inicio"></p-calendar>
+              <p-date-picker formControlName="fechaInicio"panelStyleClass="custom-datepicker" dateFormat="dd/mm/yy" [showIcon]="true"
+                placeholder="Fecha inicio"></p-date-picker>
               <small *ngIf="coberturasForm.get('fechaInicio')?.errors?.['fechaPasada']" class="p-error">
                 La fecha de inicio no puede ser anterior a hoy.
               </small>
@@ -185,7 +190,8 @@
           </div>
 
         </form>
-        <p-button label="Registrar Contrato"  class="mb-3 boton-azul" icon="pi pi-check" (onClick)="registrarContratacion()" [disabled]="!clienteEncontrado"></p-button>
+        <p-button label="Registrar Contrato" class="mb-3 boton-azul" icon="pi pi-check"
+          (onClick)="registrarContratacion()" [disabled]="!clienteEncontrado"></p-button>
 
       </div>
 
@@ -222,12 +228,15 @@
         <div class="form-field">
           <label for="identificationNumber">Número de Identificación</label>
           <input id="identificationNumber" type="text" pInputText [(ngModel)]="nuevoCliente.identificationNumber"
-            name="identificationNumber" placeholder="Ej: 1234567890" required pattern="[0-9]{10}"
+            name="identificationNumber" required pattern="[0-9]{10}"
             class="add-client-input" maxlength="10"
             (input)="restrictToNumbers($event, nuevoCliente, 'identificationNumber')" #identificationNumber="ngModel" />
-          <small *ngIf="identificationNumber.touched && identificationNumber.invalid" class="add-client-error">
-            Debe tener exactamente 10 dígitos numéricos.
-          </small>
+        <small *ngIf="identificationNumber.touched && (identificationNumber.invalid || cedulaError)" class="add-client-error">
+    <!-- Mostrar primero el error de 'required' si existe -->
+    {{ identificationNumber.errors?.['required']
+        ? 'La cédula es requerida'
+        : cedulaError }}
+  </small>
         </div>
 
         <label for="birthDate">Fecha de Nacimiento</label>

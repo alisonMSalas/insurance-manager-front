@@ -313,7 +313,9 @@ p-table .p-dropdown {
   font-size: 0.75rem;
   color: #e24c4c;
 }
-
+:host ::ng-deep .custom-datepicker {
+  z-index: 10000 !important; /* Asegura que el calendario esté por encima de p-toast y p-confirmDialog */
+}
 /* Footer */
 .add-client-footer {
   padding: 1rem 1.5rem;
