@@ -1,4 +1,12 @@
-import { Component, ViewChild, ElementRef, inject, Input, SimpleChanges, OnChanges } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  ElementRef,
+  inject,
+  Input,
+  SimpleChanges,
+  OnChanges
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -23,35 +31,20 @@ import { AttachmentService } from '../../../core/services/attachment.service';
   templateUrl: './documentacion.component.html',
   styleUrls: ['./documentacion.component.css'],
   providers: [MessageService],
-  
 })
-export class DocumentacionComponent implements OnChanges{
+export class DocumentacionComponent implements OnChanges {
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @Input() clienteId: string = '';
-
+  @Input() clientAttachments?: Attachment[] = [];
 
   activeTab: 'upload' | 'view' = 'upload';
   archivoSeleccionado: File | null = null;
   uploadProgress: number = 0;
   isDragging: boolean = false;
+
   docService = inject(AttachmentService);
   messageService = inject(MessageService);
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['clienteId'] && changes['clienteId'].currentValue) {
-      console.log('Client ID actualizado en DocumentacionComponent:', this.clienteId);
-      // Realiza aquí cualquier lógica de inicialización que dependa de clienteId
-      if (!this.clienteId) {
-        console.error('Client ID no proporcionado');
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Client ID no proporcionado' });
-      }
-    }
-  }
-
-  ngOnInit() {
-    // Opcional: Mantén la verificación inicial si es necesaria, pero evita errores redundantes
-    console.log('Client ID en DocumentacionComponent (ngOnInit):', this.clienteId);
-  }
   documentosCargados: Array<{
     name: string;
     size: number;
@@ -59,6 +52,63 @@ export class DocumentacionComponent implements OnChanges{
     date: Date;
     file: File;
   }> = [];
+
+  ngOnInit() {
+    console.log('Client ID en DocumentacionComponent (ngOnInit):', this.clienteId);
+  }
+
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['clienteId'] && changes['clienteId'].currentValue) {
+      console.log('Client ID actualizado en DocumentacionComponent:', this.clienteId);
+
+      if (!this.clienteId) {
+        console.error('Client ID no proporcionado');
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Client ID no proporcionado' });
+      }
+
+      if (changes['clientAttachments']) {
+        const newAttachments = changes['clientAttachments'].currentValue;
+        console.log('>> Attachments actualizados desde el padre:', newAttachments);
+
+        if (Array.isArray(newAttachments)) {
+          this.documentosCargados = newAttachments.map((att) => {
+            const file = this.base64ToFile(att.content, att.fileName, att.attachmentType);
+            return {
+              name: att.fileName,
+              size: +(file.size / 1024).toFixed(2),
+              type: att.attachmentType === 'IDENTIFICATION' ? 'pdf' : 'image',
+              date: new Date(),
+              file: file,
+            };
+          });
+        }
+      }
+    }
+  }
+
+  base64ToFile(base64: string, fileName: string, type: AttachmentType): File {
+    const mimeType = this.getMimeTypeFromType(type);
+    const byteString = atob(base64);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    const blob = new Blob([ab], { type: mimeType });
+    return new File([blob], fileName, { type: mimeType });
+  }
+
+  getMimeTypeFromType(type: AttachmentType): string {
+    switch (type) {
+      case AttachmentType.IDENTIFICATION:
+        return 'application/pdf';
+      case AttachmentType.PORTRAIT_PHOTO:
+      case AttachmentType.PAYMENT_PROOF:
+        return 'image/jpeg';
+      default:
+        return 'application/octet-stream';
+    }
+  }
 
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -106,6 +156,7 @@ export class DocumentacionComponent implements OnChanges{
       this.fileInput.nativeElement.value = '';
     }
   }
+
   triggerFileInput() {
     this.fileInput.nativeElement.click();
   }
@@ -129,20 +180,20 @@ export class DocumentacionComponent implements OnChanges{
   }
 
   guardar() {
-  console.log('Guardar fue clickeado');
-  console.log('Documentos cargados:', this.documentosCargados);
-  console.log('Client ID:', this.clienteId);
+    console.log('Guardar fue clickeado');
+    console.log('Documentos cargados:', this.documentosCargados);
+    console.log('Client ID:', this.clienteId);
 
-  if (!this.documentosCargados.length) {
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Advertencia',
-      detail: 'No hay documentos para guardar',
-    });
-    return;
-  }
+    if (!this.documentosCargados.length) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Advertencia',
+        detail: 'No hay documentos para guardar',
+      });
+      return;
+    }
 
-const documentos: Promise<Attachment>[] = this.documentosCargados.map((doc) => {
+    const documentos: Promise<Attachment>[] = this.documentosCargados.map((doc) => {
       return new Promise<Attachment>((resolve) => {
         const reader = new FileReader();
         reader.onload = () => {
@@ -167,29 +218,28 @@ const documentos: Promise<Attachment>[] = this.documentosCargados.map((doc) => {
       });
     });
 
-  Promise.all(documentos).then((docs) => {
-    this.docService.uploadDocument(this.clienteId, docs).subscribe({
-      next: () => {
-        console.log('Documentos guardados exitosamente', docs);
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Se han guardado los documentos',
-        });
-        // Opcional: Limpiar documentosCargados después de guardar
-        this.documentosCargados = [];
-      },
-      error: (err) => {
-        console.error('Error al guardar documentos:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error al guardar los documentos',
-        });
-      },
+    Promise.all(documentos).then((docs) => {
+      this.docService.uploadDocument(this.clienteId, docs).subscribe({
+        next: () => {
+          console.log('Documentos guardados exitosamente', docs);
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Se han guardado los documentos',
+          });
+          this.documentosCargados = [];
+        },
+        error: (err) => {
+          console.error('Error al guardar documentos:', err);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error al guardar los documentos',
+          });
+        },
+      });
     });
-  });
-}
+  }
 
   getFileType(mimeType: string): string {
     if (mimeType.includes('pdf')) return 'PDF';

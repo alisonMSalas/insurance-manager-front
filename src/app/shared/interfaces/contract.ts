@@ -1,3 +1,4 @@
+import { Attachment } from "./attachment";
 import { Client } from "./client";
 import { Insurance } from "./insurance";
 
@@ -24,4 +25,5 @@ export interface Contract {
     identificationNumber: string;
     phoneNumber: string;
   }[];
+  clientAttachments?: Attachment[];
 }
