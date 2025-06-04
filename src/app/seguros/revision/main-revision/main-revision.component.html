@@ -8,7 +8,7 @@
                     class="p-button-outlined back-button" title="Volver">
                 </button>
 
-                <div class="text-2xl text-white">Revisión de Contrato</div>
+                <div class="text-2xl text-white">Detalles y Acciones del Contrato</div>
 
             </div>
         </div>
@@ -23,15 +23,15 @@
             </p-accordion-content>
         </p-accordion-panel>
 
-        <p-accordion-panel value="1">
-            <p-accordion-header>Documentación</p-accordion-header>
+        <p-accordion-panel value="1" *ngIf="clientId">
+            <p-accordion-header>Carga de Documentos</p-accordion-header>
             <p-accordion-content>
-                <app-documentacion></app-documentacion>
+                <app-documentacion [clienteId]="clientId"></app-documentacion>
             </p-accordion-content>
         </p-accordion-panel>
 
         <p-accordion-panel value="2">
-            <p-accordion-header>Header III</p-accordion-header>
+            <p-accordion-header>Pagos</p-accordion-header>
             <p-accordion-content>
                 <p class="m-0">
                     Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium,
@@ -45,4 +45,15 @@
             </p-accordion-content>
         </p-accordion-panel>
     </p-accordion>
+</div>
+
+<div class="content-area">
+
+    <div class="insurance-header">
+        <div class="header-content">
+            <div class="title-container">
+                <div class="text-2xl text-white">Revisión de Documentación</div>
+            </div>
+        </div>
+    </div>
 </div>

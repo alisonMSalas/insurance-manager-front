@@ -6,15 +6,20 @@ import { DocumentacionComponent } from "../documentacion/documentacion.component
 import { ResumenComponent } from "../resumen/resumen.component";
 import { ContratacionesService } from '../../../core/services/contrataciones.service';
 import { Subscription } from 'rxjs';
+import { Contract } from '../../../shared/interfaces/contract';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-main-revision',
-  imports: [ButtonModule, RouterLink, AccordionModule, DocumentacionComponent, ResumenComponent],
+  standalone: true,
+  imports: [CommonModule, ButtonModule, RouterLink, AccordionModule, DocumentacionComponent, ResumenComponent],
   templateUrl: './main-revision.component.html',
   styleUrl: './main-revision.component.css'
 })
 export class MainRevisionComponent implements OnInit, OnDestroy {
+  contractInfo: Contract | null = null;
   contratoId: string = '';
+  clientId: string = '';
   contractService = inject(ContratacionesService);
   esDesdeRuta: boolean = false;
   private subscription: Subscription | undefined;
@@ -26,20 +31,37 @@ export class MainRevisionComponent implements OnInit, OnDestroy {
       this.contratoId = idFromRoute;
       this.esDesdeRuta = true;
       console.log('Contrato ID desde la URL:', this.contratoId);
+      this.cargarContrato(this.contratoId);
     } else {
-      // Nos suscribimos para recibir actualizaciones del contratoId
       this.subscription = this.contractService.contratoId$.subscribe(id => {
         this.contratoId = id;
         this.esDesdeRuta = false;
-        // Aquí puedes hacer otras cosas cuando cambie el id
         console.log('MainRevisionComponent recibió contratoId:', id);
+        this.cargarContrato(this.contratoId);
       });
     }
-
   }
 
+  private cargarContrato(id: string) {
+    this.contractService.getById(id).subscribe({
+      next: (contrato) => {
+        this.contractInfo = contrato;
+        this.clientId = contrato.clientId || ''; 
+        console.log('Contrato cargado:', this.contractInfo);
+        console.log('Contrato Cliente ID:', this.clientId);
+      },
+      error: (err) => {
+        console.error('Error al cargar contrato:', err);
+        this.contractInfo = null;
+        this.clientId = ''; 
+      }
+    });
+  }
+
+
+
   ngOnDestroy() {
-    // Limpiar la suscripción para evitar memory leaks
+    
     this.subscription?.unsubscribe();
   }
 }

@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, inject, Input, SimpleChanges, OnChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
@@ -6,6 +6,8 @@ import { ButtonModule } from 'primeng/button';
 import { PasswordModule } from 'primeng/password';
 import { CardModule } from 'primeng/card';
 import { MessageService } from 'primeng/api';
+import { Attachment, AttachmentType } from '../../../shared/interfaces/attachment';
+import { AttachmentService } from '../../../core/services/attachment.service';
 
 @Component({
   selector: 'app-documentacion',
@@ -21,15 +23,35 @@ import { MessageService } from 'primeng/api';
   templateUrl: './documentacion.component.html',
   styleUrls: ['./documentacion.component.css'],
   providers: [MessageService],
+  
 })
-export class DocumentacionComponent {
+export class DocumentacionComponent implements OnChanges{
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  @Input() clienteId: string = '';
+
 
   activeTab: 'upload' | 'view' = 'upload';
   archivoSeleccionado: File | null = null;
   uploadProgress: number = 0;
   isDragging: boolean = false;
+  docService = inject(AttachmentService);
+  messageService = inject(MessageService);
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['clienteId'] && changes['clienteId'].currentValue) {
+      console.log('Client ID actualizado en DocumentacionComponent:', this.clienteId);
+      // Realiza aquí cualquier lógica de inicialización que dependa de clienteId
+      if (!this.clienteId) {
+        console.error('Client ID no proporcionado');
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Client ID no proporcionado' });
+      }
+    }
+  }
+
+  ngOnInit() {
+    // Opcional: Mantén la verificación inicial si es necesaria, pero evita errores redundantes
+    console.log('Client ID en DocumentacionComponent (ngOnInit):', this.clienteId);
+  }
   documentosCargados: Array<{
     name: string;
     size: number;
@@ -85,8 +107,8 @@ export class DocumentacionComponent {
     }
   }
   triggerFileInput() {
-  this.fileInput.nativeElement.click();
-}
+    this.fileInput.nativeElement.click();
+  }
 
   eliminarDocumento(doc: any) {
     this.documentosCargados = this.documentosCargados.filter((d) => d !== doc);
@@ -107,8 +129,57 @@ export class DocumentacionComponent {
   }
 
   guardar() {
-    alert('Documento guardado (simulado).');
+  console.log('Guardar fue clickeado');
+  console.log('Documentos cargados:', this.documentosCargados);
+  console.log('Client ID:', this.clienteId);
+
+  if (!this.documentosCargados.length) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Advertencia',
+      detail: 'No hay documentos para guardar',
+    });
+    return;
   }
+
+const documentos: Promise<Attachment>[] = this.documentosCargados.map((doc) => {
+  return new Promise<Attachment>((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Content = (reader.result as string).split(',')[1];
+      resolve({
+        content: base64Content,
+        fileName: doc.name,
+        attachmentType: AttachmentType.IDENTIFICATION,
+      });
+    };
+    reader.readAsDataURL(doc.file);
+  });
+});
+
+  Promise.all(documentos).then((docs) => {
+    this.docService.uploadDocument(this.clienteId, docs).subscribe({
+      next: () => {
+        console.log('Documentos guardados exitosamente', docs);
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Éxito',
+          detail: 'Se han guardado los documentos',
+        });
+        // Opcional: Limpiar documentosCargados después de guardar
+        this.documentosCargados = [];
+      },
+      error: (err) => {
+        console.error('Error al guardar documentos:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error al guardar los documentos',
+        });
+      },
+    });
+  });
+}
 
   getFileType(mimeType: string): string {
     if (mimeType.includes('pdf')) return 'PDF';
