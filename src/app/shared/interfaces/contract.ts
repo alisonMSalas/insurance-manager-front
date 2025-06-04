@@ -1,6 +1,5 @@
 import { Client } from "./client";
 import { Insurance } from "./insurance";
-import { Attachment } from "./attachment";
 
 export interface Contract {
   id?: string;
@@ -25,5 +24,4 @@ export interface Contract {
     identificationNumber: string;
     phoneNumber: string;
   }[];
-  clientAttachments?: Attachment[];
 }

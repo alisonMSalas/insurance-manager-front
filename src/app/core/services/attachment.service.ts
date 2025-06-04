@@ -10,6 +10,6 @@ export class AttachmentService {
   constructor(private readonly api: ApiClientService) { }
 
   uploadDocument(clientId: string, attachments: Attachment[]): Observable<void> {
-    return this.api.post<void>(`client/attachments/${clientId}`, attachments);
+    return this.api.post<void>(`attachments/${clientId}`, attachments);
   }
 }
