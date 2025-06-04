@@ -143,19 +143,29 @@ export class DocumentacionComponent implements OnChanges{
   }
 
 const documentos: Promise<Attachment>[] = this.documentosCargados.map((doc) => {
-  return new Promise<Attachment>((resolve) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const base64Content = (reader.result as string).split(',')[1];
-      resolve({
-        content: base64Content,
-        fileName: doc.name,
-        attachmentType: AttachmentType.IDENTIFICATION,
+      return new Promise<Attachment>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64Content = (reader.result as string).split(',')[1];
+
+          let attachmentType: AttachmentType;
+          if (doc.file.type.startsWith('image/')) {
+            attachmentType = AttachmentType.PORTRAIT_PHOTO;
+          } else if (doc.file.type === 'application/pdf') {
+            attachmentType = AttachmentType.IDENTIFICATION;
+          } else {
+            attachmentType = AttachmentType.IDENTIFICATION;
+          }
+
+          resolve({
+            content: base64Content,
+            fileName: doc.name,
+            attachmentType,
+          });
+        };
+        reader.readAsDataURL(doc.file);
       });
-    };
-    reader.readAsDataURL(doc.file);
-  });
-});
+    });
 
   Promise.all(documentos).then((docs) => {
     this.docService.uploadDocument(this.clienteId, docs).subscribe({
