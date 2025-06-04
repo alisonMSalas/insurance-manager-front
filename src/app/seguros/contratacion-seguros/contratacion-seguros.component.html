@@ -240,8 +240,8 @@
         </div>
 
         <label for="birthDate">Fecha de Nacimiento</label>
-        <p-calendar [(ngModel)]="nuevoCliente.birthDate" name="birthDate" required showIcon="true"
-          #birthDate="ngModel"></p-calendar>
+        <p-date-picker [(ngModel)]="nuevoCliente.birthDate" name="birthDate" required showIcon="true"
+          #birthDate="ngModel"></p-date-picker>
         <small *ngIf="birthDate.touched && birthDate.invalid" class="add-client-error">
           La fecha de nacimiento es requerida
         </small>
