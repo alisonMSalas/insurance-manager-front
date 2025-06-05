@@ -47,6 +47,38 @@
         <div class="actions">
             <button pButton label="Guardar documentos" icon="pi pi-save" class="save-btn"
                 [disabled]="completedFiles.length === 0 || completedFiles.length > 2" (click)="guardar()"></button>
+                <button pButton label="Rechazar" icon="pi pi-times-circle" class="reject-btn"
+    severity="danger" (click)="mostrarModalRechazo()"></button>
+
         </div>
     </p-card>
 </div>
+
+
+<p-dialog header="Motivo de Rechazo" [(visible)]="modalRechazoVisible" [modal]="true" 
+          [breakpoints]="{'960px': '75vw', '640px': '90vw'}" 
+          [style]="{ width: '500px', 'min-width': '300px' }" 
+          [draggable]="false" [resizable]="false"
+          styleClass="rechazo-dialog">
+    <div class="dialog-content">
+        <div class="field">
+            <label for="observacion" class="dialog-label">
+                Por favor, indique el motivo del rechazo <span class="required-asterisk">*</span>
+            </label>
+            <textarea id="observacion" pInputTextarea [(ngModel)]="observacionRechazo" rows="5"
+                      placeholder="Describa detalladamente los motivos del rechazo..."
+                      class="dialog-textarea" [autoResize]="true" required></textarea>
+            <small *ngIf="!observacionRechazo && formSubmitted" class="error-message">
+                Este campo es obligatorio
+            </small>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <div class="dialog-footer">
+            <p-button label="Cancelar" icon="pi pi-times" (click)="cerrarModal()"
+                     class="cancel-button" [disabled]="procesando"/>
+            <p-button class="button-rechazo" label="Confirmar Rechazo" icon="pi pi-check" (click)="rechazarDocumentos()"
+                     severity="danger" [loading]="procesando" [disabled]="!observacionRechazo"/>
+        </div>
+    </ng-template>
+</p-dialog>
