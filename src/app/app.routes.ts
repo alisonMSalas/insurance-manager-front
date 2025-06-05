@@ -9,6 +9,7 @@ import { ListClientsComponent } from './clientes/list-clients/list-clients.compo
 import { ContratacionesListadoComponent } from './seguros/contratacion-listado/contrataciones-listado.component';
 import { MainRevisionComponent } from './seguros/revision/main-revision/main-revision.component';
 import { ResumenComponent } from './seguros/revision/resumen/resumen.component';
+import { ReportesComponent } from './reportes/reportes.component';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -25,7 +26,8 @@ export const routes: Routes = [
             { path: 'contrataciones', component: ContratacionesListadoComponent },
             { path: 'main-revision', component:  MainRevisionComponent},
             { path: 'summary-revision', component:  ResumenComponent},
-            { path: 'main-revision/:id', component: MainRevisionComponent }
+            { path: 'main-revision/:id', component: MainRevisionComponent },
+            { path: 'reportes', component: ReportesComponent },
 
 
         ]
