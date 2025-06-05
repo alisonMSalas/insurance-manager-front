@@ -93,3 +93,9 @@
   background: #23a0ed;
   border-color: #1d91da;
 }
+
+::ng-deep .dialog-white-text .p-dialog-content,
+::ng-deep .dialog-white-text .p-dialog-header,
+::ng-deep .dialog-white-text .p-dialog-footer {
+  color: white;
+}

@@ -38,7 +38,6 @@ export class MainRevisionComponent implements OnInit, OnDestroy {
       this.subscription = this.contractService.contratoId$.subscribe(id => {
         this.contratoId = id;
         this.esDesdeRuta = false;
-        console.log('MainRevisionComponent recibió contratoId:', id);
         this.cargarContrato(this.contratoId);
       });
     }
@@ -50,8 +49,7 @@ export class MainRevisionComponent implements OnInit, OnDestroy {
         this.contractInfo = contrato;
         this.clientId = contrato.clientId || ''; 
         this.attatchments = contrato.clientAttachments||  [];
-        console.log('Contrato cargado:', this.contractInfo);
-        console.log('Contrato Cliente ID:', this.clientId);
+
       },
       error: (err) => {
         console.error('Error al cargar contrato:', err);
