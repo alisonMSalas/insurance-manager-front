@@ -15,6 +15,7 @@ export class MenuService {
     { title: 'Usuarios', url: '/users', icon: 'pi pi-user', roles: ['ADMIN'] },
     { title: 'Clientes', url: '/clients', icon: 'pi pi-user-plus', roles: ['ADMIN', 'AGENT'] },
     { title: 'Contrataciones', url: '/contrataciones', icon: 'pi pi-shield', roles: ['ADMIN', 'AGENT', 'CLIENT'] },
+    {title:'Reportes', url:'/reportes', icon:'pi pi-chart-bar', roles:['ADMIN', 'AGENT']},
 
   ];
 
