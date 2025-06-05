@@ -26,7 +26,7 @@
         <p-accordion-panel value="1" *ngIf="clientId">
             <p-accordion-header>Carga de Documentos</p-accordion-header>
             <p-accordion-content>
-                <app-documentacion [clienteId]="clientId"></app-documentacion>
+                <app-documentacion [clienteId]="clientId" [clientAttachments]="attatchments"></app-documentacion>
             </p-accordion-content>
         </p-accordion-panel>
 
@@ -49,11 +49,4 @@
 
 <div class="content-area">
 
-    <div class="insurance-header">
-        <div class="header-content">
-            <div class="title-container">
-                <div class="text-2xl text-white">Revisión de Documentación</div>
-            </div>
-        </div>
-    </div>
 </div>

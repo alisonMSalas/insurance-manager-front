@@ -33,15 +33,8 @@ export class ContratacionesListadoComponent implements OnInit {
 
   ngOnInit(): void {
     this.userRole = this.getUserRole();
-    if (this.userRole === 'ADMIN' || this.userRole === 'AGENT') {
-      this.cargarContrataciones();
-    } else {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Acceso Denegado',
-        detail: 'No tienes permisos para ver las contrataciones.'
-      });
-    }
+    this.cargarContrataciones();
+
   }
 
   cargarContrataciones(): void {
@@ -58,10 +51,10 @@ export class ContratacionesListadoComponent implements OnInit {
             this.contratos = contratos.map((contrato, index) => ({
               ...contrato,
               isActive: contrato.status === 'ACTIVE',
-              client: results[index][0], // <-- Cliente completo
+              client: results[index][0], 
               insurance: {
-                ...results[index][1], // <-- Seguro completo
-                benefits: contrato.insurance?.benefits ?? [] // si necesitas asegurar esto
+                ...results[index][1], 
+                benefits: contrato.insurance?.benefits ?? [] 
               },
               totalPaymentAmount: contrato.totalPaymentAmount ?? 0,
               beneficiaries: contrato.beneficiaries ?? []
@@ -114,11 +107,11 @@ export class ContratacionesListadoComponent implements OnInit {
   }
 
   canCreateContract(): boolean {
-    return ['ADMIN', 'AGENT', 'CLIENT'].includes(this.userRole || '');
+    return ['ADMIN', 'AGENT'].includes(this.userRole || '');
   }
 
   canViewContracts(): boolean {
-    return ['ADMIN', 'AGENT'].includes(this.userRole || '');
+    return ['ADMIN', 'AGENT', 'CLIENT'].includes(this.userRole || '');
   }
 
   canDeactivateContract(): boolean {

@@ -23,7 +23,7 @@
           <th>Estado</th>
           <th>Monto Pagado</th>
           <th>Beneficiarios</th>
-          <th *ngIf="canDeactivateContract()">Acciones</th>
+          <th *ngIf="canViewContracts()">Acciones</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-contrato>
@@ -38,11 +38,11 @@
 
           <td>{{ contrato.totalPaymentAmount !== undefined ? contrato.totalPaymentAmount : '-' }}</td>
           <td>{{ formatBeneficiaries(contrato.beneficiaries) }}</td>
-          <td *ngIf="canDeactivateContract()">
+          <td *ngIf="canViewContracts()">
             <button pButton icon="pi pi-folder-open" class="p-button-text p-button-plain p-button-sm"
               [routerLink]="['/main-revision', contrato.id]" title="Revisión de Documentación"></button>
 
-            <button pButton icon="pi pi-trash" class="p-button-text p-button-plain p-button-sm"
+            <button *ngIf="canDeactivateContract()"  pButton icon="pi pi-trash" class="p-button-text p-button-plain p-button-sm"
               (click)="onEliminar(contrato)" title="Eliminar Contrato" style="margin-left: 0.5rem; color: red;">
             </button>
 
