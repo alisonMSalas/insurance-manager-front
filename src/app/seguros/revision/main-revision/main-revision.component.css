@@ -80,3 +80,8 @@ p-accordion-content {
   width: 100% !important;
   display: block; /* o flex si es necesario */
 }
+
+.document-upload-container{
+  margin-right: 10%;
+  width: 50%;
+}

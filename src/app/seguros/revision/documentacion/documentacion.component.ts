@@ -1,11 +1,10 @@
 import {
   Component,
-  ViewChild,
-  ElementRef,
   inject,
   Input,
   SimpleChanges,
-  OnChanges
+  OnChanges,
+  ViewChild
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,7 +16,11 @@ import { MessageService } from 'primeng/api';
 import { Attachment, AttachmentType } from '../../../shared/interfaces/attachment';
 import { AttachmentService } from '../../../core/services/attachment.service';
 import { FileUploadModule } from 'primeng/fileupload';
-import { Toast } from 'primeng/toast';
+import { ToastModule } from 'primeng/toast';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { BadgeModule } from 'primeng/badge';
+import { FileUpload } from 'primeng/fileupload';
+import { MessageModule } from 'primeng/message';
 
 @Component({
   selector: 'app-documentacion',
@@ -29,33 +32,37 @@ import { Toast } from 'primeng/toast';
     ButtonModule,
     PasswordModule,
     CardModule,
-    Toast,
-    FileUploadModule
+    ToastModule,
+    FileUploadModule,
+    ProgressBarModule,
+    BadgeModule,
+    MessageModule
   ],
   templateUrl: './documentacion.component.html',
   styleUrls: ['./documentacion.component.css'],
   providers: [MessageService],
 })
 export class DocumentacionComponent implements OnChanges {
-  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @Input() clienteId: string = '';
   @Input() clientAttachments?: Attachment[] = [];
+  @ViewChild('fileUpload') fileUpload!: FileUpload;
 
-  activeTab: 'upload' | 'view' = 'upload';
-  archivoSeleccionado: File | null = null;
-  uploadProgress: number = 0;
-  isDragging: boolean = false;
-
-  docService = inject(AttachmentService);
-  messageService = inject(MessageService);
-
-  documentosCargados: Array<{
+  pendingFiles: File[] = [];
+  completedFiles: Array<{
     name: string;
     size: number;
     type: 'pdf' | 'image';
     date: Date;
     file: File;
+    attachmentType: AttachmentType;
+    objectURL?: string;
   }> = [];
+  totalSize: string = '0B';
+  totalSizePercent: number = 0;
+  showSaveWarning: boolean = false;
+
+  docService = inject(AttachmentService);
+  messageService = inject(MessageService);
 
   ngOnInit() {
     console.log('Client ID en DocumentacionComponent (ngOnInit):', this.clienteId);
@@ -64,28 +71,33 @@ export class DocumentacionComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['clienteId'] && changes['clienteId'].currentValue) {
       console.log('Client ID actualizado en DocumentacionComponent:', this.clienteId);
-
       if (!this.clienteId) {
-        console.error('Client ID no proporcionado');
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Client ID no proporcionado' });
       }
+    }
 
-      if (changes['clientAttachments']) {
-        const newAttachments = changes['clientAttachments'].currentValue;
-        console.log('>> Attachments actualizados desde el padre:', newAttachments);
+    if (changes['clientAttachments'] && changes['clientAttachments'].currentValue) {
+      const newAttachments = changes['clientAttachments'].currentValue;
+      console.log('>> Attachments actualizados desde el padre:', newAttachments);
 
-        if (Array.isArray(newAttachments)) {
-          this.documentosCargados = newAttachments.map((att) => {
+      if (Array.isArray(newAttachments)) {
+        this.completedFiles = newAttachments
+          .filter((att: Attachment) => 
+            [AttachmentType.IDENTIFICATION, AttachmentType.PORTRAIT_PHOTO].includes(att.attachmentType)
+          )
+          .map((att: Attachment) => {
             const file = this.base64ToFile(att.content, att.fileName, att.attachmentType);
             return {
               name: att.fileName,
-              size: +(file.size / 1024).toFixed(2),
-              type: att.attachmentType === 'IDENTIFICATION' ? 'pdf' : 'image',
+              size: file.size / 1024, // Size in KB
+              type: att.attachmentType === AttachmentType.IDENTIFICATION ? 'pdf' : 'image',
               date: new Date(),
-              file: file,
+              file,
+              attachmentType: att.attachmentType,
+              objectURL: URL.createObjectURL(file)
             };
           });
-        }
+        this.updateTotalSize();
       }
     }
   }
@@ -107,88 +119,111 @@ export class DocumentacionComponent implements OnChanges {
       case AttachmentType.IDENTIFICATION:
         return 'application/pdf';
       case AttachmentType.PORTRAIT_PHOTO:
-      case AttachmentType.PAYMENT_PROOF:
         return 'image/jpeg';
       default:
         return 'application/octet-stream';
     }
   }
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      if (this.validarArchivo(file)) {
-        this.archivoSeleccionado = file;
-        this.simularCarga(file);
-      } else {
-        alert('Archivo no válido o excede los 5MB.');
-        this.limpiarInput();
-      }
-    }
-  }
+  onSelectedFiles(event: any) {
+    console.log('onSelectedFiles triggered with files:', event.files);
+    const selectedFiles: File[] = event.files;
 
-  simularCarga(file: File) {
-    this.uploadProgress = 0;
-    const interval = setInterval(() => {
-      if (this.uploadProgress >= 100) {
-        clearInterval(interval);
-        this.documentosCargados.push({
-          name: file.name,
-          size: +(file.size / 1024).toFixed(2),
-          type: file.type.includes('pdf') ? 'pdf' : 'image',
-          date: new Date(),
-          file,
+    if (this.completedFiles.length + selectedFiles.length > 2) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Límite excedido',
+        detail: 'Solo se permiten hasta dos archivos (Identificación y Foto).'
+      });
+      this.fileUpload.clear();
+      this.pendingFiles = [];
+      this.updateTotalSize();
+      return;
+    }
+
+    for (const file of selectedFiles) {
+      if (this.validateFile(file)) {
+        const attachmentType = file.type.includes('pdf') 
+          ? AttachmentType.IDENTIFICATION 
+          : AttachmentType.PORTRAIT_PHOTO;
+        
+        if (this.completedFiles.some(doc => doc.attachmentType === attachmentType)) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Archivo duplicado',
+            detail: `Ya se ha cargado un archivo de tipo ${attachmentType === AttachmentType.IDENTIFICATION ? 'Identificación' : 'Foto'}.`
+          });
+        } else {
+          this.completedFiles.push({
+            name: file.name,
+            size: file.size / 1024, // Size in KB
+            type: file.type.includes('pdf') ? 'pdf' : 'image',
+            date: new Date(),
+            file,
+            attachmentType,
+            objectURL: URL.createObjectURL(file)
+          });
+          this.showSaveWarning = true; // Show warning on new file
+        }
+      } else {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Archivo no válido',
+          detail: `El archivo ${file.name} no es válido o excede los 5MB.`
         });
-        this.archivoSeleccionado = null;
-        this.limpiarInput();
-        this.uploadProgress = 0;
-      } else {
-        this.uploadProgress += 10;
       }
-    }, 100);
-  }
-
-  eliminarArchivo() {
-    this.archivoSeleccionado = null;
-    this.limpiarInput();
-    this.uploadProgress = 0;
-  }
-
-  limpiarInput() {
-    if (this.fileInput) {
-      this.fileInput.nativeElement.value = '';
     }
+
+    this.fileUpload.clear(); // Clear file upload after processing
+    this.pendingFiles = [];
+    console.log('Updated completedFiles:', this.completedFiles);
+    this.updateTotalSize();
   }
 
-  triggerFileInput() {
-    this.fileInput.nativeElement.click();
+  onFileRemoved(event: any): void {
+    console.log('onFileRemoved triggered:', event);
+    this.pendingFiles = this.fileUpload.files;
+    this.updateTotalSize();
   }
 
-  eliminarDocumento(doc: any) {
-    this.documentosCargados = this.documentosCargados.filter((d) => d !== doc);
+  removeCompletedFile(index: number): void {
+    console.log('removeCompletedFile triggered for index:', index);
+    const removedFile = this.completedFiles.splice(index, 1)[0];
+    if (removedFile.objectURL) {
+      URL.revokeObjectURL(removedFile.objectURL);
+    }
+    this.fileUpload.clear();
+    this.updateTotalSize();
+    console.log('Updated completedFiles:', this.completedFiles);
   }
 
-  verDocumento(doc: any) {
-    const fileURL = URL.createObjectURL(doc.file);
+  updateTotalSize(): void {
+    const totalBytes = this.completedFiles.reduce((sum, doc) => sum + (doc.size * 1024), 0); // Convert KB back to bytes
+    this.totalSize = this.formatSize(totalBytes);
+    this.totalSizePercent = Math.min((totalBytes / (5 * 1024 * 1024)) * 100, 100);
+    console.log('Updated totalSize:', this.totalSize, 'totalSizePercent:', this.totalSizePercent);
+  }
+
+  formatSize(bytes: number): string {
+    if (bytes === 0) return '0B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  getFilePreviewUrl(doc: any): string {
+    return doc.objectURL || URL.createObjectURL(doc.file);
+  }
+
+  verDocumento(doc: any): void {
+    const fileURL = doc.objectURL || URL.createObjectURL(doc.file);
     window.open(fileURL, '_blank');
   }
 
-  descargarDocumento(doc: any) {
-    const a = document.createElement('a');
-    const fileURL = URL.createObjectURL(doc.file);
-    a.href = fileURL;
-    a.download = doc.name;
-    a.click();
-    URL.revokeObjectURL(fileURL);
-  }
+  guardar(): void {
 
-  guardar() {
-    console.log('Guardar fue clickeado');
-    console.log('Documentos cargados:', this.documentosCargados);
-    console.log('Client ID:', this.clienteId);
-
-    if (!this.documentosCargados.length) {
+    if (!this.completedFiles.length) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Advertencia',
@@ -197,25 +232,15 @@ export class DocumentacionComponent implements OnChanges {
       return;
     }
 
-    const documentos: Promise<Attachment>[] = this.documentosCargados.map((doc) => {
+    const documentos: Promise<Attachment>[] = this.completedFiles.map((doc) => {
       return new Promise<Attachment>((resolve) => {
         const reader = new FileReader();
         reader.onload = () => {
           const base64Content = (reader.result as string).split(',')[1];
-
-          let attachmentType: AttachmentType;
-          if (doc.file.type.startsWith('image/')) {
-            attachmentType = AttachmentType.PORTRAIT_PHOTO;
-          } else if (doc.file.type === 'application/pdf') {
-            attachmentType = AttachmentType.IDENTIFICATION;
-          } else {
-            attachmentType = AttachmentType.IDENTIFICATION;
-          }
-
           resolve({
             content: base64Content,
             fileName: doc.name,
-            attachmentType,
+            attachmentType: doc.attachmentType
           });
         };
         reader.readAsDataURL(doc.file);
@@ -231,7 +256,8 @@ export class DocumentacionComponent implements OnChanges {
             summary: 'Éxito',
             detail: 'Se han guardado los documentos',
           });
-          this.documentosCargados = [];
+          this.showSaveWarning = false; 
+          this.updateTotalSize();
         },
         error: (err) => {
           console.error('Error al guardar documentos:', err);
@@ -240,7 +266,7 @@ export class DocumentacionComponent implements OnChanges {
             summary: 'Error',
             detail: 'Error al guardar los documentos',
           });
-        },
+        }
       });
     });
   }
@@ -251,36 +277,15 @@ export class DocumentacionComponent implements OnChanges {
     return 'Desconocido';
   }
 
-  validarArchivo(file: File): boolean {
-    const tiposValidos = ['application/pdf', 'image/jpeg', 'image/png'];
+  validateFile(file: File): boolean {
+    const validTypes = ['application/pdf', 'image/jpeg', 'image/png'];
     const maxSizeMB = 5;
-    return tiposValidos.includes(file.type) && file.size <= maxSizeMB * 1024 * 1024;
+    const isValid = validTypes.includes(file.type) && file.size <= maxSizeMB * 1024 * 1024;
+    console.log('Validating file:', file.name, 'isValid:', isValid);
+    return isValid;
   }
 
-  onDragOver(event: DragEvent) {
-    event.preventDefault();
-    this.isDragging = true;
+  choose(event: Event, chooseCallback: any) {
+    chooseCallback();
   }
-
-  onDragLeave(event: DragEvent) {
-    event.preventDefault();
-    this.isDragging = false;
-  }
-
-  onDrop(event: DragEvent) {
-    event.preventDefault();
-    this.isDragging = false;
-    if (event.dataTransfer?.files.length) {
-      const file = event.dataTransfer.files[0];
-      if (this.validarArchivo(file)) {
-        this.archivoSeleccionado = file;
-        this.simularCarga(file);
-      } else {
-        alert('Archivo no válido o excede los 5MB.');
-      }
-    }
-  }
-
-
-  
 }
