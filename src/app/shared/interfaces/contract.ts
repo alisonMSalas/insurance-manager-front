@@ -23,6 +23,7 @@ export interface Contract {
     name: string;
     lastName: string;
     identificationNumber: string;
+    relationship: string;
     phoneNumber: string;
   }[];
   clientAttachments?: Attachment[];

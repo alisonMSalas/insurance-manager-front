@@ -26,6 +26,7 @@ import { ApiClientService } from '../../core/api/httpclient';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { CheckboxModule } from 'primeng/checkbox';
 import { Router } from '@angular/router';
+import { SelectModule } from 'primeng/select';
 
 @Component({
   selector: 'app-contratacion-seguros',
@@ -47,7 +48,8 @@ import { Router } from '@angular/router';
     DividerModule,
     Dialog,
     ConfirmDialogModule,
-    CheckboxModule
+    CheckboxModule,
+    SelectModule
   ],
   templateUrl: './contratacion-seguros.component.html',
   styleUrls: ['./contratacion-seguros.component.scss'],
@@ -106,7 +108,8 @@ export class ContratacionSegurosComponent {
       cedula: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
-      parentesco: ['', Validators.required],
+     parentesco: [null, Validators.required],
+
     });
   }
 
@@ -331,6 +334,19 @@ export class ContratacionSegurosComponent {
   eliminarBeneficiario(b: any) {
     this.beneficiarios = this.beneficiarios.filter(ben => ben !== b);
   }
+
+ parentescos = [
+  { label: 'Padre', value: 'Padre' },
+  { label: 'Madre', value: 'Madre' },
+  { label: 'Hermano(a)', value: 'Hermano(a)' },
+  { label: 'Hijo(a)', value: 'Hijo(a)' },
+  { label: 'Cónyuge', value: 'Cónyuge' },
+  { label: 'Tío(a)', value: 'Tío(a)' },
+  { label: 'Primo(a)', value: 'Primo(a)' },
+  { label: 'Otro', value: 'Otro' }
+];
+
+
   registrarContratacion(): void {
     if (this.coberturasForm.invalid || !this.clienteEncontrado) {
       this.messageService.add({
@@ -350,7 +366,8 @@ export class ContratacionSegurosComponent {
         name: b.nombre,
         lastName: b.apellido,
         identificationNumber: b.cedula,
-        phoneNumber: b.telefono || ''
+        phoneNumber: b.telefono || '',
+        relationship: b.parentesco
       }))
     };
 

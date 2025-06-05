@@ -9,11 +9,12 @@ import { Subscription } from 'rxjs';
 import { Contract } from '../../../shared/interfaces/contract';
 import { CommonModule } from '@angular/common';
 import { Attachment } from '../../../shared/interfaces/attachment';
+import { PaymentsComponent } from '../payments/payments.component';
 
 @Component({
   selector: 'app-main-revision',
   standalone: true,
-  imports: [CommonModule, ButtonModule, RouterLink, AccordionModule, DocumentacionComponent, ResumenComponent],
+  imports: [CommonModule, ButtonModule, RouterLink, AccordionModule, DocumentacionComponent, ResumenComponent,PaymentsComponent],
   templateUrl: './main-revision.component.html',
   styleUrl: './main-revision.component.css'
 })

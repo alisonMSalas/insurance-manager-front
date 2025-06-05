@@ -21,6 +21,8 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { BadgeModule } from 'primeng/badge';
 import { FileUpload } from 'primeng/fileupload';
 import { MessageModule } from 'primeng/message';
+import { Dialog } from 'primeng/dialog';
+import { TextareaModule } from 'primeng/textarea';
 
 @Component({
   selector: 'app-documentacion',
@@ -36,7 +38,9 @@ import { MessageModule } from 'primeng/message';
     FileUploadModule,
     ProgressBarModule,
     BadgeModule,
-    MessageModule
+    MessageModule,
+    Dialog,
+    TextareaModule
   ],
   templateUrl: './documentacion.component.html',
   styleUrls: ['./documentacion.component.css'],
@@ -288,4 +292,38 @@ export class DocumentacionComponent implements OnChanges {
   choose(event: Event, chooseCallback: any) {
     chooseCallback();
   }
+
+
+  modalRechazoVisible: boolean = false;
+observacionRechazo: string = '';
+
+mostrarModalRechazo() {
+  this.modalRechazoVisible = true;
+}
+
+async rechazarDocumentos() {
+    this.formSubmitted = true;
+    
+    if (!this.observacionRechazo) {
+        return;
+    }
+
+    this.procesando = true;
+    try {
+        await // tu lógica de rechazo aquí
+        this.cerrarModal();
+    } finally {
+        this.procesando = false;
+    }
+}
+procesando: boolean = false;
+formSubmitted: boolean = false;
+
+cerrarModal() {
+    this.modalRechazoVisible = false;
+    this.formSubmitted = false;
+    this.observacionRechazo = '';
+    
+}
+
 }
