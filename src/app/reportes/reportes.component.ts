@@ -22,7 +22,7 @@ import { DividerModule } from 'primeng/divider';
     RippleModule, DividerModule
   ],
   templateUrl: './reportes.component.html',
-  styleUrls: ['./reportes.component.css']
+  styleUrls: ['./reportes.component.scss']
 })
 export class ReportesComponent {
   user = {
