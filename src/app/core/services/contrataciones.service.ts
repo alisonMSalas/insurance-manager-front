@@ -42,4 +42,9 @@ export class ContratacionesService {
     localStorage.removeItem('contratoId');
     this.contratoIdSubject.next('');
   }
+
+  aprobarContrato(id: string): Observable<Contract> {
+    return this.api.post(`contract/approve-contract/${id}`,{});
+  }
+
 }
