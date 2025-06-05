@@ -27,4 +27,5 @@ export interface Contract {
     phoneNumber: string;
   }[];
   clientAttachments?: Attachment[];
+  contractFile?: string; 
 }
