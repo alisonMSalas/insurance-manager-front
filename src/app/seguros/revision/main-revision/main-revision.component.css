@@ -1,17 +1,21 @@
-.content-area {
-  flex: 1;
-  flex-grow: 1;
-  overflow-y: auto;
+:host {
   display: flex;
   flex-direction: column;
-  height: auto;
-  overflow: hidden;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+}
+
+.content-area {
+  display: flex;
+  flex-direction: column;
 
   .p-divider {
     margin: 0;
     margin-bottom: 0.75rem;
   }
 }
+
 .content-container {
   flex: 1;
   display: flex;
@@ -23,6 +27,7 @@
   height: 100%;
   min-height: 0;
 }
+
 .insurance-header {
   display: flex;
   justify-content: flex-start;
@@ -32,11 +37,13 @@
   flex-wrap: wrap;
   gap: 1rem;
 }
+
 .header-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
 .header-content {
   display: flex;
   align-items: center;
@@ -44,44 +51,70 @@
   width: 100%;
   padding-right: 1rem;
 }
+
 .title-container {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
+
 .title-container {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
+
 ::ng-deep .p-button.back-button {
   background: none;
   border: none;
   color: #fff !important;
+
+  &:hover {
+    background: none;
+    border: none;
+    color: #fff !important;
+  }
 }
+
 ::ng-deep .p-button.p-button-text .boton-azul {
-    color: #6c757d;
+  color: #6c757d;
 }
 
-::ng-deep .p-button.p-button-text:hover.boton-azul  {
-    background: rgba(108, 117, 125, 0.04);
+::ng-deep .p-button.p-button-text:hover.boton-azul {
+  background: rgba(108, 117, 125, 0.04);
 }
 
-::ng-deep .p-button:not(.p-button-text).boton-azul  {
-    background: #044167;
-    border: 1px solid #044167;
+::ng-deep .p-button:not(.p-button-text).boton-azul {
+  background: #044167;
 }
 
 ::ng-deep .p-button:not(.p-button-text):hover {
-    background: #044167;
-    border-color: #044167;
-}
-p-accordion-content {
-  width: 100% !important;
-  display: block; /* o flex si es necesario */
+  background: #044167;
+  border-color: #044167;
 }
 
-.document-upload-container{
+.document-upload-container {
   margin-right: 10%;
   width: 50%;
+}
+
+.p-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .p-accordionheader {
+    background-color: #0069a9 !important;
+    border-radius: 6px;
+    color: #fff !important;
+
+    &:hover {
+      background-color: #074a73 !important;
+      color: #fff;
+    }
+  }
+
+  .p-accordioncontent-content {
+    padding: 0;
+  }
 }

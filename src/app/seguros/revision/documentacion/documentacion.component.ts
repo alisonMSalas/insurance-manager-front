@@ -23,6 +23,7 @@ import { FileUpload } from 'primeng/fileupload';
 import { MessageModule } from 'primeng/message';
 import { Dialog } from 'primeng/dialog';
 import { TextareaModule } from 'primeng/textarea';
+import { ContratacionesService } from '../../../core/services/contrataciones.service';
 
 @Component({
   selector: 'app-documentacion',
@@ -49,6 +50,8 @@ import { TextareaModule } from 'primeng/textarea';
 export class DocumentacionComponent implements OnChanges {
   @Input() clienteId: string = '';
   @Input() clientAttachments?: Attachment[] = [];
+  @Input() contratoId: string = '';
+  @Input() documentosAprobados!: boolean;
   @ViewChild('fileUpload') fileUpload!: FileUpload;
 
   pendingFiles: File[] = [];
@@ -67,14 +70,13 @@ export class DocumentacionComponent implements OnChanges {
 
   docService = inject(AttachmentService);
   messageService = inject(MessageService);
+  contratoService = inject(ContratacionesService);
 
   ngOnInit() {
-    console.log('Client ID en DocumentacionComponent (ngOnInit):', this.clienteId);
   }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['clienteId'] && changes['clienteId'].currentValue) {
-      console.log('Client ID actualizado en DocumentacionComponent:', this.clienteId);
       if (!this.clienteId) {
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Client ID no proporcionado' });
       }
@@ -82,11 +84,10 @@ export class DocumentacionComponent implements OnChanges {
 
     if (changes['clientAttachments'] && changes['clientAttachments'].currentValue) {
       const newAttachments = changes['clientAttachments'].currentValue;
-      console.log('>> Attachments actualizados desde el padre:', newAttachments);
 
       if (Array.isArray(newAttachments)) {
         this.completedFiles = newAttachments
-          .filter((att: Attachment) => 
+          .filter((att: Attachment) =>
             [AttachmentType.IDENTIFICATION, AttachmentType.PORTRAIT_PHOTO].includes(att.attachmentType)
           )
           .map((att: Attachment) => {
@@ -130,7 +131,6 @@ export class DocumentacionComponent implements OnChanges {
   }
 
   onSelectedFiles(event: any) {
-    console.log('onSelectedFiles triggered with files:', event.files);
     const selectedFiles: File[] = event.files;
 
     if (this.completedFiles.length + selectedFiles.length > 2) {
@@ -147,10 +147,10 @@ export class DocumentacionComponent implements OnChanges {
 
     for (const file of selectedFiles) {
       if (this.validateFile(file)) {
-        const attachmentType = file.type.includes('pdf') 
-          ? AttachmentType.IDENTIFICATION 
+        const attachmentType = file.type.includes('pdf')
+          ? AttachmentType.IDENTIFICATION
           : AttachmentType.PORTRAIT_PHOTO;
-        
+
         if (this.completedFiles.some(doc => doc.attachmentType === attachmentType)) {
           this.messageService.add({
             severity: 'error',
@@ -180,32 +180,27 @@ export class DocumentacionComponent implements OnChanges {
 
     this.fileUpload.clear(); // Clear file upload after processing
     this.pendingFiles = [];
-    console.log('Updated completedFiles:', this.completedFiles);
     this.updateTotalSize();
   }
 
   onFileRemoved(event: any): void {
-    console.log('onFileRemoved triggered:', event);
     this.pendingFiles = this.fileUpload.files;
     this.updateTotalSize();
   }
 
   removeCompletedFile(index: number): void {
-    console.log('removeCompletedFile triggered for index:', index);
     const removedFile = this.completedFiles.splice(index, 1)[0];
     if (removedFile.objectURL) {
       URL.revokeObjectURL(removedFile.objectURL);
     }
     this.fileUpload.clear();
     this.updateTotalSize();
-    console.log('Updated completedFiles:', this.completedFiles);
   }
 
   updateTotalSize(): void {
     const totalBytes = this.completedFiles.reduce((sum, doc) => sum + (doc.size * 1024), 0); // Convert KB back to bytes
     this.totalSize = this.formatSize(totalBytes);
     this.totalSizePercent = Math.min((totalBytes / (5 * 1024 * 1024)) * 100, 100);
-    console.log('Updated totalSize:', this.totalSize, 'totalSizePercent:', this.totalSizePercent);
   }
 
   formatSize(bytes: number): string {
@@ -254,13 +249,12 @@ export class DocumentacionComponent implements OnChanges {
     Promise.all(documentos).then((docs) => {
       this.docService.uploadDocument(this.clienteId, docs).subscribe({
         next: () => {
-          console.log('Documentos guardados exitosamente', docs);
           this.messageService.add({
             severity: 'success',
             summary: 'Éxito',
             detail: 'Se han guardado los documentos',
           });
-          this.showSaveWarning = false; 
+          this.showSaveWarning = false;
           this.updateTotalSize();
         },
         error: (err) => {
@@ -285,7 +279,6 @@ export class DocumentacionComponent implements OnChanges {
     const validTypes = ['application/pdf', 'image/jpeg', 'image/png'];
     const maxSizeMB = 5;
     const isValid = validTypes.includes(file.type) && file.size <= maxSizeMB * 1024 * 1024;
-    console.log('Validating file:', file.name, 'isValid:', isValid);
     return isValid;
   }
 
@@ -295,35 +288,43 @@ export class DocumentacionComponent implements OnChanges {
 
 
   modalRechazoVisible: boolean = false;
-observacionRechazo: string = '';
+  observacionRechazo: string = '';
 
-mostrarModalRechazo() {
-  this.modalRechazoVisible = true;
-}
+  mostrarModalRechazo() {
+    this.modalRechazoVisible = true;
+  }
 
-async rechazarDocumentos() {
+  async rechazarDocumentos() {
     this.formSubmitted = true;
-    
+
     if (!this.observacionRechazo) {
-        return;
+      return;
     }
 
     this.procesando = true;
     try {
-        await // tu lógica de rechazo aquí
+      await // tu lógica de rechazo aquí
         this.cerrarModal();
     } finally {
-        this.procesando = false;
+      this.procesando = false;
     }
-}
-procesando: boolean = false;
-formSubmitted: boolean = false;
+  }
+  procesando: boolean = false;
+  formSubmitted: boolean = false;
 
-cerrarModal() {
+  cerrarModal() {
     this.modalRechazoVisible = false;
     this.formSubmitted = false;
     this.observacionRechazo = '';
-    
-}
 
-}
+  }
+
+  aprobarDocumentos() {
+    this.contratoService.aprobarDocumentos(this.contratoId).subscribe({
+      next: () => {
+        this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Documentos aprobados' });
+        this.documentosAprobados = true;
+      }
+    });
+  }
+} 

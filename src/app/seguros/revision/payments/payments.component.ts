@@ -12,7 +12,7 @@ import { Pipe } from '@angular/core';
 
 @Component({
   selector: 'app-payments',
-  imports: [ButtonModule,CardModule,CommonModule],
+  imports: [ButtonModule, CardModule, CommonModule],
   templateUrl: './payments.component.html',
   styleUrl: './payments.component.css'
 })
@@ -38,7 +38,6 @@ export class PaymentsComponent implements OnInit {
 
     this.contractService.getById(this.contratoId).subscribe({
       next: (data) => {
-        console.log('Contrato recibido:', data);
         this.contract = data;
         this.policy = data.insurance!;
         this.client = data.client!;
@@ -58,8 +57,8 @@ export class PaymentsComponent implements OnInit {
       });
   }
   getStatusClass(status: string): string {
-  // Normaliza el nombre del estado para evitar problemas con mayúsculas/espacios
-  const normalizedStatus = status.toLowerCase().trim().replace(/\s+/g, '-');
-  return `status-${normalizedStatus}`;
-}
+    // Normaliza el nombre del estado para evitar problemas con mayúsculas/espacios
+    const normalizedStatus = status.toLowerCase().trim().replace(/\s+/g, '-');
+    return `status-${normalizedStatus}`;
+  }
 }

@@ -108,7 +108,7 @@ export class ContratacionSegurosComponent {
       cedula: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
-     parentesco: [null, Validators.required],
+      parentesco: [null, Validators.required],
 
     });
   }
@@ -194,7 +194,6 @@ export class ContratacionSegurosComponent {
       });
 
       this.clienteEncontrado = true;
-      console.log('Cliente encontrado:', data);
       this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Cliente encontrado' });
 
     } catch (error) {
@@ -335,16 +334,16 @@ export class ContratacionSegurosComponent {
     this.beneficiarios = this.beneficiarios.filter(ben => ben !== b);
   }
 
- parentescos = [
-  { label: 'Padre', value: 'Padre' },
-  { label: 'Madre', value: 'Madre' },
-  { label: 'Hermano(a)', value: 'Hermano(a)' },
-  { label: 'Hijo(a)', value: 'Hijo(a)' },
-  { label: 'Cónyuge', value: 'Cónyuge' },
-  { label: 'Tío(a)', value: 'Tío(a)' },
-  { label: 'Primo(a)', value: 'Primo(a)' },
-  { label: 'Otro', value: 'Otro' }
-];
+  parentescos = [
+    { label: 'Padre', value: 'Padre' },
+    { label: 'Madre', value: 'Madre' },
+    { label: 'Hermano(a)', value: 'Hermano(a)' },
+    { label: 'Hijo(a)', value: 'Hijo(a)' },
+    { label: 'Cónyuge', value: 'Cónyuge' },
+    { label: 'Tío(a)', value: 'Tío(a)' },
+    { label: 'Primo(a)', value: 'Primo(a)' },
+    { label: 'Otro', value: 'Otro' }
+  ];
 
 
   registrarContratacion(): void {
@@ -371,13 +370,10 @@ export class ContratacionSegurosComponent {
       }))
     };
 
-    console.log('Contrato a registrar:', contrato);
-
     this.contractService.create(contrato).subscribe({
       next: (contratoCreado: Contract) => {
         // ⚠️ GUARDAR EL ID AQUÍ
         this.contractService.setContratoId(contratoCreado.id!);
-        console.log('ID guardado en el servicio:', this.contractService.getContratoId());
 
         this.messageService.add({
           severity: 'success',

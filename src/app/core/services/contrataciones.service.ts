@@ -44,7 +44,10 @@ export class ContratacionesService {
   }
 
   aprobarContrato(id: string): Observable<Contract> {
-    return this.api.post(`contract/approve-contract/${id}`,{});
+    return this.api.post(`contract/approve-contract/${id}`, {});
   }
 
+  aprobarDocumentos(contractId: string): Observable<Contract> {
+    return this.api.post(`contract/approve-attachments/${contractId}`, {});
+  }
 }
