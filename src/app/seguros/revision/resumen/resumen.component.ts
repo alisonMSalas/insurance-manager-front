@@ -33,7 +33,6 @@ export class ResumenComponent {
   //   getContractById() {
   //   this.contractService.getById('8b417e2d-1114-4101-9702-e1d99479ca11').subscribe({
   //     next: (data) => {
-  //       console.log('Contrato recibido:', data);
   //       this.contract = data;
 
   //       // Si el contrato tiene un insuranceId, hacemos la llamada
@@ -41,7 +40,6 @@ export class ResumenComponent {
   //       if (insuranceId) {
   //         this.segurosService.getById(insuranceId).subscribe({
   //           next: (insuranceData) => {
-  //             console.log('Seguro recibido:', insuranceData);
   //             this.policy = insuranceData;
   //           },
   //           error: (error) => {
@@ -104,11 +102,9 @@ export class ResumenComponent {
       return;
     }
 
-    console.log('Obteniendo contrato con ID:', this.contratoId);
 
     this.contractService.getById(this.contratoId).subscribe({
       next: (data) => {
-        console.log('Contrato recibido:', data);
         this.contract = data;
         this.policy = data.insurance!;
         this.client = data.client!;

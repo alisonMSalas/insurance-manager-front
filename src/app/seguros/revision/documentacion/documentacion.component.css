@@ -38,7 +38,9 @@
 
 .actions {
   margin-top: 20px;
-  text-align: right;
+  display: flex;
+  justify-content: center !important;
+  gap: 10px;
 }
 
 .save-btn {
