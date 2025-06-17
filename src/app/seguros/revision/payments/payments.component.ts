@@ -28,8 +28,19 @@ export class PaymentsComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.getContractById();
+  this.getContractById();
+
+  // Si vuelves de un pago, puedes usar query params o localStorage para detectarlo
+  const urlParams = new URLSearchParams(window.location.search);
+  const pagoExitoso = urlParams.get('pago') === 'exitoso';
+
+  if (pagoExitoso) {
+    // Simula recarga de contrato actualizado
+    setTimeout(() => {
+      this.getContractById();
+    }, 1000); // espera un momento por si el backend tarda
   }
+}
   getContractById() {
     if (!this.contratoId) {
       console.warn('No se recibió contratoId como @Input');
@@ -49,13 +60,17 @@ export class PaymentsComponent implements OnInit {
     });
   }
 
-  iniciarPago() {
-    this.paymentsService.createCheckoutSession(this.contratoId)
-      .subscribe({
-        next: (paymentUrl: PaymentUrl) => window.location.href = paymentUrl.url,
-        error: err => console.error('Error al iniciar sesión de pago', err)
-      });
-  }
+iniciarPago() {
+  this.paymentsService.createCheckoutSession(this.contratoId)
+    .subscribe({
+      next: (paymentUrl: PaymentUrl) => {
+        // Puedes agregar un parámetro para saber que volverás de pago
+        localStorage.setItem('esperandoPago', 'true');
+        window.location.href = paymentUrl.url;
+      },
+      error: err => console.error('Error al iniciar sesión de pago', err)
+    });
+}
   getStatusClass(status: string): string {
     // Normaliza el nombre del estado para evitar problemas con mayúsculas/espacios
     const normalizedStatus = status.toLowerCase().trim().replace(/\s+/g, '-');

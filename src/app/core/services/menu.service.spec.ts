@@ -1,74 +1,113 @@
 import { TestBed } from '@angular/core/testing';
-import { MenuService } from './menu.service';
+import { MenuService, IMenu } from './menu.service';
 
 describe('MenuService', () => {
   let service: MenuService;
+  let localStorageSpy: jasmine.SpyObj<Storage>;
 
-  const mockToken = (role: string): string => {
-    const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
-    const payload = btoa(JSON.stringify({ role }));
-    const signature = 'test-signature';
-    return `${header}.${payload}.${signature}`;
-  };
+  const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicm9sZSI6IkFETUlOIn0.signature';
+  const mockAdminToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicm9sZSI6IkFETUlOIn0.signature';
+  const mockAgentToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicm9sZSI6IkFHRU5UIn0.signature';
+  const mockClientToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwicm9sZSI6IkNMSUVOVCJ9.signature';
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    const storageSpy = jasmine.createSpyObj('localStorage', ['getItem']);
+    localStorageSpy = storageSpy;
+    Object.defineProperty(window, 'localStorage', { value: storageSpy });
+
+    TestBed.configureTestingModule({
+      providers: [MenuService]
+    });
+
     service = TestBed.inject(MenuService);
-    localStorage.clear();
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  describe('getUserRole', () => {
+    it('should return null when no token exists', () => {
+      localStorageSpy.getItem.and.returnValue(null);
+      expect(service['getUserRole']()).toBeNull();
+    });
+
+    it('should return null when token is invalid', () => {
+      localStorageSpy.getItem.and.returnValue('invalid-token');
+      expect(service['getUserRole']()).toBeNull();
+    });
+
+    it('should return role from valid token', () => {
+      localStorageSpy.getItem.and.returnValue(mockAdminToken);
+      expect(service['getUserRole']()).toBe('ADMIN');
+    });
   });
 
   describe('getMenu', () => {
-    it('debería retornar el menú para el rol ADMIN', () => {
-      localStorage.setItem('token', mockToken('ADMIN'));
-
-      const menu = service.getMenu();
-      const titles = menu.map(m => m.title);
-
-      expect(titles).toContain('Seguros');
-      expect(titles).toContain('Usuarios');
-      expect(titles).toContain('Clientes');
+    it('should return empty array when no role exists', () => {
+      localStorageSpy.getItem.and.returnValue(null);
+      expect(service.getMenu()).toEqual([]);
     });
 
-    it('debería retornar el menú para el rol CLIENT', () => {
-      localStorage.setItem('token', mockToken('CLIENT'));
-
+    it('should return admin menu items', () => {
+      localStorageSpy.getItem.and.returnValue(mockAdminToken);
       const menu = service.getMenu();
-      const titles = menu.map(m => m.title);
-
-      expect(titles).toContain('Usuarios');
-      expect(titles).toContain('Clientes');
-      expect(titles).not.toContain('Seguros');
+      expect(menu.length).toBeGreaterThan(0);
+      expect(menu.every(item => item.roles.includes('ADMIN'))).toBeTrue();
     });
 
-    it('debería retornar un array vacío si no hay token', () => {
+    it('should return agent menu items', () => {
+      localStorageSpy.getItem.and.returnValue(mockAgentToken);
       const menu = service.getMenu();
-      expect(menu).toEqual([]);
+      expect(menu.length).toBeGreaterThan(0);
+      expect(menu.every(item => item.roles.includes('AGENT'))).toBeTrue();
     });
 
-    it('debería retornar un array vacío si el token es inválido', () => {
-      localStorage.setItem('token', 'invalid.token.value');
+    it('should return client menu items', () => {
+      localStorageSpy.getItem.and.returnValue(mockClientToken);
       const menu = service.getMenu();
-      expect(menu).toEqual([]);
+      expect(menu.length).toBeGreaterThan(0);
+      expect(menu.every(item => item.roles.includes('CLIENT'))).toBeTrue();
+    });
+
+    it('should return a new array instance', () => {
+      localStorageSpy.getItem.and.returnValue(mockAdminToken);
+      const menu1 = service.getMenu();
+      const menu2 = service.getMenu();
+      expect(menu1).not.toBe(menu2);
     });
   });
 
   describe('getMenuByURL', () => {
-    it('debería retornar el menú correcto si la URL y rol coinciden', () => {
-      localStorage.setItem('token', mockToken('ADMIN'));
-      const menu = service.getMenuByURL('/insurance');
-      expect(menu).toBeTruthy();
-      expect(menu?.title).toBe('Seguros');
+    it('should return undefined when no role exists', () => {
+      localStorageSpy.getItem.and.returnValue(null);
+      expect(service.getMenuByURL('/insurance')).toBeUndefined();
     });
 
-    it('debería retornar undefined si el rol no tiene acceso a la URL', () => {
-      localStorage.setItem('token', mockToken('CLIENT'));
-      const menu = service.getMenuByURL('/insurance');
-      expect(menu).toBeUndefined();
+    it('should return menu item for valid URL and role', () => {
+      localStorageSpy.getItem.and.returnValue(mockAdminToken);
+      const menuItem = service.getMenuByURL('/insurance');
+      expect(menuItem).toBeDefined();
+      expect(menuItem?.url).toBe('/insurance');
+      expect(menuItem?.roles).toContain('ADMIN');
     });
 
-    it('debería retornar undefined si no hay token', () => {
-      const menu = service.getMenuByURL('/insurance');
-      expect(menu).toBeUndefined();
+    it('should return undefined for invalid URL', () => {
+      localStorageSpy.getItem.and.returnValue(mockAdminToken);
+      expect(service.getMenuByURL('/invalid-url')).toBeUndefined();
+    });
+
+    it('should be case insensitive for URL matching', () => {
+      localStorageSpy.getItem.and.returnValue(mockAdminToken);
+      const menuItem = service.getMenuByURL('/INSURANCE');
+      expect(menuItem).toBeDefined();
+      expect(menuItem?.url).toBe('/insurance');
+    });
+
+    it('should return undefined for URL with role mismatch', () => {
+      localStorageSpy.getItem.and.returnValue(mockClientToken);
+      const menuItem = service.getMenuByURL('/users');
+      expect(menuItem).toBeUndefined();
     });
   });
 });

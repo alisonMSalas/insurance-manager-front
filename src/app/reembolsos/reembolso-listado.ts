@@ -22,6 +22,7 @@ import { DropdownModule } from 'primeng/dropdown';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { MessageModule } from 'primeng/message';
 import { FormsModule } from '@angular/forms';
+import { SelectModule } from 'primeng/select';
 
 @Component({
   selector: 'app-reembolso-listado',
@@ -40,7 +41,8 @@ import { FormsModule } from '@angular/forms';
     DropdownModule,
     FloatLabelModule,
     MessageModule,
-    FormsModule
+    FormsModule,
+    SelectModule
   ],
   templateUrl: './reembolso-listado.html',
   styleUrls: ['./reembolso-listado.scss'],
@@ -75,6 +77,8 @@ export class ReembolsoListadoComponent implements OnInit {
   rejectReason = '';
   rechazoFormSubmitted = false;
   reembolsoSeleccionadoParaRechazo: Refund | null = null;
+filtroTipo: string = '';
+filtroEstado: string = '';
 
 
   ngOnInit(): void {
@@ -82,6 +86,28 @@ export class ReembolsoListadoComponent implements OnInit {
     this.cargarReembolsos();
     this.cargarContratos();
   }
+
+
+estados = [
+  { label: 'Todos los estados', value: '' },
+  { label: 'Nuevo', value: 'NEW' },
+  { label: 'Aprobado', value: 'APPROVED' },
+  { label: 'Rechazado', value: 'REJECTED' }
+];
+
+reembolsosFiltrados() {
+  return this.reembolsos.filter(r => {
+    const cumpleTipo = this.filtroTipo
+      ? r.refundType?.toLowerCase().includes(this.filtroTipo.toLowerCase())
+      : true;
+
+    const cumpleEstado = this.filtroEstado
+      ? r.status?.toLowerCase() === this.filtroEstado.toLowerCase()
+      : true;
+
+    return cumpleTipo && cumpleEstado;
+  });
+}
 
   cargarReembolsos(): void {
     this.refundService.getAll().subscribe({

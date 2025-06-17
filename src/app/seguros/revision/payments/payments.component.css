@@ -81,3 +81,19 @@
   background-color: #e9ecef;
   color: #495057;
 }
+
+.status-pagado {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.status-pendiente {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+}

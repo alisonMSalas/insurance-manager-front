@@ -67,6 +67,7 @@ export class DocumentacionComponent implements OnChanges {
   totalSize: string = '0B';
   totalSizePercent: number = 0;
   showSaveWarning: boolean = false;
+documentosGuardados: boolean = false;
 
   docService = inject(AttachmentService);
   messageService = inject(MessageService);
@@ -255,6 +256,7 @@ export class DocumentacionComponent implements OnChanges {
             detail: 'Se han guardado los documentos',
           });
           this.showSaveWarning = false;
+           this.documentosGuardados = true;
           this.updateTotalSize();
         },
         error: (err) => {
