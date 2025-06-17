@@ -131,13 +131,16 @@ export class ContratacionSegurosComponent {
     });
   }
 
-  onTipoSeguroSeleccionado(seguroSeleccionado: any) {
-    if (seguroSeleccionado && seguroSeleccionado.paymentPeriod) {
-      const periodoTraducido = this.traducirPeriodo(seguroSeleccionado.paymentPeriod);
-      this.coberturasForm.patchValue({ periodicidad: periodoTraducido });
-
-    }
+ onTipoSeguroSeleccionado(seguroSeleccionado: any) {
+  if (seguroSeleccionado?.paymentPeriod) {
+    const periodoTraducido = this.traducirPeriodo(seguroSeleccionado.paymentPeriod);
+    this.coberturasForm.patchValue({
+      periodicidad: periodoTraducido
+    });
   }
+}
+
+
 
   traducirPeriodo(periodo: string): string {
     switch (periodo.toUpperCase()) {
@@ -241,31 +244,48 @@ export class ContratacionSegurosComponent {
 
   }
   guardarCliente(): void {
+  this.nuevoCliente.user.name = this.nuevoCliente.name + ' ' + this.nuevoCliente.lastName;
 
-    this.nuevoCliente.user.name = this.nuevoCliente.name + ' ' + this.nuevoCliente.lastName;
+  const payload = { ...this.nuevoCliente };
 
-    const payload = { ...this.nuevoCliente };
+  this.clientService.create(payload).subscribe({
+    next: (clienteCreado: Client) => {
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Éxito',
+        detail: 'Cliente creado correctamente',
+      });
 
-    this.clientService.create(payload).subscribe({
-      next: () => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Éxito',
-          detail: 'Cliente creado correctamente',
-        });
-        this.mostrarModal2 = false;
+      // Ocultar modal
+      this.mostrarModal2 = false;
 
-      },
-      error: (err) => {
-        console.error('Error al crear cliente:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err?.error?.message || err?.error?.detail || 'No se pudo crear el cliente',
-        });
-      }
-    });
-  }
+      // ✅ Llenar los campos del formulario con los datos del cliente creado
+      this.clienteForm.patchValue({
+        id: clienteCreado.id,
+        cedula: clienteCreado.identificationNumber,
+        nombres: clienteCreado.name,
+        apellidos: clienteCreado.lastName,
+        fechaNacimiento: new Date(clienteCreado.birthDate),
+        genero: clienteCreado.gender,
+        telefono: clienteCreado.phoneNumber,
+        correo: clienteCreado.user?.email,
+        ocupacion: clienteCreado.occupation,
+        direccion: clienteCreado.address,
+       
+      });
+
+      this.clienteEncontrado = true;
+    },
+    error: (err) => {
+      console.error('Error al crear cliente:', err);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: err?.error?.message || err?.error?.detail || 'No se pudo crear el cliente',
+      });
+    }
+  });
+}
 
   restrictToNumbers(event: Event, client: any, field: string): void {
     const input = event.target as HTMLInputElement;

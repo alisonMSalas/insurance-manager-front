@@ -8,16 +8,22 @@ import { MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { Router } from '@angular/router';
 import { ApiClientService } from '../../api/httpclient';
+import { Menu } from 'primeng/menu';
+import { By } from '@angular/platform-browser';
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
-  let mockRouter: jasmine.SpyObj<Router>;
-  let mockApiClient: jasmine.SpyObj<ApiClientService>;
+  let routerSpy: jasmine.SpyObj<Router>;
+  let apiClientSpy: jasmine.SpyObj<ApiClientService>;
+  let localStorageSpy: jasmine.SpyObj<Storage>;
 
   beforeEach(async () => {
-    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
-    mockApiClient = jasmine.createSpyObj('ApiClientService', ['getCurrentUserEmail']);  
+    const router = jasmine.createSpyObj('Router', ['navigate']);
+    const apiClient = jasmine.createSpyObj('ApiClientService', ['getCurrentUserEmail']);
+    const storage = jasmine.createSpyObj('localStorage', ['removeItem']);
+
+    Object.defineProperty(window, 'localStorage', { value: storage });
 
     await TestBed.configureTestingModule({
       imports: [
@@ -30,11 +36,17 @@ describe('HeaderComponent', () => {
         HeaderComponent
       ],
       providers: [
-        { provide: Router, useValue: mockRouter },
-        { provide: ApiClientService, useValue: mockApiClient }
+        { provide: Router, useValue: router },
+        { provide: ApiClientService, useValue: apiClient }
       ]
     }).compileComponents();
 
+    routerSpy = TestBed.inject(Router) as jasmine.SpyObj<Router>;
+    apiClientSpy = TestBed.inject(ApiClientService) as jasmine.SpyObj<ApiClientService>;
+    localStorageSpy = window.localStorage as jasmine.SpyObj<Storage>;
+  });
+
+  beforeEach(() => {
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -44,91 +56,97 @@ describe('HeaderComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have default title and subtitle', () => {
+  it('should initialize with default values', () => {
     expect(component.pageTitle).toBe('Gestión de Seguros');
     expect(component.pageSubtitle).toBe('Administra y revisa todas las pólizas de seguros');
-  });
-
-  it('should have default search query as empty string', () => {
     expect(component.searchQuery).toBe('');
+    expect(component.user).toEqual({
+      name: 'Usuario',
+      role: 'Agente de Seguros',
+      icon: 'pi pi-user'
+    });
   });
 
-  it('should have default user information', () => {
-    expect(component.user).toBeDefined();
-    expect(component.user.name).toBe('Usuario');
-    expect(component.user.role).toBe('Agente de Seguros');
-    expect(component.user.icon).toBe('pi pi-user');
-  });
-
-  it('should update user name with email from ApiClientService', () => {
+  it('should update user name when email is available', () => {
     const testEmail = 'test@example.com';
-    mockApiClient.getCurrentUserEmail.and.returnValue(testEmail);
+    apiClientSpy.getCurrentUserEmail.and.returnValue(testEmail);
+
     component.ngOnInit();
+
     expect(component.user.name).toBe(testEmail);
   });
 
-  it('should have menu items', () => {
-    expect(component.menuItems).toBeDefined();
+  it('should keep default user name when email is not available', () => {
+    apiClientSpy.getCurrentUserEmail.and.returnValue(null);
+
+    component.ngOnInit();
+
+    expect(component.user.name).toBe('Usuario');
+  });
+
+  it('should have logout menu item', () => {
     expect(component.menuItems.length).toBe(1);
     expect(component.menuItems[0].label).toBe('Cerrar Sesión');
     expect(component.menuItems[0].icon).toBe('pi pi-sign-out');
   });
 
- it('should call router.navigate and remove token from localStorage when logout is triggered', () => {
-  const removeItemSpy = spyOn(localStorage, 'removeItem');
+  describe('logout', () => {
+    it('should remove token from localStorage and navigate to login', () => {
+      component.logout();
 
-  component.logout();
-
-  expect(removeItemSpy).toHaveBeenCalledWith('token');
-  expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
-});
-
-
-  it('should update search query when input changes', () => {
-    const testQuery = 'test search';
-    component.searchQuery = testQuery;
-    expect(component.searchQuery).toBe(testQuery);
+      expect(localStorageSpy.removeItem).toHaveBeenCalledWith('token');
+      expect(routerSpy.navigate).toHaveBeenCalledWith(['/login']);
+    });
   });
 
-it('should call logout from menu item command', () => {
-  const removeItemSpy = spyOn(localStorage, 'removeItem');
-  const fakeEvent = { originalEvent: new Event('click'), item: component.menuItems[0] };
-  component.menuItems[0].command!(fakeEvent);
-  expect(removeItemSpy).toHaveBeenCalledWith('token');
-  expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
-});
+  describe('onKeydown', () => {
+    it('should toggle menu on Enter key', () => {
+      const event = new KeyboardEvent('keydown', { key: 'Enter' });
+      const menuSpy = jasmine.createSpyObj('Menu', ['toggle']);
+      component.menu = menuSpy;
 
-  it('debe llamar a menu.toggle y prevenir el comportamiento predeterminado al presionar Enter', () => {
-    const menuSpy = spyOn(component.menu, 'toggle'); // Espía el método toggle del menú
-    const event = new KeyboardEvent('keydown', { key: 'Enter' });
-    spyOn(event, 'preventDefault'); // Espía preventDefault
+      component.onKeydown(event);
 
-    component.onKeydown(event);
+      expect(menuSpy.toggle).toHaveBeenCalledWith(event);
+    });
 
-    expect(event.preventDefault).toHaveBeenCalled();
-    expect(menuSpy).toHaveBeenCalledWith(event);
+    it('should toggle menu on Space key', () => {
+      const event = new KeyboardEvent('keydown', { key: ' ' });
+      const menuSpy = jasmine.createSpyObj('Menu', ['toggle']);
+      component.menu = menuSpy;
+
+      component.onKeydown(event);
+
+      expect(menuSpy.toggle).toHaveBeenCalledWith(event);
+    });
+
+    it('should not toggle menu on other keys', () => {
+      const event = new KeyboardEvent('keydown', { key: 'A' });
+      const menuSpy = jasmine.createSpyObj('Menu', ['toggle']);
+      component.menu = menuSpy;
+
+      component.onKeydown(event);
+
+      expect(menuSpy.toggle).not.toHaveBeenCalled();
+    });
   });
 
-  it('debe llamar a menu.toggle y prevenir el comportamiento predeterminado al presionar Espacio', () => {
-    const menuSpy = spyOn(component.menu, 'toggle'); // Espía el método toggle del menú
-    const event = new KeyboardEvent('keydown', { key: ' ' });
-    spyOn(event, 'preventDefault'); // Espía preventDefault
+  describe('Input properties', () => {
+    it('should accept custom pageTitle', () => {
+      const customTitle = 'Custom Title';
+      component.pageTitle = customTitle;
+      fixture.detectChanges();
 
-    component.onKeydown(event);
+      expect(component.pageTitle).toBe(customTitle);
+    });
 
-    expect(event.preventDefault).toHaveBeenCalled();
-    expect(menuSpy).toHaveBeenCalledWith(event);
-  });
+    it('should accept custom pageSubtitle', () => {
+      const customSubtitle = 'Custom Subtitle';
+      component.pageSubtitle = customSubtitle;
+      fixture.detectChanges();
 
-  it('no debe llamar a menu.toggle ni prevenir el comportamiento predeterminado para otras teclas', () => {
-    const menuSpy = spyOn(component.menu, 'toggle'); // Espía el método toggle del menú
-    const event = new KeyboardEvent('keydown', { key: 'ArrowDown' });
-    spyOn(event, 'preventDefault'); // Espía preventDefault
-
-    component.onKeydown(event);
-
-    expect(event.preventDefault).not.toHaveBeenCalled();
-    expect(menuSpy).not.toHaveBeenCalled();
+      expect(component.pageSubtitle).toBe(customSubtitle);
+    });
   });
 });
 

@@ -15,13 +15,21 @@
     </div>
   </div>
   
-  <ng-template pTemplate="footer">
-    <div class="flex justify-content-center">
-      <button pButton type="button" 
-              label="Realizar Pago" 
-              icon="pi pi-credit-card" 
-              (click)="iniciarPago()"
-              class="payment-button"></button>
-    </div>
-  </ng-template>
+<ng-template pTemplate="footer">
+  <div class="flex justify-content-center">
+    <p *ngIf="contract?.status === 'PAGADO'" class="text-success font-bold">
+      <i class="pi pi-check-circle"></i> Pago realizado
+    </p>
+    <button *ngIf="contract?.status?.toLowerCase() === 'pending'" 
+        pButton 
+        type="button" 
+        label="Realizar Pago" 
+        icon="pi pi-credit-card" 
+        (click)="iniciarPago()"
+        class="payment-button">
+</button>
+
+  </div>
+</ng-template>
+
 </p-card>

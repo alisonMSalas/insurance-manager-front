@@ -17,11 +17,15 @@ import { ChipModule } from 'primeng/chip';
 import { DividerModule } from 'primeng/divider';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { DialogModule } from 'primeng/dialog';
+import { SelectButton } from 'primeng/selectbutton';
+import { FormsModule } from '@angular/forms';
+import { Select } from 'primeng/select';
+import { InputText } from 'primeng/inputtext';
 
 @Component({
   selector: 'app-contrataciones-listado',
   standalone: true,
-  imports: [CommonModule, RouterModule, TableModule, ButtonModule, ToastModule, ChipModule, DividerModule, DialogModule],
+  imports: [CommonModule, RouterModule,Select,InputText,TableModule, ButtonModule, ToastModule, ChipModule, DividerModule,FormsModule, DialogModule],
   templateUrl: './contrataciones-listado.component.html',
   styleUrls: ['./contrataciones-listado.component.scss'],
   providers: [MessageService]
@@ -37,10 +41,25 @@ export class ContratacionesListadoComponent implements OnInit {
   userRole: string | null = null;
   modalVisible = false;
   contratoSeleccionado: Contract | null = null;
+  selectedEstado: string | null = null;
+filterCliente: string = '';
+
+estadosOptions = [
+  { label: 'Pendiente', value: 'PENDING' },
+  { label: 'Activo', value: 'ACTIVE' },
+  { label: 'Cancelado', value: 'CANCELLED' },
+  { label: 'Rechazado', value: 'REJECTED_BY_CLIENT' },
+  { label: 'Expirado', value: 'EXPIRED' }
+];
+
+// Recuerda llenar clientName para facilitar filtro:
+
 
   ngOnInit(): void {
     this.userRole = this.getUserRole();
     this.cargarContrataciones();
+
+    
 
   }
 
@@ -66,6 +85,7 @@ export class ContratacionesListadoComponent implements OnInit {
               totalPaymentAmount: contrato.totalPaymentAmount ?? 0,
               beneficiaries: contrato.beneficiaries ?? []
             }));
+            
 
           },
           error: (err) => {

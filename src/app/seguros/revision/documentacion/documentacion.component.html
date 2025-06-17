@@ -17,20 +17,28 @@
       (onSelect)="onSelectedFiles($event)"
       [files]="pendingFiles"
     >
-      <ng-template #header let-files let-chooseCallback="chooseCallback">
-        <div class="flex flex-wrap justify-between items-center flex-1 gap-4">
-          <div class="flex gap-2">
-            <p-button
-              (onClick)="choose($event, chooseCallback)"
-              icon="pi pi-images"
-              [rounded]="true"
-              [outlined]="true"
-              label="Seleccionar"
-            />
-          </div>
-        </div>
-      </ng-template>
+    
+<ng-template #header let-files let-chooseCallback="chooseCallback">
+  <div class="flex flex-col w-full px-2">
+    
+    <div class="flex justify-start">
+      <p-button
+        (onClick)="choose($event, chooseCallback)"
+        icon="pi pi-images"
+        [rounded]="true"
+        [outlined]="true"
+        label="Seleccionar"
+      />
+    </div>
+  </div>
+</ng-template>
+
+
+
       <ng-template #content let-files let-uploadedFiles="completedFiles">
+        <div class="text-sm mb-2" style="color: #6c757d;">
+      Debe subir una <strong>identificación en formato PDF</strong> y una <strong>foto en formato PNG</strong>.
+    </div>
         <div class="flex flex-col gap-8 pt-4">
           <div *ngIf="(completedFiles?.length || 0) > 0">
             <div class="flex gap-4">
@@ -95,7 +103,7 @@
     </p-fileupload>
     <div class="actions" style="display: flex; justify-content: end; gap: 10px">
       <button
-        *ngIf="!documentosAprobados"
+        *ngIf="documentosGuardados && !documentosAprobados"
         pButton
         label="Rechazar"
         icon="pi pi-times-circle"
@@ -104,7 +112,7 @@
         (click)="mostrarModalRechazo()"
       ></button>
       <button
-        *ngIf="!documentosAprobados && completedFiles.length == 2"
+        *ngIf="documentosGuardados && !documentosAprobados && completedFiles.length == 2"
         pButton
         label="Aprobar"
         icon="pi pi-check"

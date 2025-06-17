@@ -50,7 +50,7 @@ export class ListClientsComponent {
   confirmationService = inject(ConfirmationService);
   messageService = inject(MessageService);
   loading = false;
-
+clientesOriginales: Client[] = [];
   @ViewChild('menu') menu: any;
 
   mostrarModal: boolean = false;
@@ -89,6 +89,7 @@ export class ListClientsComponent {
   obtenerClientes(): void {
     this.clientService.getAll().subscribe({
       next: (data) => {
+         this.clientesOriginales = data;
         this.clientes = data;
         this.initializeMenuItems();
         this.filtrarClientes();
@@ -132,11 +133,19 @@ export class ListClientsComponent {
   }
 
   filtrarClientes(): void {
-    const filtro = this.filtroCedula.trim().toLowerCase();
-    this.clientes = this.clientes.filter((cliente) =>
-      filtro === '' || cliente.identificationNumber.toLowerCase().includes(filtro)
+  const filtro = this.filtroCedula.trim().toLowerCase();
+
+  if (filtro === '') {
+    this.clientes = [...this.clientesOriginales]; // mostrar todos
+  } else {
+    this.clientes = this.clientesOriginales.filter(cliente =>
+      cliente.identificationNumber.toLowerCase().includes(filtro)
     );
   }
+
+  this.initializeMenuItems(); // vuelve a actualizar el menú por cliente filtrado
+}
+
 
   restrictToNumbers(event: Event, client: any, field: string): void {
     const input = event.target as HTMLInputElement;

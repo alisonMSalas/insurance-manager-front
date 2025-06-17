@@ -10,11 +10,29 @@
 
   <div class="content-container">
 
-    <div class="actions" *ngIf="canCreateContract()">
-      <button pButton label="Nueva Contratación" icon="pi pi-plus" [routerLink]="['/contratacion']"
-        class="p-button-primary"></button>
-    </div>
-    <p-table [value]="contratos" [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'">
+    <div class="actions" *ngIf="canCreateContract()" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+
+  <div style="display: flex; align-items: center; gap: 1rem; flex-grow: 1;">
+    <span class="p-input-icon-left">
+      <i class="pi pi-search"></i>
+      <input type="text" pInputText placeholder="Buscar por cliente" [(ngModel)]="filterCliente" />
+    </span>
+
+    <p-select
+      [options]="estadosOptions"
+      [(ngModel)]="selectedEstado"
+      placeholder="Filtrar por estado"
+      optionLabel="label"
+      optionValue="value"
+     
+    ></p-select>
+  </div>
+
+  <button pButton label="Nueva Contratación" icon="pi pi-plus" [routerLink]="['/contratacion']" class="p-button-primary"></button>
+
+</div>
+
+    <p-table [value]="contratos" [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'"  [globalFilterFields]="['clientName']" [filterDelay]="300" [filters]="{ 'clientName': { value: filterCliente, matchMode: 'contains' } }">
       <ng-template pTemplate="header">
         <tr>
           <th>Cliente</th>

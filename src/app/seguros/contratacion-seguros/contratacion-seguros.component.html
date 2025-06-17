@@ -10,8 +10,8 @@
         <div class="text-2xl text-white">Contratación</div>
 
       </div>
-      <p-button icon="pi pi-plus" label="Crear" styleClass="p-button-primary" size="small"
-        [routerLink]="['/main-revision']"></p-button>
+      <!-- <p-button icon="pi pi-plus" label="Crear" styleClass="p-button-primary" size="small"
+        [routerLink]="['/main-revision']"></p-button> -->
 
     </div>
   </div>
@@ -182,11 +182,13 @@
                 La fecha de inicio no puede ser anterior a hoy.
               </small>
             </div>
+<div style="flex: 1;">
+      <label for="periodicidad">Periodicidad</label>
+      <label style="display: block; padding: 0.5rem 0; font-weight: normal;">
+  {{ coberturasForm.get('periodicidad')?.value || '-' }}
+</label>
 
-            <div style="flex: 1;">
-              <label for="periodicidad">Periodicidad</label>
-              <input id="periodicidad" type="text" pInputText formControlName="periodicidad" readonly />
-            </div>
+    </div>
           </div>
 
         </form>
