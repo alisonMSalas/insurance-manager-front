@@ -10,6 +10,7 @@ import { ContratacionesListadoComponent } from './seguros/contratacion-listado/c
 import { MainRevisionComponent } from './seguros/revision/main-revision/main-revision.component';
 import { ResumenComponent } from './seguros/revision/resumen/resumen.component';
 import { ReportesComponent } from './reportes/reportes.component';
+import { ReembolsoListadoComponent } from './reembolsos/reembolso-listado';
 
 export const routes: Routes = [
     { path: 'login', component: LoginComponent },
@@ -28,6 +29,7 @@ export const routes: Routes = [
             { path: 'summary-revision', component:  ResumenComponent},
             { path: 'main-revision/:id', component: MainRevisionComponent },
             { path: 'reportes', component: ReportesComponent },
+            {path: 'refunds', component: ReembolsoListadoComponent}
 
 
         ]

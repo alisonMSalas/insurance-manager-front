@@ -1,0 +1,363 @@
+.content-area {
+  flex: 1;
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+
+  .p-divider {
+    margin: 0;
+    margin-bottom: 0.75rem;
+  }
+}
+
+:host {
+  flex: 1;
+  display: flex;
+  height: 100%;
+}
+
+.content-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  height: 100%;
+  min-height: 0;
+}
+
+.insurance-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.actions {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+}
+
+.custom-table {
+  width: 100%;
+}
+
+.p-button-primary {
+  margin-bottom: 1rem;
+}
+
+.status-new {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.status-approved {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+:host ::ng-deep .p-button {
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+:host ::ng-deep .p-button.p-button-primary {
+  background: #0069a9;
+  border: 1px solid #0069a9;
+  padding: 12px 18px;
+}
+
+:host ::ng-deep .p-button.p-button-primary:hover {
+  background: #23a0ed;
+  border-color: #1d91da;
+}
+
+:host ::ng-deep .p-button.p-button-text {
+  color: #6c757d;
+}
+
+:host ::ng-deep .p-button.p-button-text:hover {
+  background: rgba(108, 117, 125, 0.1);
+  color: #495057;
+}
+
+::ng-deep .dialog-white-text .p-dialog-content,
+::ng-deep .dialog-white-text .p-dialog-header,
+::ng-deep .dialog-white-text .p-dialog-footer {
+  color: white;
+}
+
+:host ::ng-deep .p-dialog {
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  border: none;
+  position: fixed;
+  z-index: 1000;
+  max-width: 50vw;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header {
+  background: linear-gradient(135deg, #407f68, #407f68); /* Cambiado a verde degradado */
+  color: white;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  padding: 1.5rem;
+  border-bottom: none;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header .p-dialog-title {
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icon {
+  color: white;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icon:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+:host ::ng-deep .p-dialog .p-dialog-content {
+  padding: 1.5rem;
+  background: #f8f9fa;
+  overflow-y: auto;
+  max-height: 60vh;
+}
+
+:host ::ng-deep .p-dialog .p-dialog-footer {
+  border-top: 1px solid #e9ecef;
+  padding: 1rem 1.5rem;
+  background: white;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+:host ::ng-deep .p-dialog-mask {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  overflow: auto;
+}
+
+:host ::ng-deep .p-floatlabel label {
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0.5rem;
+  display: block;
+  transition: all 0.2s;
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  pointer-events: none;
+}
+
+:host ::ng-deep .p-floatlabel .p-inputtext:not(:placeholder-shown) + label,
+:host ::ng-deep .p-floatlabel .p-inputtextarea:not(:placeholder-shown) + label,
+:host ::ng-deep .p-floatlabel .p-dropdown:not(.p-placeholder) + label {
+  top: -0.75rem;
+  font-size: 0.75rem;
+  background: #f8f9fa;
+  padding: 0 0.25rem;
+  color: #0069a9;
+}
+
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-inputtextarea,
+:host ::ng-deep .p-dropdown {
+  width: 100%; /* Asegurar que ocupen el ancho completo */
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  background: white;
+  box-sizing: border-box; /* Evitar que el padding afecte el ancho */
+}
+
+:host ::ng-deep .p-inputtext:enabled:hover,
+:host ::ng-deep .p-inputtextarea:enabled:hover,
+:host ::ng-deep .p-dropdown:not(.p-disabled):hover {
+  border-color: #0069a9;
+}
+
+:host ::ng-deep .p-inputtext:enabled:focus,
+:host ::ng-deep .p-inputtextarea:enabled:focus,
+:host ::ng-deep .p-dropdown:not(.p-disabled).p-focus {
+  border-color: #0069a9;
+  box-shadow: 0 0 0 0.2rem rgba(0, 105, 169, 0.2);
+  outline: none;
+}
+
+:host ::ng-deep .p-dropdown .p-dropdown-label {
+  padding: 0.75rem;
+  color: #495057;
+}
+
+:host ::ng-deep .p-fileupload {
+  border-radius: 8px;
+  border: 1px solid #ced4da;
+  background: white;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  width: 100%; /* Asegurar que ocupe el ancho completo */
+  box-sizing: border-box;
+}
+
+:host ::ng-deep .p-fileupload .p-fileupload-buttonbar {
+  background: transparent;
+  border-bottom: none;
+  padding: 0;
+}
+
+:host ::ng-deep .p-fileupload .p-button {
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  background: #0069a9;
+  border: 1px solid #0069a9;
+  color: white;
+}
+
+:host ::ng-deep .p-fileupload .p-button:hover {
+  background: #23a0ed;
+  border-color: #1d91da;
+}
+
+:host ::ng-deep .p-fileupload .p-fileupload-content {
+  padding: 0.5rem 0;
+  background: transparent;
+}
+
+:host ::ng-deep .p-fileupload .p-fileupload-row {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  border-bottom: 1px solid #f0f0f0;
+  background: white;
+  border-radius: 4px;
+  margin-bottom: 0.25rem;
+}
+
+:host ::ng-deep .p-fileupload .p-fileupload-row:last-child {
+  border-bottom: none;
+}
+
+:host ::ng-deep .p-fileupload .p-fileupload-row .card {
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+:host ::ng-deep .p-fileupload .p-fileupload-row .card img,
+:host ::ng-deep .p-fileupload .p-fileupload-row .card i {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  color: #495057;
+}
+
+:host ::ng-deep .p-fileupload .p-fileupload-row .card span {
+  flex: 1;
+  font-size: 0.85rem;
+  color: #495057;
+}
+
+:host ::ng-deep .p-fileupload .p-fileupload-row .card .text-xs {
+  color: #6c757d;
+  font-size: 0.75rem;
+}
+
+:host ::ng-deep .p-fileupload .p-fileupload-row .card .p-button {
+  background: transparent;
+  border: 1px solid #f56565;
+  color: #f56565;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+}
+
+:host ::ng-deep .p-fileupload .p-fileupload-row .card .p-button:hover {
+  background: #f56565;
+  color: white;
+}
+
+:host ::ng-deep .p-message {
+  margin-top: 0.5rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+}
+
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%; /* Asegurar que el formulario ocupe el ancho completo */
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%; /* Asegurar que cada campo ocupe el ancho completo */
+}
+
+.required-asterisk {
+  color: red;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  :host ::ng-deep .p-dialog {
+    width: 90vw !important;
+    max-width: none;
+  }
+
+  .form-grid {
+    gap: 1rem;
+  }
+
+  :host ::ng-deep .p-fileupload .p-fileupload-row .card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
