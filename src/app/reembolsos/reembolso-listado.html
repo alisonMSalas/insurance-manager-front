@@ -13,7 +13,33 @@
       <button pButton label="Nueva Solicitud de Reembolso" icon="pi pi-plus" class="p-button-primary"
         (click)="abrirModalCrear()"></button>
     </div>
-    <p-table [value]="reembolsos" [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'">
+    <div class="flex flex-wrap gap-4 mb-3">
+  <div class="p-inputgroup">
+    <input
+  type="text"
+  pInputText
+  placeholder="Buscar por tipo"
+  [(ngModel)]="filtroTipo"
+/>
+
+  </div>
+
+  <div>
+<p-select 
+  [options]="estados" 
+  [(ngModel)]="filtroEstado" 
+  optionLabel="label" 
+  optionValue="value" 
+  placeholder="Filtrar por estado"
+  class="w-full md:w-56">
+</p-select>
+
+
+
+  </div>
+</div>
+
+    <p-table [value]="reembolsosFiltrados()"[paginator]="true" [rows]="10" [responsiveLayout]="'scroll'">
       <ng-template pTemplate="header">
         <tr>
           <th>Tipo de Reembolso</th>
