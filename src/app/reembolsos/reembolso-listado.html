@@ -1,0 +1,172 @@
+<p-toast></p-toast>
+<div class="content-area">
+  <div class="insurance-header">
+    <div>
+      <div class="text-2xl text-white">Reembolsos</div>
+    </div>
+  </div>
+
+  <p-divider></p-divider>
+
+  <div class="content-container">
+    <div class="actions" *ngIf="canCreateRefund()">
+      <button pButton label="Nueva Solicitud de Reembolso" icon="pi pi-plus" class="p-button-primary"
+        (click)="abrirModalCrear()"></button>
+    </div>
+    <p-table [value]="reembolsos" [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Tipo de Reembolso</th>
+          <th>Descripción</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th>Monto Pagado</th>
+          <th>Monto Cubierto</th>
+          <th>Contrato</th>
+          <th>Adjuntos</th>
+          <th *ngIf="canViewRefunds()">Acciones</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-reembolso>
+        <tr>
+          <td>{{ reembolso.refundType || '-' }}</td>
+          <td>{{ reembolso.observation || reembolso.description }}</td>
+          <td>{{ formatFecha(reembolso.date) }}</td>
+          <td>
+            <p-chip [label]="formatStatus(reembolso.status)"
+              [styleClass]="'status-' + reembolso.status?.toLowerCase()"></p-chip>
+          </td>
+          <td>{{ reembolso.paidAmount !== undefined ? reembolso.paidAmount : '-' }}</td>
+          <td>{{ reembolso.coveredAmount !== undefined ? reembolso.coveredAmount : '-' }}</td>
+          <td>{{ reembolso.contract?.insurance?.name || '-' }}</td>
+          <td>{{ reembolso.attachments?.length || 0 }}</td>
+          <td *ngIf="canViewRefunds()">
+            <button *ngIf="reembolso.attachments?.length > 0" pButton icon="pi pi-folder-open"
+              class="p-button-text p-button-plain p-button-sm" (click)="mostrarModalReembolso(reembolso)"
+              title="Ver Adjuntos"></button>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- Modal para ver adjuntos -->
+<p-dialog header="Adjuntos de la Solicitud" [(visible)]="modalVisible" [modal]="true"
+  [style]="{width: '80vw', height: '90vh'}" [dismissableMask]="true" [closeOnEscape]="true" (onHide)="cerrarModal()"
+  styleClass="dialog-white-text">
+  <ng-container *ngFor="let attachment of reembolsoSeleccionado?.attachments" class="attachment-container">
+    <ng-container *ngIf="esPDF(attachment.fileName); else imagen">
+      <iframe [src]="sanitizarBase64Pdf(attachment.content)" width="100%" height="400px" style="border: none;"></iframe>
+    </ng-container>
+    <ng-template #imagen>
+      <img [src]="sanitizarBase64Image(attachment.content)"
+        style="max-width: 100%; max-height: 400px; object-fit: contain;" alt="Adjunto" />
+    </ng-template>
+    <p class="attachment-name">{{ attachment.fileName }}</p>
+  </ng-container>
+
+  <ng-template pTemplate="footer">
+    <ng-container *ngIf="reembolsoSeleccionado?.status === 'NEW' && canProcessRefund()">
+      <button pButton label="Aprobar Reembolso" icon="pi pi-check" class="p-button-success"
+        (click)="aprobarReembolso(reembolsoSeleccionado!)">
+      </button>
+
+      <button pButton label="Rechazar Reembolso" icon="pi pi-times" class="p-button-danger"
+        (click)="mostrarModalRechazo(reembolsoSeleccionado!)">
+      </button>
+    </ng-container>
+    <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary" (click)="cerrarModal()"></button>
+  </ng-template>
+</p-dialog>
+
+<!-- Modal para crear reembolso -->
+<p-dialog header="Nueva Solicitud de Reembolso" [(visible)]="crearModalVisible" [modal]="true"
+  [style]="{ width: '60vw' }" [dismissableMask]="true" [closeOnEscape]="true" (onHide)="cerrarModal()">
+  <div class="p-fluid p-grid">
+    <!-- Tipo de Reembolso -->
+    <div class="p-field p-col-12 p-md-6">
+      <label for="refundType">Tipo de Reembolso *</label>
+      <input id="refundType" pInputText [(ngModel)]="newRefund.refundType" />
+      <small *ngIf="formSubmitted && !newRefund.refundType" class="p-error">Este campo es obligatorio</small>
+    </div>
+
+    <!-- Contrato -->
+    <div class="p-field p-col-12 p-md-6">
+      <label for="contractId">Contrato *</label>
+      <p-dropdown id="contractId" [options]="contracts" optionLabel="label" optionValue="id"
+        [(ngModel)]="newRefund.contractId" placeholder="Selecciona un contrato"></p-dropdown>
+      <small *ngIf="formSubmitted && !newRefund.contractId" class="p-error">Este campo es obligatorio</small>
+    </div>
+
+    <!-- Monto Pagado -->
+    <div class="p-field p-col-12 p-md-6">
+      <label for="paidAmount">Monto Pagado *</label>
+      <input id="paidAmount" type="number" pInputText [(ngModel)]="newRefund.paidAmount" />
+      <small *ngIf="formSubmitted && newRefund.paidAmount <= 0" class="p-error">Debe ser mayor a 0</small>
+    </div>
+
+    <!-- Descripción -->
+    <div class="p-field p-col-12">
+      <label for="description">Descripción *</label>
+      <input id="description" pInputText [(ngModel)]="newRefund.description" />
+      <small *ngIf="formSubmitted && !newRefund.description" class="p-error">Este campo es obligatorio</small>
+    </div>
+
+
+    <!-- Archivos -->
+    <div class="p-col-12">
+      <p-fileupload name="attachments[]" [customUpload]="true" accept=".pdf,.jpg,.jpeg,.png" [maxFileSize]="5000000"
+        [multiple]="true" (onSelect)="onSelectedFiles($event)" [files]="pendingFiles">
+        <ng-template #header let-chooseCallback="chooseCallback">
+          <div class="flex justify-between items-center gap-4">
+            <button pButton type="button" icon="pi pi-upload" [rounded]="true" [outlined]="true"
+              label="Seleccionar Archivos" (click)="chooseCallback()"></button>
+          </div>
+        </ng-template>
+
+        <ng-template #content let-files let-uploadedFiles="completedFiles">
+          <div class="flex flex-wrap gap-4 mt-3">
+            <div *ngFor="let doc of pendingFiles; let i = index"
+              class="card p-3 border-1 surface-border border-round flex flex-column align-items-center gap-2">
+              <div>
+                <img *ngIf="doc.type?.includes('image')" [src]="getFilePreviewUrl(doc)" width="50" height="50"
+                  alt="preview" />
+                <i *ngIf="doc.type?.includes('pdf')" class="pi pi-file-pdf text-3xl"></i>
+              </div>
+              <span class="text-sm text-center font-medium w-10rem text-ellipsis overflow-hidden white-space-nowrap">
+                {{ doc.name }}
+              </span>
+              <div class="text-xs">{{ formatSize(doc.size) }}</div>
+              <div class="flex gap-1">
+                <p-button icon="pi pi-times" (click)="removePendingFile(i)" severity="danger"
+                  styleClass="p-button-sm p-button-outlined p-button-rounded"></p-button>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+      </p-fileupload>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" icon="pi pi-times" (click)="cerrarModal()" class="p-button-text"></p-button>
+    <p-button label="Guardar" icon="pi pi-check" (click)="guardarReembolso()" class="p-button-primary"></p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- Modal para ingresar razón de rechazo -->
+<p-dialog header="Rechazar Reembolso" [(visible)]="rechazarModalVisible" [modal]="true" [style]="{ width: '40vw' }"
+  [dismissableMask]="true" [closeOnEscape]="true" (onHide)="cancelarRechazo()" [baseZIndex]="10000">
+  <div class="p-field p-col-12 p-md-6">
+    <label for="rejectReason">Razón para el rechazo *</label>
+    <input id="rejectReason" pInputText [(ngModel)]="rejectReason" />
+    <small *ngIf="formSubmitted && !newRefund.refundType" class="p-error">La razón es obligatoria.</small>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="cancelarRechazo()"></p-button>
+    <p-button label="Rechazar" icon="pi pi-check" class="p-button-text" [disabled]="!rejectReason"
+      (click)="confirmarRechazo()"></p-button>
+  </ng-template>
+</p-dialog>
