@@ -63,6 +63,8 @@ export class ListSegurosComponent implements OnInit {
   selectedInsurance: Insurance | null = null;
   filteredInsurances: Insurance[] = [];
   loading = false;
+  allBenefits: Benefit[] = [];
+  submitted: boolean = false;
 
   statusOptions: StatusOption[] = [
     { label: 'Todos', value: null },
@@ -234,8 +236,27 @@ export class ListSegurosComponent implements OnInit {
   paymentPeriods = getPaymentPeriodOptions();
 
   saveInsurance() {
+    this.submitted = true;
+    if (
+    !this.insurance.name ||
+    !this.insurance.type ||
+    !this.insurance.description ||
+    this.insurance.coverage == null ||
+    this.insurance.deductible == null ||
+    this.insurance.paymentAmount == null ||
+    !this.insurance.paymentPeriod ||
+    !this.selectedBenefits || this.selectedBenefits.length === 0
+  ) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Campos obligatorios',
+      detail: 'Por favor, complete todos los campos requeridos y seleccione al menos un beneficio.'
+    });
+    return; 
+  }
     console.log('benefits seleccionados:', this.selectedBenefits);
     this.insurance.benefits = [...this.selectedBenefits];
+    console.log('cambios de beneficios', this.insurance.benefits);
     if (this.isEditing && this.currentInsuranceId) {
       // Lógica de actualización
       const updatedInsurance: Insurance = {
@@ -280,10 +301,15 @@ export class ListSegurosComponent implements OnInit {
   }
   openModal(insuranceToEdit?: Insurance) {
     this.isEditing = !!insuranceToEdit;
+
     if (this.isEditing && insuranceToEdit) {
       this.currentInsuranceId = insuranceToEdit.id || null;
-      this.selectedBenefits = [...(insuranceToEdit.benefits || [])]; // Crear nueva referencia
-      this.availableBenefits = [...this.availableBenefits.filter(b => !this.selectedBenefits.some(sb => sb.id === b.id))]; // Actualizar availableBenefits
+      this.selectedBenefits = [...(insuranceToEdit.benefits || [])];
+
+      this.availableBenefits = this.allBenefits.filter(
+        b => !this.selectedBenefits.some(sb => sb.id === b.id)
+      );
+
       this.insurance = {
         name: insuranceToEdit.name,
         type: insuranceToEdit.type,
@@ -296,25 +322,38 @@ export class ListSegurosComponent implements OnInit {
       };
     } else {
       this.resetCampos();
-      this.currentInsuranceId = null;
     }
+
     this.display = true;
-    this.cdr.detectChanges(); // Forzar detección de cambios
+    this.cdr.detectChanges(); // Asegura que el modal actualice la vista
   }
+
+  eliminarBeneficioDesdePickList(benefit: Benefit): void {
+    // Mover el beneficio de selectedBenefits a availableBenefits
+    this.selectedBenefits = this.selectedBenefits.filter(b => b.id !== benefit.id);
+    this.availableBenefits.push(benefit);
+
+    // Forzar detección de cambios si es necesario
+    this.cdr.detectChanges();
+  }
+
+
+
 
   resetCampos() {
     this.insurance = {
       name: '',
-      type: InsuranceType.HEALTH, // Valor por defecto del enum
+      type: InsuranceType.HEALTH, 
       description: '',
       coverage: 0,
       deductible: 0,
       paymentAmount: 0,
-      paymentPeriod: PaymentPeriod.MONTHLY, // Valor por defecto del enum
+      paymentPeriod: PaymentPeriod.MONTHLY, 
       active: false,
     };
     this.selectedBenefits = [];
     this.getBenefits();
+    this.submitted = false;
   }
 
   preventNegativeInput(event: KeyboardEvent): void {
@@ -357,22 +396,19 @@ export class ListSegurosComponent implements OnInit {
   //   }
   // ];
 
-  getBenefits() {
+  getBenefits(): void {
     this.segurosService.getAllBenefits().subscribe({
       next: (benefits: Benefit[]) => {
-        this.availableBenefits = [...benefits]; // Clonar la lista de beneficios
-        // Si estás editando, filtra los beneficios ya seleccionados
-        if (this.isEditing && this.selectedBenefits.length > 0) {
-          this.availableBenefits = this.availableBenefits.filter(
-            (benefit) => !this.selectedBenefits.some((selected) => selected.id === benefit.id)
-          );
+        this.allBenefits = benefits;
+        if (!this.isEditing) {
+          // Solo al crear, carga toda la lista
+          this.availableBenefits = [...benefits];
         }
-        this.cdr.detectChanges();
-        // this.selectedBenefits = []
       },
       error: (error: HttpErrorResponse) => {
         this.handleError(error);
       }
     });
   }
+
 }

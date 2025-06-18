@@ -641,3 +641,14 @@ h2 {
   align-items: flex-start;
   gap: 0.5rem;
 }
+.p-ripple.cdk-drag.p-listbox-option.ng-star-inserted {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-msg {
+  color: #ba2624; 
+  margin-top: 5px;
+  font-size: 0.9rem;
+}

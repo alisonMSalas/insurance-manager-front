@@ -83,7 +83,11 @@
           <div class="form-field">
             <label for="name">Nombre del Seguro</label>
             <input id="name" type="text" pInputText [(ngModel)]="insurance.name" />
+            <div *ngIf="!insurance.name && submitted" class="error-msg">
+              El nombre es obligatorio.
+            </div>
           </div>
+
 
           <div class="form-field">
             <label for="type">Tipo</label>
@@ -98,12 +102,18 @@
             <label for="coverage">Cobertura</label>
             <input id="coverage" type="number" pInputText min="0" (keydown)="preventNegativeInput($event)"
               [(ngModel)]="insurance.coverage" />
+            <div *ngIf="!insurance.coverage && submitted" class="error-msg">
+              La cobertura es obligatorio.
+            </div>
           </div>
 
           <div class="form-field">
             <label for="deductible">Deducible</label>
             <input id="deductible" type="number" min="0" (keydown)="preventNegativeInput($event)" pInputText
               [(ngModel)]="insurance.deductible" />
+            <div *ngIf="!insurance.deductible && submitted" class="error-msg">
+              El deducible es obligatorio.
+            </div>
           </div>
         </div>
 
@@ -113,6 +123,9 @@
             <label for="paymentAmount">Monto de Pago</label>
             <input id="paymentAmount" type="number" min="0" (keydown)="preventNegativeInput($event)" pInputText
               [(ngModel)]="insurance.paymentAmount" />
+            <div *ngIf="!insurance.paymentAmount && submitted" class="error-msg">
+              El monto de pago es obligatorio.
+            </div>
           </div>
 
           <div class="form-field">
@@ -128,12 +141,14 @@
         <div class="form-row-full">
           <div class="dual-benefits-container">
             <!-- Checklist -->
+
             <div class="form-field checklist-container">
               <label>Lista de Beneficios</label>
+
               <div class="checkbox-list">
                 <div *ngFor="let benefit of availableBenefits" class="checkbox-item">
-                  <p-checkbox [binary]="false" [value]="benefit" name="benefits"
-                    [(ngModel)]="selectedBenefits"></p-checkbox>
+                  <p-checkbox [binary]="false" [value]="benefit" name="benefits" [(ngModel)]="selectedBenefits">
+                  </p-checkbox>
                   <label class="checkbox-label">
                     <span>{{ benefit.name }}</span>
                     <small>{{ benefit.description }}</small>
@@ -141,12 +156,15 @@
                 </div>
               </div>
             </div>
+
             <!-- PickList -->
             <div class="form-field picklist-container">
               <label>Beneficios Incluidos</label>
-              <p-pickList [source]="availableBenefits" [target]="selectedBenefits" [responsive]="true" dragdrop="true" filterBy="name"
-                sourceFilterPlaceholder="Buscar" targetFilterPlaceholder="Buscar"
+              <p-pickList [source]="availableBenefits" [target]="selectedBenefits" [responsive]="true" dragdrop="true"
+                filterBy="name" sourceFilterPlaceholder="Buscar" targetFilterPlaceholder="Buscar"
                 (onMoveToTarget)="onMoveToTarget($event)" (onMoveToSource)="onMoveToSource($event)">
+
+                <!-- Item template para source -->
                 <ng-template let-benefit pTemplate="item">
                   <div class="benefit-item">
                     <i class="pi pi-shield" style="color: var(--primary-color); margin-right: 10px;"></i>
@@ -156,12 +174,41 @@
                     </div>
                   </div>
                 </ng-template>
+
+                <!-- Item template para target con botón eliminar -->
+                <ng-template let-benefit pTemplate="targetItem">
+                  <div class="benefit-item" style="display: flex; align-items: center; width: 100%;">
+                    <div style="flex: 1; display: flex; align-items: center; overflow: hidden;">
+                      <i class="pi pi-check-circle" style="color: green; margin-right: 10px; flex-shrink: 0;"></i>
+                      <div class="benefit-content"
+                        style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        <h4 style="margin: 0; font-size: 1rem;">{{ benefit.name }}</h4>
+                        <p style="margin: 0; font-size: 0.85rem;">{{ benefit.description }}</p>
+                      </div>
+                    </div>
+                    <button type="button" (click)="eliminarBeneficioDesdePickList(benefit)"
+                      class="p-button p-button-text p-button-danger" style="height: 2rem; width: 2rem; flex-shrink: 0;"
+                      aria-label="Eliminar beneficio">
+                      <i class="pi pi-trash"></i>
+                    </button>
+                  </div>
+                </ng-template>
+                
+
+
+
+
               </p-pickList>
+              <div *ngIf="(!selectedBenefits || selectedBenefits.length === 0) && submitted" class="error-msg">
+                  Debes escoger al menos un beneficio.
+                </div>
             </div>
-
-
           </div>
         </div>
+
+
+        <p-toast></p-toast>
+
 
 
         <!-- Fila 5 (descripción ocupa toda la fila) -->
@@ -185,8 +232,7 @@
         <p-button label="Cancelar" icon="pi pi-times" (onClick)="display = false" class="p-button-text"></p-button>
         <p-button label="Guardar" icon="pi pi-check" (onClick)="saveInsurance()" class="p-button-primary"></p-button>
       </ng-template>
-      <p-button label="Ver seleccionados" (onClick)="verBeneficiosSeleccionados()"
-        class="p-button-secondary"></p-button>
+
 
     </p-dialog>
 
