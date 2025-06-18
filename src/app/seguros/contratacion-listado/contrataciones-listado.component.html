@@ -10,11 +10,28 @@
 
   <div class="content-container">
 
-    <div class="actions" *ngIf="canCreateContract()">
-      <button pButton label="Nueva Contratación" icon="pi pi-plus" [routerLink]="['/contratacion']"
-        class="p-button-primary"></button>
-    </div>
-    <p-table [value]="contratos" [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'">
+    <div class="actions" *ngIf="canCreateContract()" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+
+  <div style="display: flex; align-items: center; gap: 1rem; flex-grow: 1;">
+    <span class="p-input-icon-left">
+      <input type="text" pInputText placeholder="Buscar por cliente" [(ngModel)]="filterCliente" />
+    </span>
+
+    <p-select
+      [options]="estadosOptions"
+      [(ngModel)]="selectedEstado"
+      placeholder="Filtrar por estado"
+      optionLabel="label"
+      optionValue="value"
+     
+    ></p-select>
+  </div>
+
+  <button pButton label="Nueva Contratación" icon="pi pi-plus" [routerLink]="['/contratacion']" class="p-button-primary"></button>
+
+</div>
+
+    <p-table [value]="contratos" [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'"  [globalFilterFields]="['clientName']" [filterDelay]="300" [filters]="{ 'clientName': { value: filterCliente, matchMode: 'contains' } }">
       <ng-template pTemplate="header">
         <tr>
           <th>Cliente</th>
@@ -39,12 +56,22 @@
           <td>{{ contrato.totalPaymentAmount !== undefined ? contrato.totalPaymentAmount : '-' }}</td>
           <td>{{ formatBeneficiaries(contrato.beneficiaries) }}</td>
           <td *ngIf="canViewContracts()">
+
+
+            <button *ngIf="(contrato.status === 'PENDING' || contrato.status === 'ACTIVE') && contrato.contractFile"
+              pButton icon="pi pi-pencil" class="p-button-text p-button-plain p-button-sm"
+              (click)="mostrarModalFirma(contrato)" title="Firmar Contrato">
+            </button>
+
+
             <button pButton icon="pi pi-folder-open" class="p-button-text p-button-plain p-button-sm"
               [routerLink]="['/main-revision', contrato.id]" title="Revisión de Documentación"></button>
 
-            <button *ngIf="canDeactivateContract()"  pButton icon="pi pi-trash" class="p-button-text p-button-plain p-button-sm"
-              (click)="onEliminar(contrato)" title="Eliminar Contrato" style="margin-left: 0.5rem; color: red;">
+            <button *ngIf="canDeactivateContract()" pButton icon="pi pi-trash"
+              class="p-button-text p-button-plain p-button-sm" (click)="onEliminar(contrato)" title="Eliminar Contrato"
+              style="margin-left: 0.5rem; color: red;">
             </button>
+
 
           </td>
 
@@ -53,3 +80,24 @@
     </p-table>
   </div>
 </div>
+
+<!-- Modal de Firma de Contrato -->
+<p-dialog header="Contrato para Firma" [(visible)]="modalVisible" [modal]="true"
+  [style]="{width: '80vw', height: '90vh'}" [dismissableMask]="true" [closeOnEscape]="true"
+  (onHide)="contratoSeleccionado = null" styleClass="dialog-white-text">
+
+
+  <ng-container>
+    <iframe [src]="sanitizarBase64Pdf(contratoSeleccionado?.contractFile || '')" type="application/pdf" width="100%"
+      height="100%">
+    </iframe>
+
+  </ng-container>
+
+  <ng-template pTemplate="footer">
+    <button *ngIf="contratoSeleccionado?.status !== 'ACTIVE'" pButton label="Firmar Contrato" icon="pi pi-check" class="p-button-success"
+      (click)="aprobarContrato(contratoSeleccionado!)" [disabled]="!contratoSeleccionado"></button>
+    <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary"
+      (click)="modalVisible = false"></button>
+  </ng-template>
+</p-dialog>

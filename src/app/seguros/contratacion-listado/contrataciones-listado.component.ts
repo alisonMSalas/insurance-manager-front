@@ -15,10 +15,17 @@ import { forkJoin, Observable } from 'rxjs';
 import { SegurosService } from '../service/seguros.service';
 import { ChipModule } from 'primeng/chip';
 import { DividerModule } from 'primeng/divider';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DialogModule } from 'primeng/dialog';
+import { SelectButton } from 'primeng/selectbutton';
+import { FormsModule } from '@angular/forms';
+import { Select } from 'primeng/select';
+import { InputText } from 'primeng/inputtext';
+
 @Component({
   selector: 'app-contrataciones-listado',
   standalone: true,
-  imports: [CommonModule, RouterModule, TableModule, ButtonModule, ToastModule, ChipModule, DividerModule],
+  imports: [CommonModule, RouterModule,Select,InputText,TableModule, ButtonModule, ToastModule, ChipModule, DividerModule,FormsModule, DialogModule],
   templateUrl: './contrataciones-listado.component.html',
   styleUrls: ['./contrataciones-listado.component.scss'],
   providers: [MessageService]
@@ -28,12 +35,31 @@ export class ContratacionesListadoComponent implements OnInit {
   private clientsService = inject(ClientsService);
   private segurosService = inject(SegurosService);
   private messageService = inject(MessageService);
+  private sanitizer = inject(DomSanitizer);
+
   contratos: Contract[] = [];
   userRole: string | null = null;
+  modalVisible = false;
+  contratoSeleccionado: Contract | null = null;
+  selectedEstado: string | null = null;
+filterCliente: string = '';
+
+estadosOptions = [
+  { label: 'Pendiente', value: 'PENDING' },
+  { label: 'Activo', value: 'ACTIVE' },
+  { label: 'Cancelado', value: 'CANCELLED' },
+  { label: 'Rechazado', value: 'REJECTED_BY_CLIENT' },
+  { label: 'Expirado', value: 'EXPIRED' }
+];
+
+// Recuerda llenar clientName para facilitar filtro:
+
 
   ngOnInit(): void {
     this.userRole = this.getUserRole();
     this.cargarContrataciones();
+
+    
 
   }
 
@@ -51,14 +77,15 @@ export class ContratacionesListadoComponent implements OnInit {
             this.contratos = contratos.map((contrato, index) => ({
               ...contrato,
               isActive: contrato.status === 'ACTIVE',
-              client: results[index][0], 
+              client: results[index][0],
               insurance: {
-                ...results[index][1], 
-                benefits: contrato.insurance?.benefits ?? [] 
+                ...results[index][1],
+                benefits: contrato.insurance?.benefits ?? []
               },
               totalPaymentAmount: contrato.totalPaymentAmount ?? 0,
               beneficiaries: contrato.beneficiaries ?? []
             }));
+            
 
           },
           error: (err) => {
@@ -140,9 +167,45 @@ export class ContratacionesListadoComponent implements OnInit {
     }
   }
 
-onEliminar(contrato: any) {
-  // Lógica para eliminar el contrato, posiblemente con confirmación
-}
+  onEliminar(contrato: any) {
+    // Lógica para eliminar el contrato, posiblemente con confirmación
+  }
 
 
+  mostrarModalFirma(contrato: Contract): void {
+    this.contratoSeleccionado = contrato;
+    this.modalVisible = true;
+  }
+
+  sanitizarBase64Pdf(base64: string): SafeResourceUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(`data:application/pdf;base64,${base64}`);
+  }
+
+  aprobarContrato(contrato: Contract): void {
+    if (contrato.id){
+      this.contratacionesService.aprobarContrato(contrato.id).subscribe({
+        next: (response) => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Contrato aprobado correctamente.'
+          });
+          this.cerrarModal();
+          this.cargarContrataciones(); 
+        },
+        error: (err) => {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se pudo aprobar el contrato.'
+          });
+          console.error('Error al aprobar contrato:', err);
+        }
+      });
+    }
+  }
+  cerrarModal(): void {
+    this.modalVisible = false;
+    this.contratoSeleccionado = null;
+  }
 }

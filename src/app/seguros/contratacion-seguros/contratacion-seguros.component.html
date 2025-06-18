@@ -121,7 +121,7 @@
 
       <!-- Modal para agregar beneficiario -->
       <p-dialog header="Agregar Beneficiario" [(visible)]="modalVisible" [modal]="true" [closable]="false"
-        [style]="{width: '400px'}">
+        [style]="{width: '700px'}">
         <form [formGroup]="beneficiarioForm" (ngSubmit)="agregarBeneficiario()">
           <div class="p-fluid">
             <div class="p-field">
@@ -138,8 +138,13 @@
             </div>
             <div class="p-field">
               <label for="parentesco">Parentesco</label>
-              <input id="parentesco" type="text" pInputText formControlName="parentesco" />
+              <p-select formControlName="parentesco" [options]="parentescos" optionLabel="label" optionValue="value"
+                placeholder="Seleccione" [style]="{'min-width': '100%'}" class="w-full"></p-select>
             </div>
+
+
+
+
           </div>
           <div class="p-dialog-footer">
             <button pButton label="Cancelar" icon="pi pi-times" class="p-button-text" (click)="cerrarModal()"
@@ -176,15 +181,18 @@
                 La fecha de inicio no puede ser anterior a hoy.
               </small>
             </div>
+<div style="flex: 1;">
+      <label for="periodicidad">Periodicidad</label>
+      <label style="display: block; padding: 0.5rem 0; font-weight: normal;">
+  {{ coberturasForm.get('periodicidad')?.value || '-' }}
+</label>
 
-            <div style="flex: 1;">
-              <label for="periodicidad">Periodicidad</label>
-              <input id="periodicidad" type="text" pInputText formControlName="periodicidad" readonly />
-            </div>
+    </div>
           </div>
 
         </form>
-        <p-button label="Registrar Contrato"  class="mb-3 boton-azul" icon="pi pi-check" (onClick)="registrarContratacion()" [disabled]="!clienteEncontrado"></p-button>
+        <p-button label="Registrar Contrato" class="mb-3 boton-azul" icon="pi pi-check"
+          (onClick)="registrarContratacion()" [disabled]="!clienteEncontrado"></p-button>
 
       </div>
 

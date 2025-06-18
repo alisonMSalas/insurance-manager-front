@@ -9,11 +9,13 @@ import { Subscription } from 'rxjs';
 import { Contract } from '../../../shared/interfaces/contract';
 import { CommonModule } from '@angular/common';
 import { Attachment } from '../../../shared/interfaces/attachment';
+import { PaymentsComponent } from '../payments/payments.component';
+import { ContractStep } from '../../../shared/interfaces/contract-step';
 
 @Component({
   selector: 'app-main-revision',
   standalone: true,
-  imports: [CommonModule, ButtonModule, RouterLink, AccordionModule, DocumentacionComponent, ResumenComponent],
+  imports: [CommonModule, ButtonModule, RouterLink, AccordionModule, DocumentacionComponent, ResumenComponent, PaymentsComponent],
   templateUrl: './main-revision.component.html',
   styleUrl: './main-revision.component.css'
 })
@@ -25,20 +27,19 @@ export class MainRevisionComponent implements OnInit, OnDestroy {
   esDesdeRuta: boolean = false;
   private subscription: Subscription | undefined;
   private route = inject(ActivatedRoute);
-  attatchments:Attachment[] = [];
+  attatchments: Attachment[] = [];
+  contractStep = ContractStep;
 
   ngOnInit() {
     const idFromRoute = this.route.snapshot.paramMap.get('id');
     if (idFromRoute) {
       this.contratoId = idFromRoute;
       this.esDesdeRuta = true;
-      console.log('Contrato ID desde la URL:', this.contratoId);
       this.cargarContrato(this.contratoId);
     } else {
       this.subscription = this.contractService.contratoId$.subscribe(id => {
         this.contratoId = id;
         this.esDesdeRuta = false;
-        console.log('MainRevisionComponent recibió contratoId:', id);
         this.cargarContrato(this.contratoId);
       });
     }
@@ -48,15 +49,12 @@ export class MainRevisionComponent implements OnInit, OnDestroy {
     this.contractService.getById(id).subscribe({
       next: (contrato) => {
         this.contractInfo = contrato;
-        this.clientId = contrato.clientId || ''; 
-        this.attatchments = contrato.clientAttachments||  [];
-        console.log('Contrato cargado:', this.contractInfo);
-        console.log('Contrato Cliente ID:', this.clientId);
+        this.clientId = contrato.clientId || '';
+        this.attatchments = contrato.clientAttachments || [];
       },
       error: (err) => {
-        console.error('Error al cargar contrato:', err);
         this.contractInfo = null;
-        this.clientId = ''; 
+        this.clientId = '';
       }
     });
   }
@@ -64,7 +62,6 @@ export class MainRevisionComponent implements OnInit, OnDestroy {
 
 
   ngOnDestroy() {
-    
     this.subscription?.unsubscribe();
   }
 }

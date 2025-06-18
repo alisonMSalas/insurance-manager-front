@@ -12,11 +12,13 @@
     margin-bottom: 0.75rem;
   }
 }
+
 :host {
   flex: 1;
   display: flex;
   height: 100%;
 }
+
 .content-container {
   flex: 1;
   display: flex;
@@ -38,7 +40,7 @@
 }
 
 .actions {
-   display: flex;
+  display: flex;
   justify-content: end;
   align-items: center;
 }
@@ -92,4 +94,10 @@
 :host ::ng-deep .p-button.p-button-primary:hover {
   background: #23a0ed;
   border-color: #1d91da;
+}
+
+::ng-deep .dialog-white-text .p-dialog-content,
+::ng-deep .dialog-white-text .p-dialog-header,
+::ng-deep .dialog-white-text .p-dialog-footer {
+  color: white;
 }

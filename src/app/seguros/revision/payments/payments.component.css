@@ -1,0 +1,99 @@
+/* Tarjeta con disposición vertical */
+.vertical-contract-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 300px; /* Ancho más compacto */
+  margin: 0 auto;
+}
+
+/* Detalles en columna */
+.contract-detail {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.contract-detail:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  font-weight: 600;
+  color: #495057;
+  margin-right: 0.5rem;
+  min-width: 80px;
+  font-size: 0.9rem;
+}
+
+.detail-value {
+  color: #212529;
+  font-size: 0.9rem;
+}
+
+.highlight {
+  font-weight: 700;
+  color: #2b8a3e;
+}
+
+/* Badge de estado */
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: capitalize;
+}
+
+/* Botón de pago */
+.payment-button {
+  background: linear-gradient(135deg, #37b24d 0%, #2b8a3e 100%);
+  border: none;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  width: auto;
+}
+
+.payment-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Mantén los mismos colores de estado de la versión anterior */
+.status-active, .status-approved, .status-paid {
+  background-color: #d3f9d8;
+  color: #2b8a3e;
+}
+
+.status-pending {
+  background-color: #fff3bf;
+  color: #e67700;
+}
+
+.status-cancelled, .status-rejected {
+  background-color: #ffd8d8;
+  color: #c92a2a;
+}
+
+.status-unknown {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+.status-pagado {
+  background-color: #d4edda;
+  color: #155724;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+.status-pendiente {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 4px 10px;
+  border-radius: 5px;
+  font-weight: bold;
+}

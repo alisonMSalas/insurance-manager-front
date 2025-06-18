@@ -1,5 +1,6 @@
 import { Attachment } from "./attachment";
 import { Client } from "./client";
+import { ContractStep } from "./contract-step";
 import { Insurance } from "./insurance";
 
 export interface Contract {
@@ -23,7 +24,10 @@ export interface Contract {
     name: string;
     lastName: string;
     identificationNumber: string;
+    relationship: string;
     phoneNumber: string;
   }[];
   clientAttachments?: Attachment[];
+  contractFile?: string;
+  stepStatuses?: Record<ContractStep, boolean>;
 }

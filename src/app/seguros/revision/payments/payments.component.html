@@ -1,0 +1,35 @@
+<p-card *ngIf="contract" class="vertical-contract-card">
+  <div class="flex flex-column gap-2 p-3">
+    <!-- Monto -->
+    <div class="contract-detail">
+      <span class="detail-label"><i class="pi pi-money-bill mr-2"></i> Monto:</span>
+      <span class="detail-value highlight">{{ contract.totalPaymentAmount | currency:'USD':'symbol':'1.2-2' }}</span>
+    </div>
+    
+    <!-- Estado -->
+    <div class="contract-detail">
+      <span class="detail-label"><i class="pi pi-info-circle mr-2"></i> Estado:</span>
+      <span class="status-badge" [ngClass]="contract.status ? getStatusClass(contract.status) : ''">
+        {{ contract.status }}
+      </span>
+    </div>
+  </div>
+  
+<ng-template pTemplate="footer">
+  <div class="flex justify-content-center">
+    <p *ngIf="contract?.status === 'PAGADO'" class="text-success font-bold">
+      <i class="pi pi-check-circle"></i> Pago realizado
+    </p>
+    <button *ngIf="contract?.status?.toLowerCase() === 'pending'" 
+        pButton 
+        type="button" 
+        label="Realizar Pago" 
+        icon="pi pi-credit-card" 
+        (click)="iniciarPago()"
+        class="payment-button">
+</button>
+
+  </div>
+</ng-template>
+
+</p-card>
