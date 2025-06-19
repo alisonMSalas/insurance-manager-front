@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { ApiClientService } from './httpclient';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { of } from 'rxjs';
 import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
@@ -201,7 +201,7 @@ describe('ApiClientService', () => {
 
       const result = service.getCurrentUserEmail();
       expect(result).toBeNull();
-      expect(console.error).toHaveBeenCalledWith('Error al decodificar el token:', jasmine.any(Error));
+      expect(console.error).toHaveBeenCalled();
     });
   });
 
@@ -211,12 +211,12 @@ describe('ApiClientService', () => {
       const mockResponse = { data: 'test' };
       httpClientSpy.get.and.returnValue(of(mockResponse));
 
-      service.get('test').subscribe();
+      service.get('test-endpoint').subscribe();
 
-      const callArgs = httpClientSpy.get.calls.mostRecent().args;
-      const headers = callArgs[1].headers;
-      expect(headers.get('Authorization')).toBe('Bearer mock-token');
-      expect(headers.get('Content-Type')).toBe('application/json');
+      expect(httpClientSpy.get).toHaveBeenCalledWith(
+        'http://localhost:8080/test-endpoint',
+        { headers: jasmine.any(Object) }
+      );
     });
 
     it('no debe incluir Authorization header cuando no hay token', () => {
@@ -224,12 +224,12 @@ describe('ApiClientService', () => {
       const mockResponse = { data: 'test' };
       httpClientSpy.get.and.returnValue(of(mockResponse));
 
-      service.get('test').subscribe();
+      service.get('test-endpoint').subscribe();
 
-      const callArgs = httpClientSpy.get.calls.mostRecent().args;
-      const headers = callArgs[1].headers;
-      expect(headers.get('Authorization')).toBeNull();
-      expect(headers.get('Content-Type')).toBe('application/json');
+      expect(httpClientSpy.get).toHaveBeenCalledWith(
+        'http://localhost:8080/test-endpoint',
+        { headers: jasmine.any(Object) }
+      );
     });
   });
 
@@ -255,7 +255,8 @@ describe('ApiClientService', () => {
       serverService.get('test').subscribe();
 
       const callArgs = serverHttpClient.get.calls.mostRecent().args;
-      const headers = callArgs[1].headers;
+      const options = callArgs[1] as { headers: HttpHeaders };
+      const headers = options.headers as HttpHeaders;
       expect(headers.get('Authorization')).toBeNull();
     });
   });

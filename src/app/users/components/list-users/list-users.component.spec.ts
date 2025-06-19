@@ -7,6 +7,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 describe('ListUsersComponent (integración)', () => {
   const user: User = {
@@ -59,6 +60,7 @@ describe('ListUsersComponent (integración)', () => {
         { provide: ApiClientService, useValue: mockApiClientService },
         { provide: ConfirmationService, useValue: mockConfirmationService },
         { provide: MessageService, useValue: mockMessageService },
+        provideNoopAnimations()
       ],
     }).compileComponents();
   
