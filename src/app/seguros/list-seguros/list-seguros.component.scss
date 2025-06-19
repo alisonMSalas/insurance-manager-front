@@ -461,6 +461,11 @@ h2 {
   border-bottom: 1px solid #f0f0f0;
 }
 
+.benefits-row {
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
 .detail-label {
   font-weight: 600;
   color: #495057;
@@ -500,4 +505,155 @@ h2 {
     align-items: flex-start;
     gap: 0.5rem;
   }
+}
+
+/* Agrega esto a tu archivo de estilos */
+.benefit-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin: 0.25rem;
+  background-color: #ffffff;
+  transition: all 0.2s;
+}
+
+.benefit-item:hover {
+  background-color: #ffffff;
+  transform: translateX(5px);
+}
+
+.benefit-content {
+  flex: 1;
+  margin-left: 0.5rem;
+}
+
+.benefit-content h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #495057;
+}
+
+.benefit-content p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.p-picklist .p-picklist-list {
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.p-picklist .p-picklist-header {
+  background: #f8f9fa;
+  color: #495057;
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+}
+
+/* Estilo para los chips seleccionados */
+.p-multiselect .p-multiselect-token {
+  background: var(--primary-color);
+  color: white;
+  border-radius: 16px;
+}
+
+/* Mejorar el espaciado */
+.p-multiselect {
+  width: 100%;
+}
+
+/* Estilo para items en la lista */
+.p-multiselect-item {
+  padding: 0.75rem 1.25rem;
+}
+/* Estilos para la lista de checkboxes */
+.checkbox-list {
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.checkbox-item:last-child {
+  border-bottom: none;
+}
+
+.checkbox-item:hover {
+  background-color: #f8f9fa;
+}
+
+.checkbox-label {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.benefit-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.benefit-description {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Estilos para la barra de búsqueda */
+.p-input-icon-left {
+  width: 100%;
+}
+
+.p-input-icon-left i {
+  left: 10px;
+  color: #6c757d;
+}
+
+.p-input-icon-left input {
+  width: 100%;
+  padding-left: 2rem;
+}
+
+.dual-benefits-container {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.picklist-container, .checklist-container {
+  flex: 1 1 45%;
+  min-width: 300px;
+}
+
+.checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.p-ripple.cdk-drag.p-listbox-option.ng-star-inserted {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-msg {
+  color: #ba2624; 
+  margin-top: 5px;
+  font-size: 0.9rem;
 }

@@ -69,6 +69,21 @@ input:focus,
 .p-checkbox-checked .p-checkbox-box {
   border-color: #0485d5 !important;
 }
+.p-picklist-source-controls{
+  display: none !important;
+}
+
+.p-picklist-target-controls{
+  display: none !important;
+}
+
+.p-picklist-source-list-container{
+  display: none !important;
+}
+
+.p-picklist-transfer-controls{
+  display: none !important;
+}
 
 .content-container {
   overflow-y: auto;

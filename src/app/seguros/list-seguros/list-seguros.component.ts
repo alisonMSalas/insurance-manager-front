@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Insurance, InsuranceType, PaymentPeriod } from '../../shared/interfaces/insurance';
 import { SegurosService } from '../service/seguros.service';
@@ -10,16 +10,18 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ErrorResponse } from '../../shared/interfaces/error-response';
 import { DialogModule } from 'primeng/dialog';
-import { FormsModule,ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DropdownModule } from 'primeng/dropdown';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
-
+import { PickListModule, PickListMoveToSourceEvent, PickListMoveToTargetEvent } from 'primeng/picklist';
 import { SelectModule } from 'primeng/select';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TooltipModule } from 'primeng/tooltip';
 import { DividerModule } from 'primeng/divider';
+import { Benefit } from '../../shared/interfaces/benefit';
+import { MultiSelectModule } from 'primeng/multiselect';
 
 interface StatusOption {
   label: string;
@@ -44,7 +46,8 @@ interface StatusOption {
     SelectModule,
     ConfirmDialogModule,
     TooltipModule,
-    DividerModule
+    DividerModule,
+    PickListModule, MultiSelectModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './list-seguros.component.html',
@@ -53,13 +56,15 @@ interface StatusOption {
 
 export class ListSegurosComponent implements OnInit {
   insurances: Insurance[] = [];
-  display=false;
+  display = false;
   isEditing: boolean = false;
   currentInsuranceId: string | null = null;
   displayViewModal = false;
   selectedInsurance: Insurance | null = null;
   filteredInsurances: Insurance[] = [];
   loading = false;
+  allBenefits: Benefit[] = [];
+  submitted: boolean = false;
 
   statusOptions: StatusOption[] = [
     { label: 'Todos', value: null },
@@ -75,20 +80,47 @@ export class ListSegurosComponent implements OnInit {
 
   selectedStatus: boolean | null = null;
   selectedType: string | null = null;
+  selectedBenefits!: Benefit[];
+  availableBenefits!: Benefit[];
 
   constructor(
     private segurosService: SegurosService,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
     this.loadInsurances();
+    this.getBenefits();
   }
 
   refreshData(): void {
     this.loading = true;
     this.loadInsurances();
+    this.getBenefits();
+  }
+
+  onMoveToTarget(event: PickListMoveToTargetEvent): void {
+    const newItems = event.items.filter(
+      item => !this.selectedBenefits.some(b => b.id === item.id)
+    );
+    this.selectedBenefits.push(...newItems);
+    this.availableBenefits = this.availableBenefits.filter(
+      item => !newItems.some(n => n.id === item.id)
+    );
+  }
+
+  onMoveToSource(event: PickListMoveToSourceEvent): void {
+    const movedIds = event.items.map(item => item.id);
+    this.availableBenefits.push(...event.items);
+    this.selectedBenefits = this.selectedBenefits.filter(
+      item => !movedIds.includes(item.id)
+    );
+  }
+
+  verBeneficiosSeleccionados() {
+    console.log('Beneficios seleccionados:', this.selectedBenefits);
   }
 
   loadInsurances(): void {
@@ -109,6 +141,7 @@ export class ListSegurosComponent implements OnInit {
       }
     });
   }
+
   openViewModal(insurance: Insurance) {
     this.selectedInsurance = insurance;
     this.displayViewModal = true;
@@ -125,6 +158,7 @@ export class ListSegurosComponent implements OnInit {
   onFilterChange(): void {
     this.applyFilters();
   }
+
   changeStatus(insurance: Insurance): void {
     this.segurosService.updateStatus(insurance.id!, !insurance.active).subscribe({
       next: () => {
@@ -164,7 +198,7 @@ export class ListSegurosComponent implements OnInit {
     });
   }
 
-   handleError(error: HttpErrorResponse): void {
+  handleError(error: HttpErrorResponse): void {
     if (error.error && typeof error.error === 'object') {
       const errorResponse = error.error as ErrorResponse;
       if (errorResponse.message) {
@@ -189,28 +223,48 @@ export class ListSegurosComponent implements OnInit {
 
   insurance: Omit<Insurance, 'id'> = {
     name: '',
-    type: InsuranceType.HEALTH, 
+    type: InsuranceType.HEALTH,
     description: '',
-    coverage: 0, 
-    deductible: 0, 
-    paymentAmount: 0, 
-    paymentPeriod: PaymentPeriod.MONTHLY, 
+    coverage: 0,
+    deductible: 0,
+    paymentAmount: 0,
+    paymentPeriod: PaymentPeriod.MONTHLY,
     active: false,
   };
-  
+
   insuranceTypes = getInsuranceTypeOptions();
-  
   paymentPeriods = getPaymentPeriodOptions();
-  
+
   saveInsurance() {
+    this.submitted = true;
+    if (
+    !this.insurance.name ||
+    !this.insurance.type ||
+    !this.insurance.description ||
+    this.insurance.coverage == null ||
+    this.insurance.deductible == null ||
+    this.insurance.paymentAmount == null ||
+    !this.insurance.paymentPeriod ||
+    !this.selectedBenefits || this.selectedBenefits.length === 0
+  ) {
+    this.messageService.add({
+      severity: 'warn',
+      summary: 'Campos obligatorios',
+      detail: 'Por favor, complete todos los campos requeridos y seleccione al menos un beneficio.'
+    });
+    return; 
+  }
+    console.log('benefits seleccionados:', this.selectedBenefits);
+    this.insurance.benefits = [...this.selectedBenefits];
+    console.log('cambios de beneficios', this.insurance.benefits);
     if (this.isEditing && this.currentInsuranceId) {
       // Lógica de actualización
       const updatedInsurance: Insurance = {
         ...this.insurance,
         id: this.currentInsuranceId
       };
-      
-      this.segurosService.update(this.currentInsuranceId,updatedInsurance).subscribe({
+
+      this.segurosService.update(this.currentInsuranceId, updatedInsurance).subscribe({
         next: (response) => {
           this.messageService.add({
             severity: 'success',
@@ -234,6 +288,7 @@ export class ListSegurosComponent implements OnInit {
             summary: 'Éxito',
             detail: 'Seguro registrado correctamente'
           });
+          console.log('Seguro registrado:', response);
           this.loadInsurances();
           this.display = false;
           this.resetCampos();
@@ -246,10 +301,15 @@ export class ListSegurosComponent implements OnInit {
   }
   openModal(insuranceToEdit?: Insurance) {
     this.isEditing = !!insuranceToEdit;
-    
+
     if (this.isEditing && insuranceToEdit) {
       this.currentInsuranceId = insuranceToEdit.id || null;
-      // Copiar los datos del seguro a editar
+      this.selectedBenefits = [...(insuranceToEdit.benefits || [])];
+
+      this.availableBenefits = this.allBenefits.filter(
+        b => !this.selectedBenefits.some(sb => sb.id === b.id)
+      );
+
       this.insurance = {
         name: insuranceToEdit.name,
         type: insuranceToEdit.type,
@@ -262,23 +322,38 @@ export class ListSegurosComponent implements OnInit {
       };
     } else {
       this.resetCampos();
-      this.currentInsuranceId = null;
     }
-    
+
     this.display = true;
+    this.cdr.detectChanges(); // Asegura que el modal actualice la vista
   }
+
+  eliminarBeneficioDesdePickList(benefit: Benefit): void {
+    // Mover el beneficio de selectedBenefits a availableBenefits
+    this.selectedBenefits = this.selectedBenefits.filter(b => b.id !== benefit.id);
+    this.availableBenefits.push(benefit);
+
+    // Forzar detección de cambios si es necesario
+    this.cdr.detectChanges();
+  }
+
+
+
 
   resetCampos() {
     this.insurance = {
       name: '',
-      type: InsuranceType.HEALTH, // Valor por defecto del enum
+      type: InsuranceType.HEALTH, 
       description: '',
       coverage: 0,
       deductible: 0,
       paymentAmount: 0,
-      paymentPeriod: PaymentPeriod.MONTHLY, // Valor por defecto del enum
+      paymentPeriod: PaymentPeriod.MONTHLY, 
       active: false,
     };
+    this.selectedBenefits = [];
+    this.getBenefits();
+    this.submitted = false;
   }
 
   preventNegativeInput(event: KeyboardEvent): void {
@@ -286,4 +361,54 @@ export class ListSegurosComponent implements OnInit {
       event.preventDefault();
     }
   }
+
+  // En tu componente
+  // availableBenefits: any[] = [
+  //   { 
+  //     id: 1, 
+  //     name: 'Cobertura Dental', 
+  //     description: 'Incluye limpiezas, extracciones y tratamientos básicos' 
+  //   },
+  //   { 
+  //     id: 2, 
+  //     name: 'Cobertura Visual', 
+  //     description: 'Exámenes de la vista y descuentos en lentes' 
+  //   },
+  //   { 
+  //     id: 3, 
+  //     name: 'Medicina General', 
+  //     description: 'Consultas con médicos generales y especialistas' 
+  //   },
+  //   { 
+  //     id: 4, 
+  //     name: 'Hospitalización', 
+  //     description: 'Cobertura por días de hospitalización' 
+  //   },
+  //   { 
+  //     id: 5, 
+  //     name: 'Medicamentos', 
+  //     description: 'Descuentos en medicamentos recetados' 
+  //   },
+  //   { 
+  //     id: 6, 
+  //     name: 'Emergencias', 
+  //     description: 'Cobertura en casos de emergencia médica' 
+  //   }
+  // ];
+
+  getBenefits(): void {
+    this.segurosService.getAllBenefits().subscribe({
+      next: (benefits: Benefit[]) => {
+        this.allBenefits = benefits;
+        if (!this.isEditing) {
+          // Solo al crear, carga toda la lista
+          this.availableBenefits = [...benefits];
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        this.handleError(error);
+      }
+    });
+  }
+
 }
