@@ -45,8 +45,7 @@ import { SelectModule } from 'primeng/select';
     SelectModule
   ],
   templateUrl: './reembolso-listado.html',
-  styleUrls: ['./reembolso-listado.scss'],
-  providers: [MessageService]
+  styleUrls: ['./reembolso-listado.scss']
 })
 export class ReembolsoListadoComponent implements OnInit {
   private refundService = inject(RefundService);
@@ -123,22 +122,22 @@ reembolsosFiltrados() {
             }));
           },
           error: (err) => {
+            console.error('Error al cargar contratos:', err);
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
               detail: 'No se pudieron cargar los datos de contratos.'
             });
-            console.error('Error al cargar contratos:', err);
           }
         });
       },
       error: (err) => {
+        console.error('Error al cargar reembolsos:', err);
         this.messageService.add({
           severity: 'error',
           summary: 'Error',
           detail: 'No se pudieron cargar los reembolsos.'
         });
-        console.error('Error al cargar reembolsos:', err);
       }
     });
   }

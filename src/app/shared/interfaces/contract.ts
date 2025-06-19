@@ -6,7 +6,7 @@ import { Insurance } from "./insurance";
 export interface Contract {
   id?: string;
   startDate?: string;
-  status?: string;
+status?: string;
   totalPaymentAmount?: number;
   insuranceId?: string;
   clientId?: string;

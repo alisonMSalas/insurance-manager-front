@@ -326,6 +326,10 @@ documentosGuardados: boolean = false;
       next: () => {
         this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Documentos aprobados' });
         this.documentosAprobados = true;
+      },
+      error: (err) => {
+        console.error('Error al aprobar documentos:', err);
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al aprobar documentos' });
       }
     });
   }
