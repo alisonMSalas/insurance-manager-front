@@ -1,0 +1,369 @@
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+::ng-deep .search-group {
+  margin-top: 15px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+::ng-deep .search-input {
+  width: 250px !important;
+  padding: 0.5rem 0.75rem !important;
+  height: 2.5rem !important;
+  border-radius: 6px 0 0 6px !important;
+  flex: none !important;
+  border-right: none !important;
+}
+
+::ng-deep .search-button {
+  height: 2.5rem !important;
+  border-radius: 0 6px 6px 0 !important;
+  background: #044167 !important;
+  border-color: #044167 !important;
+  padding: 0 1rem !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+::ng-deep .search-button:hover {
+  background: #044167e4 !important;
+  border-color: #044167e4 !important;
+}
+
+.form-layout .form-group p-dropdown,
+.form-layout .form-group p-calendar,
+.form-layout .field p-calendar {
+  width: 100%;
+}
+
+.form-layout ::ng-deep .p-dropdown,
+.form-layout ::ng-deep .p-calendar {
+  width: 100% !important;
+}
+
+.form-layout ::ng-deep .p-calendar .p-inputtext {
+  width: 100% !important;
+}
+
+.form-layout label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+}
+
+.form-layout .form-group,
+.form-layout .field > div {
+  margin-bottom: 1rem;
+}
+
+::ng-deep .p-datepicker {
+  width: 100% !important;
+  max-width: 90% !important;
+  display: inline-flex !important;
+  position: relative;
+}
+
+p-table input[pInputText],
+p-table .p-dropdown {
+  width: 100% !important;
+  min-width: 120px;
+}
+
+.p-dropdown-panel {
+  width: 100% !important;
+  min-width: auto !important;
+  max-width: none !important;
+}
+
+:host ::ng-deep .p-dropdown-panel {
+  z-index: 1050 !important;
+}
+
+.content-area {
+  flex: 1;
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  overflow: hidden;
+
+  .p-divider {
+    margin: 0;
+    margin-bottom: 0.75rem;
+  }
+}
+
+.content-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  height: 100%;
+  min-height: 0;
+}
+.row-container {
+  display: flex;
+  gap: 1rem; 
+}
+.half-width {
+  flex: 1;
+}
+.insurance-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+/* Estilos mejorados sin cambiar estructura */
+::ng-deep .p-dialog .p-dialog-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1.25rem;
+}
+
+::ng-deep .p-dialog .p-dialog-title {
+    font-size: 1.25rem;
+    color: #fff;
+    font-weight: 600;
+}
+
+::ng-deep .p-dialog .p-dialog-content {
+    padding: 1.5rem;
+}
+
+.p-field {
+    margin-bottom: 1.25rem;
+}
+
+.p-field label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #181717;
+    font-size: 0.875rem;
+}
+
+::ng-deep .p-inputtext {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+    transition: border-color 0.2s;
+}
+
+
+
+.p-dialog-footer {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+}
+
+::ng-deep .p-button.p-button-text .boton-azul {
+    color: #6c757d;
+}
+
+::ng-deep .p-button.p-button-text:hover.boton-azul  {
+    background: rgba(108, 117, 125, 0.04);
+}
+
+::ng-deep .p-button:not(.p-button-text).boton-azul  {
+    background: #044167;
+    border: 1px solid #044167;
+}
+
+::ng-deep .p-button:not(.p-button-text):hover {
+    background: #044167;
+    border-color: #044167;
+}
+
+::ng-deep .p-button:disabled {
+    opacity: 0.6;
+}
+
+
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.text-2xl {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+}
+::ng-deep .p-button.back-button {
+  background: none;
+  border: none;
+  color: #fff !important;
+}
+
+
+//modal crear clientes
+/* Diálogo completo */
+.add-client-dialog {
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Header */
+.add-client-dialog .p-dialog-header {
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 1.25rem 1.5rem;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.add-client-dialog .p-dialog-title {
+  font-size: 1.25rem;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+/* Contenido */
+.add-client-dialog .p-dialog-content {
+  padding: 1.5rem;
+  background: #ffffff;
+}
+
+/* Estructura del formulario */
+.add-client-form {
+  display: block;
+}
+
+.add-client-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.add-client-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Campos */
+.add-client-field {
+  margin-bottom: 0;
+}
+
+.add-client-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #495057;
+  font-size: 0.875rem;
+}
+
+.add-client-input {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #ced4da;
+  transition: border-color 0.2s;
+}
+
+.add-client-input:hover {
+  border-color: #6366f1;
+}
+
+.add-client-input:focus {
+  outline: 0 none;
+  box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+  border-color: #6366f1;
+}
+
+/* Mensajes de error */
+.add-client-error {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: #e24c4c;
+}
+
+/* Footer */
+.add-client-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #e0e0e0;
+  background: #f8f9fa;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.insurance-header {
+  display: flex;
+  margin: 0.75rem 0;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-right: 1rem;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-content > p-button {
+  flex-shrink: 0;
+}
+:host ::ng-deep .p-button.p-button-primary {
+  background: #92c0dc;
+  border: 1px solid #0069a9;
+  padding: 12px 18px;
+}
+
+:host ::ng-deep .p-button.p-button-primary:hover {
+  background: #23a0ed;
+  border-color: #1d91da;
+}
+
+:host ::ng-deep .p-button.p-button-text {
+  color: #6c757d;
+}
+
+:host ::ng-deep .p-button.p-button-text:hover {
+  background: rgba(108, 117, 125, 0.1);
+  color: #495057;
+}

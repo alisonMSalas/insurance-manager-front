@@ -2,14 +2,15 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Insurance } from '../../shared/interfaces/insurance';
 import { ApiClientService } from '../../core/api/httpclient';
+import { Benefit } from '../../shared/interfaces/benefit';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SegurosService {
-  private endpoint = 'insurance';
+  private readonly endpoint = 'insurance';
 
-  constructor(private apiClient: ApiClientService) { }
+  constructor(private readonly apiClient: ApiClientService) { }
 
   getAll(): Observable<Insurance[]> {
     return this.apiClient.get<Insurance[]>(this.endpoint);
@@ -33,5 +34,9 @@ export class SegurosService {
 
   delete(id: string): Observable<void> {
     return this.apiClient.delete<void>(`${this.endpoint}/${id}`);
+  }
+
+  getAllBenefits(): Observable<Benefit[]> {
+    return this.apiClient.get<Benefit[]>(`${this.endpoint}/benefits`);
   }
 }

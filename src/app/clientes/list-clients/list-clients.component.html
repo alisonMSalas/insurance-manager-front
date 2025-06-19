@@ -1,0 +1,374 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="content-area">
+  <div class="insurance-header">
+    <div>
+      <div class="text-2xl text-white">Clientes</div>
+    </div>
+  </div>
+
+  <p-divider></p-divider>
+
+  <div class="content-container">
+    <div class="actions-container">
+      <div class="filters-container">
+        <div class="filter-group">
+          <p-floatlabel>
+            <input
+              id="search"
+              pInputText
+              [(ngModel)]="filtroCedula"
+              (input)="filtrarClientes()"
+              class="w-full md:w-56"
+            />
+            <label for="search">Buscar por cédula</label>
+          </p-floatlabel>
+        </div>
+      </div>
+      <p-button
+        icon="pi pi-plus"
+        label="Nuevo Cliente"
+        styleClass="p-button-primary"
+        size="small"
+        (onClick)="abrirModalCrear()"
+      ></p-button>
+    </div>
+
+    <!-- Tabla de clientes -->
+    <div class="insurance-table-container">
+      <p-table
+        [value]="clientes"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        [scrollable]="true"
+        scrollHeight="500px"
+        [paginator]="true"
+        [rows]="5"
+        [rowsPerPageOptions]="[5, 10, 20]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} clientes"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">DNI</th>
+            <th scope="col">Género</th>
+            <th scope="col">Telefono</th>
+            <th scope="col">Correo</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-cliente>
+          <tr>
+            <td>{{ cliente.name }} {{ cliente.lastName }}</td>
+            <td>{{ cliente.identificationNumber }}</td>
+            <td>{{ cliente.gender}}</td>
+            <td>{{ cliente.phoneNumber }}</td>
+            <td>{{ cliente.user.email }}</td>
+            <td>
+              <p-checkbox
+                [(ngModel)]="cliente.active"
+                (onChange)="toggleClientStatus(cliente)"
+                binary="true"
+                [disabled]="currentUserEmail === cliente.user.email"
+              ></p-checkbox>
+            </td>
+            <td>
+              <p-menu
+                #menu
+                [popup]="true"
+                [model]="menuItems[cliente.id]"
+                appendTo="body"
+              ></p-menu>
+              <p-button
+                icon="pi pi-ellipsis-v"
+                styleClass="p-button-text p-button-plain action-btn"
+                (click)="menu.toggle($event)"
+              ></p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Modal de Creación/Edición -->
+    <p-dialog
+      [header]="modo === 'crear' ? 'Agregar Nuevo Cliente' : 'Editar Cliente'"
+      [(visible)]="mostrarModal"
+      [modal]="true"
+      [style]="{ width: '50vw' }"
+      [closable]="true"
+      [dismissableMask]="true"
+    >
+      <form #clientForm="ngForm" (ngSubmit)="guardarCliente()">
+        <div class="form-grid">
+          <div class="form-row">
+            <div class="form-field">
+              <label for="name">Nombre</label>
+              <input
+                id="name"
+                type="text"
+                pInputText
+                [(ngModel)]="nuevoCliente.name"
+                name="name"
+                placeholder="Ej: Juan"
+                required
+                minlength="2"
+                #name="ngModel"
+              />
+              <small *ngIf="name.touched && name.invalid" class="p-error">
+                El nombre es requerido y debe tener al menos 2 caracteres.
+              </small>
+            </div>
+            <div class="form-field">
+              <label for="lastName">Apellido</label>
+              <input
+                id="lastName"
+                type="text"
+                pInputText
+                [(ngModel)]="nuevoCliente.lastName"
+                name="lastName"
+                placeholder="Ej: Pérez"
+                required
+                minlength="2"
+                #lastName="ngModel"
+              />
+              <small *ngIf="lastName.touched && lastName.invalid" class="p-error">
+                El apellido es requerido y debe tener al menos 2 caracteres.
+              </small>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="identificationNumber">Número de Identificación</label>
+              <input
+                id="identificationNumber"
+                type="text"
+                pInputText
+                [(ngModel)]="nuevoCliente.identificationNumber"
+                name="identificationNumber"
+                placeholder="Ej: 1234567890"
+                required
+                pattern="[0-9]{10}"
+                maxlength="10"
+                (input)="restrictToNumbers($event, nuevoCliente, 'identificationNumber')"
+                #identificationNumber="ngModel"
+              />
+              <small *ngIf="identificationNumber.touched && identificationNumber.invalid" class="p-error">
+                Debe tener exactamente 10 dígitos numéricos.
+              </small>
+            </div>
+            <div class="form-field">
+              <label for="birthDate">Fecha de Nacimiento</label>
+              <input
+                type="date"
+                [(ngModel)]="nuevoCliente.birthDate"
+                name="birthDate"
+                class="p-inputtext w-full"
+                required
+                [max]="today | date:'yyyy-MM-dd'"
+                #birthDate="ngModel"
+              />
+              <small *ngIf="birthDate.touched && birthDate.invalid" class="p-error">
+                La fecha de nacimiento es requerida y no puede ser futura.
+              </small>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="phoneNumber">Teléfono</label>
+              <input
+                id="phoneNumber"
+                type="text"
+                pInputText
+                [(ngModel)]="nuevoCliente.phoneNumber"
+                name="phoneNumber"
+                placeholder="Ej: 0987654321"
+                required
+                pattern="[0-9]{10}"
+                maxlength="10"
+                (input)="restrictToNumbers($event, nuevoCliente, 'phoneNumber')"
+                #phoneNumber="ngModel"
+              />
+              <small *ngIf="phoneNumber.touched && phoneNumber.invalid" class="p-error">
+                Debe tener exactamente 10 dígitos numéricos.
+              </small>
+            </div>
+            <div class="form-field">
+              <label for="address">Dirección</label>
+              <input
+                id="address"
+                type="text"
+                pInputText
+                [(ngModel)]="nuevoCliente.address"
+                name="address"
+                placeholder="Ej: Av. Principal 123"
+                required
+                minlength="5"
+                #address="ngModel"
+              />
+              <small *ngIf="address.touched && address.invalid" class="p-error">
+                La dirección debe tener al menos 5 caracteres.
+              </small>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="gender">Género</label>
+              <p-dropdown
+                id="gender"
+                [options]="['Masculino', 'Femenino']"
+                placeholder="Seleccione"
+                [(ngModel)]="nuevoCliente.gender"
+                name="gender"
+                required
+                #gender="ngModel"
+              ></p-dropdown>
+              <small *ngIf="gender.touched && gender.invalid" class="p-error">
+                El género es requerido.
+              </small>
+            </div>
+            <div class="form-field">
+              <label for="occupation">Ocupación</label>
+              <input
+                id="occupation"
+                type="text"
+                pInputText
+                [(ngModel)]="nuevoCliente.occupation"
+                name="occupation"
+                placeholder="Ej: Ingeniero"
+                required
+                minlength="2"
+                #occupation="ngModel"
+              />
+              <small *ngIf="occupation.touched && occupation.invalid" class="p-error">
+                La ocupación debe tener al menos 2 caracteres.
+              </small>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="email">Correo Electrónico</label>
+              <input
+                id="email"
+                type="email"
+                pInputText
+                [(ngModel)]="nuevoCliente.user.email"
+                name="email"
+                placeholder="Ej: cliente@dominio.com"
+                required
+                email
+                [disabled]="modo === 'editar'"
+                #email="ngModel"
+              />
+              <small *ngIf="email.touched && email.invalid" class="p-error">
+                El correo debe ser válido.
+              </small>
+            </div>
+            <div class="form-field" *ngIf="modo === 'crear'">
+              <label for="password">Las credenciales de la cuenta se enviarán a su correo*</label>
+            </div>
+          </div>
+          <div class="form-field-checkbox">
+            <p-checkbox
+              inputId="active"
+              [(ngModel)]="nuevoCliente.active"
+              name="active"
+              binary="true"
+              [disabled]="currentUserEmail === nuevoCliente.user.email"
+            ></p-checkbox>
+            <label for="active">Activo</label>
+          </div>
+        </div>
+      </form>
+      <ng-template pTemplate="footer">
+        <p-button
+          label="Cancelar"
+          icon="pi pi-times"
+          (onClick)="mostrarModal = false"
+          styleClass="p-button-text"
+        ></p-button>
+        <p-button
+          label="{{ modo === 'crear' ? 'Registrar Cliente' : 'Guardar Cambios' }}"
+          icon="pi pi-check"
+          (onClick)="guardarCliente()"
+          styleClass="p-button-primary"
+          [disabled]="clientForm?.invalid"
+        ></p-button>
+      </ng-template>
+    </p-dialog>
+
+    <!-- Modal de Visualización -->
+    <p-dialog
+      header="Detalles del Cliente"
+      [(visible)]="displayViewModal"
+      [modal]="true"
+      [style]="{ width: '50vw' }"
+      [closable]="true"
+      [dismissableMask]="true"
+    >
+      <div class="view-insurance-container" *ngIf="clienteSeleccionado">
+        <div class="view-insurance-header">
+          <h3>{{ clienteSeleccionado.name }} {{ clienteSeleccionado.lastName }}</h3>
+          <span
+            class="insurance-badge"
+            [ngClass]="{
+              active: clienteSeleccionado.active,
+              inactive: !clienteSeleccionado.active
+            }"
+          >
+            {{ clienteSeleccionado.active ? "ACTIVO" : "INACTIVO" }}
+          </span>
+        </div>
+        <div class="view-insurance-details">
+          <div class="detail-row">
+            <span class="detail-label">Documento:</span>
+            <span class="detail-value">{{ clienteSeleccionado.identificationNumber }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Edad:</span>
+            <span class="detail-value">{{ calcularEdad(clienteSeleccionado.birthDate) }} años</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Género:</span>
+            <span class="detail-value">{{ clienteSeleccionado.gender }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Nacimiento:</span>
+            <span class="detail-value">{{ clienteSeleccionado.birthDate | date:'dd/MM/yyyy' }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Teléfono:</span>
+            <span class="detail-value">{{ clienteSeleccionado.phoneNumber }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Correo:</span>
+            <span class="detail-value">{{ clienteSeleccionado.user.email }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Dirección:</span>
+            <span class="detail-value">{{ clienteSeleccionado.address }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Ocupación:</span>
+            <span class="detail-value">{{ clienteSeleccionado.occupation }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Estado:</span>
+            <span class="detail-value">{{ clienteSeleccionado.active ? "Activo" : "Inactivo" }}</span>
+          </div>
+        </div>
+      </div>
+      <ng-template pTemplate="footer">
+        <p-button
+          label="Cerrar"
+          icon="pi pi-times"
+          (onClick)="displayViewModal = false"
+
+          styleClass="p-button-text"
+        ></p-button>
+      </ng-template>
+    </p-dialog>
+  </div>
+</div>

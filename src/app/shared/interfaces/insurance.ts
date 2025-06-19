@@ -1,15 +1,18 @@
+import { Benefit } from "./benefit";
 export interface Insurance {
+
   id?: string;
   name: string;
-  type: InsuranceType;
+  type: InsuranceType | null;
   description: string;
   coverage: number;
   deductible: number;
   paymentAmount: number;
-  paymentPeriod: PaymentPeriod;
-  active?: boolean;
+  paymentPeriod: PaymentPeriod | null;
+  active: boolean | null;
+  benefits?: Benefit[]; 
+  
 }
-
 export enum InsuranceType {
   LIFE = 'LIFE',
   HEALTH = 'HEALTH',

@@ -8,6 +8,8 @@ import {
 
 describe('Insurance Utils', () => {
   describe('getInsuranceTypeOptions', () => {
+
+
     it('should return all insurance type options', () => {
       const options = getInsuranceTypeOptions();
       
@@ -51,5 +53,37 @@ describe('Insurance Utils', () => {
       const unknownPeriod = 'UNKNOWN' as PaymentPeriod;
       expect(getPaymentPeriodLabel(unknownPeriod)).toBe(unknownPeriod);
     });
+  });
+
+    it('should return correct label for known insurance type', () => {
+    expect(getInsuranceTypeLabel(InsuranceType.LIFE)).toBe('Vida');
+    expect(getInsuranceTypeLabel(InsuranceType.HEALTH)).toBe('Salud');
+  });
+
+  it('should return "Tipo no disponible" if type is null or undefined', () => {
+    expect(getInsuranceTypeLabel(null)).toBe('Tipo no disponible');
+    expect(getInsuranceTypeLabel(undefined as any)).toBe('Tipo no disponible');
+  });
+
+  it('should return "Tipo no disponible" for unknown insurance type', () => {
+    const unknownType = 'UNKNOWN' as InsuranceType;
+    expect(getInsuranceTypeLabel(unknownType)).toBe('Tipo no disponible');
+  });
+});
+
+describe('getPaymentPeriodLabel', () => {
+  it('should return correct label for known payment period', () => {
+    expect(getPaymentPeriodLabel(PaymentPeriod.MONTHLY)).toBe('Mensual');
+    expect(getPaymentPeriodLabel(PaymentPeriod.YEARLY)).toBe('Anual');
+  });
+
+  it('should return "Periodo no disponible" if period is null or undefined', () => {
+    expect(getPaymentPeriodLabel(null)).toBe('Periodo no disponible');
+    expect(getPaymentPeriodLabel(undefined as any)).toBe('Periodo no disponible');
+  });
+
+  it('should return "Periodo no disponible" for unknown payment period', () => {
+    const unknownPeriod = 'UNKNOWN' as PaymentPeriod;
+    expect(getPaymentPeriodLabel(unknownPeriod)).toBe('Periodo no disponible');
   });
 }); 

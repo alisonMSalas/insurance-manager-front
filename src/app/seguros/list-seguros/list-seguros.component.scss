@@ -1,18 +1,77 @@
-
-/* Content Area */
-.content-area {
-  padding: 2rem;
-  flex-grow: 1;
-  overflow-y: auto; /* Allow vertical scrolling */
- /* Ensure it takes full height */
+:host {
+  flex: 1;
+  display: flex;
+  height: 100%;
 }
 
-/* PrimeNG Card Overrides */
+.content-area {
+  flex: 1;
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+
+  .p-divider {
+    margin: 0;
+    margin-bottom: 0.75rem;
+  }
+}
+
+h2 {
+  margin: 0;
+}
+
+.content-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background-color: #fff;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  height: 100%;
+  min-height: 0;
+}
+
+.actions-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.filters-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .filter-group {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    label {
+      color: #000;
+      margin-bottom: 6px
+    }
+  }
+}
+
+.insurance-grid-container {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+  height: 100%;
+  padding: 0.2rem;
+}
+
 ::ng-deep .insurance-grid .p-card {
   border-radius: 1rem !important;
   box-shadow: none !important;
   border: 1px solid var(--border-color) !important;
-  position: relative; /* Ensure cards are positioned correctly in the flow */
+  position: relative;
+  overflow: auto;
 }
 
 ::ng-deep .insurance-grid .p-card .p-card-body {
@@ -23,7 +82,6 @@
   padding: 0 !important;
 }
 
-/* Encabezado */
 .insurance-header {
   display: flex;
   justify-content: space-between;
@@ -45,16 +103,14 @@
   margin-top: 0.25rem;
 }
 
-/* Grid de tarjetas */
 .insurance-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
-  position: relative; /* Ensure grid stays in document flow */
-  overflow: visible; /* Prevent clipping of cards */
+  position: relative;
+  overflow: visible;
 }
 
-/* Card styles */
 .insurance-card {
   border-radius: 0.75rem;
   background-color: #fff;
@@ -64,14 +120,13 @@
   justify-content: space-between;
   transition: all 0.2s ease-in-out;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  position: relative; /* Ensure cards don’t overlap */
+  position: relative;
 }
 
 .insurance-card:hover {
   transform: translateY(-2px);
 }
 
-/* Encabezado del card */
 .insurance-header {
   display: flex;
   justify-content: space-between;
@@ -85,7 +140,6 @@
   color: #1f2937;
 }
 
-/* Estado */
 .insurance-status {
   display: inline-flex;
   align-items: center;
@@ -120,7 +174,6 @@
   background-color: #f56565;
 }
 
-/* Tipo de seguro */
 .insurance-type {
   display: inline-block;
   padding: 0.2rem 0.6rem;
@@ -133,7 +186,6 @@
   margin-bottom: 0.5rem;
 }
 
-/* Detalles del seguro */
 .insurance-details {
   margin: 0.5rem 0;
   font-size: 0.8rem;
@@ -144,7 +196,6 @@
   margin: 0.25rem 0;
 }
 
-/* Acciones */
 .insurance-actions {
   display: flex;
   justify-content: flex-end;
@@ -180,16 +231,14 @@
   background-color: #f9fafb;
 }
 
-/* Estilos para el modal/dialogo */
 :host ::ng-deep .p-dialog {
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
   border: none;
-  position: fixed; /* Default for modals, but ensure it’s not causing issues */
-  z-index: 1000; /* Ensure modal is above other content */
+  position: fixed;
+  z-index: 1000;
 }
 
-/* Header del modal */
 :host ::ng-deep .p-dialog .p-dialog-header {
   background: linear-gradient(135deg, #407f68, #407f68);
   color: white;
@@ -199,13 +248,11 @@
   border-bottom: none;
 }
 
-/* Titulo del modal */
 :host ::ng-deep .p-dialog .p-dialog-header .p-dialog-title {
   font-weight: 600;
   font-size: 1.5rem;
 }
 
-/* Botón de cerrar */
 :host ::ng-deep .p-dialog .p-dialog-header .p-dialog-header-icon {
   color: white;
   background: rgba(255, 255, 255, 0.2);
@@ -219,14 +266,12 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
-/* Contenido del modal */
 :host ::ng-deep .p-dialog .p-dialog-content {
   padding: 1.5rem;
   background: #f8f9fa;
-  overflow-y: auto; /* Allow scrolling within modal if content is long */
+  overflow-y: auto;
 }
 
-/* Footer del modal */
 :host ::ng-deep .p-dialog .p-dialog-footer {
   border-top: 1px solid #e9ecef;
   padding: 1rem 1.5rem;
@@ -238,7 +283,6 @@
   gap: 0.5rem;
 }
 
-/* Modal Mask */
 :host ::ng-deep .p-dialog-mask {
   background-color: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(2px);
@@ -247,11 +291,10 @@
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 999; /* Below modal but above other content */
-  overflow: auto; /* Allow scrolling if needed */
+  z-index: 999;
+  overflow: auto;
 }
 
-/* Estilos para los campos del formulario */
 :host ::ng-deep .p-field label {
   font-weight: 500;
   color: #495057;
@@ -259,8 +302,8 @@
   display: block;
 }
 
-:host ::ng-deep .p-inputtext, 
-:host ::ng-deep .p-dropdown, 
+:host ::ng-deep .p-inputtext,
+:host ::ng-deep .p-dropdown,
 :host ::ng-deep .p-inputtextarea {
   width: 100%;
   border-radius: 8px;
@@ -269,20 +312,19 @@
   transition: all 0.3s;
 }
 
-:host ::ng-deep .p-inputtext:enabled:hover, 
-:host ::ng-deep .p-dropdown:not(.p-disabled):hover, 
+:host ::ng-deep .p-inputtext:enabled:hover,
+:host ::ng-deep .p-dropdown:not(.p-disabled):hover,
 :host ::ng-deep .p-inputtextarea:enabled:hover {
-  border-color: #4361ee;
+  border-color: #0069a9;
 }
 
-:host ::ng-deep .p-inputtext:enabled:focus, 
-:host ::ng-deep .p-dropdown:not(.p-disabled).p-focus, 
+:host ::ng-deep .p-inputtext:enabled:focus,
+:host ::ng-deep .p-dropdown:not(.p-disabled).p-focus,
 :host ::ng-deep .p-inputtextarea:enabled:focus {
-  border-color: #4361ee;
-  box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.2);
+  border-color: #0069a9;
+  box-shadow: 0 0 0 0.2rem rgba(0, 105, 169, 0.2);
 }
 
-/* Estilos para el checkbox */
 :host ::ng-deep .p-field-checkbox {
   display: flex;
   align-items: center;
@@ -290,7 +332,6 @@
   margin-top: 1rem;
 }
 
-/* Estilos para los botones */
 :host ::ng-deep .p-button {
   border-radius: 8px;
   padding: 0.75rem 1.5rem;
@@ -299,13 +340,14 @@
 }
 
 :host ::ng-deep .p-button.p-button-primary {
-  background: #4361ee;
-  border: 1px solid #4361ee;
+  background: #0069a9;
+  border: 1px solid #0069a9;
+  padding: 12px 18px;
 }
 
 :host ::ng-deep .p-button.p-button-primary:hover {
-  background: #3a56d4;
-  border-color: #3a56d4;
+  background: #23a0ed;
+  border-color: #1d91da;
 }
 
 :host ::ng-deep .p-button.p-button-text {
@@ -317,7 +359,6 @@
   color: #495057;
 }
 
-/* Estructura del formulario */
 .form-grid {
   display: flex;
   flex-direction: column;
@@ -340,42 +381,37 @@
   gap: 0.5rem;
 }
 
-/* Ajustes para los campos */
 :host ::ng-deep .p-inputtext,
 :host ::ng-deep .p-dropdown,
 :host ::ng-deep .p-inputtextarea {
   width: 100%;
 }
 
-/* Checkbox centrado */
 .form-field-checkbox {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-/* Textarea que ocupa toda la fila */
 :host ::ng-deep .p-inputtextarea {
   min-height: 100px;
   resize: vertical;
 }
 
-/* Ajustes responsive */
 @media (max-width: 768px) {
   .form-row {
-      grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
   }
-  
+
   .form-row-full {
-      grid-column: span 1;
+    grid-column: span 1;
   }
-  
+
   :host ::ng-deep .p-dialog {
-      width: 90vw !important;
+    width: 90vw !important;
   }
 }
 
-/* Estilos para el modal de visualización */
 .view-insurance-container {
   padding: 1rem;
 }
@@ -425,6 +461,11 @@
   border-bottom: 1px solid #f0f0f0;
 }
 
+.benefits-row {
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
 .detail-label {
   font-weight: 600;
   color: #495057;
@@ -435,35 +476,184 @@
   text-align: right;
 }
 
-/* Estilos responsivos */
 @media (max-width: 768px) {
   :host ::ng-deep .p-dialog {
-      width: 90vw !important;
+    width: 90vw !important;
   }
-  
+
   .detail-row {
-      flex-direction: column;
-      gap: 0.25rem;
+    flex-direction: column;
+    gap: 0.25rem;
   }
-  
+
   .detail-value {
-      text-align: left;
+    text-align: left;
   }
-  
+
   .insurance-grid {
-      grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
   }
-  
+
   .insurance-actions {
-      justify-content: center;
+    justify-content: center;
   }
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .insurance-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
+}
+
+/* Agrega esto a tu archivo de estilos */
+.benefit-item {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 4px;
+  margin: 0.25rem;
+  background-color: #ffffff;
+  transition: all 0.2s;
+}
+
+.benefit-item:hover {
+  background-color: #ffffff;
+  transform: translateX(5px);
+}
+
+.benefit-content {
+  flex: 1;
+  margin-left: 0.5rem;
+}
+
+.benefit-content h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #495057;
+}
+
+.benefit-content p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.p-picklist .p-picklist-list {
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.p-picklist .p-picklist-header {
+  background: #f8f9fa;
+  color: #495057;
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+}
+
+/* Estilo para los chips seleccionados */
+.p-multiselect .p-multiselect-token {
+  background: var(--primary-color);
+  color: white;
+  border-radius: 16px;
+}
+
+/* Mejorar el espaciado */
+.p-multiselect {
+  width: 100%;
+}
+
+/* Estilo para items en la lista */
+.p-multiselect-item {
+  padding: 0.75rem 1.25rem;
+}
+/* Estilos para la lista de checkboxes */
+.checkbox-list {
+  max-height: 250px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 8px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.checkbox-item:last-child {
+  border-bottom: none;
+}
+
+.checkbox-item:hover {
+  background-color: #f8f9fa;
+}
+
+.checkbox-label {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.benefit-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.benefit-description {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* Estilos para la barra de búsqueda */
+.p-input-icon-left {
+  width: 100%;
+}
+
+.p-input-icon-left i {
+  left: 10px;
+  color: #6c757d;
+}
+
+.p-input-icon-left input {
+  width: 100%;
+  padding-left: 2rem;
+}
+
+.dual-benefits-container {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.picklist-container, .checklist-container {
+  flex: 1 1 45%;
+  min-width: 300px;
+}
+
+.checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.p-ripple.cdk-drag.p-listbox-option.ng-star-inserted {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-msg {
+  color: #ba2624; 
+  margin-top: 5px;
+  font-size: 0.9rem;
 }

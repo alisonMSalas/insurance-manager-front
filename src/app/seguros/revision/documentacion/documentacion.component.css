@@ -1,0 +1,119 @@
+:host ::ng-deep .p-fileupload {
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+
+
+:host ::ng-deep .p-fileupload .p-button {
+  margin-right: 8px;
+}
+
+:host ::ng-deep .rounded-border {
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #ccc;
+}
+
+:host ::ng-deep .card {
+  border-radius: 8px;
+  padding: 16px;
+}
+
+:host ::ng-deep .p-badge {
+  font-size: 12px;
+}
+
+:host ::ng-deep .p-message {
+  font-size: 14px;
+  padding: 8px;
+}
+
+.card-documentacion {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center !important;
+  gap: 10px;
+}
+
+.save-btn {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+
+
+/* Estilos para el diálogo de rechazo */
+
+
+.rechazo-dialog .p-dialog-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+    color: #fff;
+   
+}
+
+.rechazo-dialog .p-dialog-content {
+    padding: 1.5rem;
+}
+
+.dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.dialog-label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #000000;
+}
+
+.required-asterisk {
+    color: #e55353;
+}
+
+.dialog-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.dialog-textarea:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 0.2rem rgba(99, 102, 241, 0.25);
+}
+
+.error-message {
+    color: #e55353;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 2rem;
+    padding: 1rem 1.5rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.cancel-button {
+    margin-right: auto;
+    gap: 0.5rem;
+}

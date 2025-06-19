@@ -1,14 +1,15 @@
 <div class="menu-container">
-  <div class="sidebar-logo">
-    <h3>InsureVision</h3>
-  </div>
   <div class="menu-items">
     <div *ngFor="let menu of listMenu" class="menu-item">
-      <a [href]="menu.url" class="menu-button">
+      <a
+        [routerLink]="menu.url"
+        class="menu-button"
+        [class.active]="menu.url === currentUrl"
+      >
         <i
           [class]="menu.icon"
           style="
-            margin-right: 12px;
+            margin-right: 8px;
             font-size: 1rem;
             width: 20px;
             text-align: center;

@@ -1,0 +1,191 @@
+<p-toast></p-toast>
+<div class="document-upload-container">
+  <p-card header="" class="card-documentacion">
+    <p-message
+      *ngIf="showSaveWarning"
+      severity="warn"
+      text="¡Recuerda guardar los cambios después de agregar nuevos documentos!"
+      class="mb-4"
+    ></p-message>
+    <p-fileupload
+      #fileUpload
+      name="myfile[]"
+      [customUpload]="true"
+      accept=".pdf,.jpg,.jpeg,.png"
+      [maxFileSize]="5000000"
+      [multiple]="true"
+      (onSelect)="onSelectedFiles($event)"
+      [files]="pendingFiles"
+    >
+    
+<ng-template #header let-files let-chooseCallback="chooseCallback">
+  <div class="flex flex-col w-full px-2">
+    
+    <div class="flex justify-start">
+      <p-button
+        (onClick)="choose($event, chooseCallback)"
+        icon="pi pi-images"
+        [rounded]="true"
+        [outlined]="true"
+        label="Seleccionar"
+      />
+    </div>
+  </div>
+</ng-template>
+
+
+
+      <ng-template #content let-files let-uploadedFiles="completedFiles">
+        <div class="text-sm mb-2" style="color: #6c757d;">
+      Debe subir una <strong>identificación en formato PDF</strong> y una <strong>foto en formato PNG</strong>.
+    </div>
+        <div class="flex flex-col gap-8 pt-4">
+          <div *ngIf="(completedFiles?.length || 0) > 0">
+            <div class="flex gap-4">
+              <div
+                *ngFor="let doc of completedFiles; let i = index"
+                class="card m-0 px-6 flex flex-col border border-surface items-center gap-2"
+              >
+                <div>
+                  <img
+                    role="presentation"
+                    [alt]="doc.name"
+                    [src]="getFilePreviewUrl(doc)"
+                    width="50"
+                    height="50"
+                    *ngIf="doc.type === 'image'"
+                  />
+                  <i
+                    class="pi pi-file-pdf text-3xl"
+                    *ngIf="doc.type === 'pdf'"
+                  ></i>
+                </div>
+                <span
+                  class="font-semibold text-ellipsis max-w-40 whitespace-nowrap overflow-hidden text-sm"
+                  >{{ doc.name }}</span
+                >
+                <div class="text-xs">{{ formatSize(doc.size * 1024) }}</div>
+                <p-badge
+                  [value]="
+                    doc.attachmentType === 'IDENTIFICATION'
+                      ? 'Identificación'
+                      : 'Foto'
+                  "
+                  class="mt-2"
+                  severity="success"
+                  styleClass="text-xs"
+                />
+                <div class="flex gap-1">
+                  <p-button
+                    icon="pi pi-eye"
+                    (click)="verDocumento(doc)"
+                    [outlined]="true"
+                    [rounded]="true"
+                    severity="info"
+                    styleClass="p-button-sm"
+                  />
+                  <p-button
+                    *ngIf="!documentosAprobados"
+                    icon="pi pi-times"
+                    (click)="removeCompletedFile(i)"
+                    [outlined]="true"
+                    [rounded]="true"
+                    severity="danger"
+                    styleClass="p-button-sm"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+      <ng-template #file></ng-template>
+    </p-fileupload>
+    <div class="actions" style="display: flex; justify-content: end; gap: 10px">
+      <button
+        *ngIf="documentosGuardados && !documentosAprobados"
+        pButton
+        label="Rechazar"
+        icon="pi pi-times-circle"
+        class="reject-btn"
+        severity="danger"
+        (click)="mostrarModalRechazo()"
+      ></button>
+      <button
+        *ngIf="documentosGuardados && !documentosAprobados && completedFiles.length == 2"
+        pButton
+        label="Aprobar"
+        icon="pi pi-check"
+        class="approve-btn"
+        severity="success"
+        (click)="aprobarDocumentos()"
+      ></button>
+      <button
+        *ngIf="!documentosAprobados && completedFiles.length == 2"
+        pButton
+        label="Guardar documentos"
+        icon="pi pi-save"
+        class="save-btn"
+        (click)="guardar()"
+      ></button>
+      <p-message
+        *ngIf="documentosAprobados"
+        severity="success"
+        text="¡Documentos aprobados!"
+    ></p-message>
+    </div>
+  </p-card>
+</div>
+
+<p-dialog
+  header="Motivo de Rechazo"
+  [(visible)]="modalRechazoVisible"
+  [modal]="true"
+  [breakpoints]="{ '960px': '75vw', '640px': '90vw' }"
+  [style]="{ width: '500px', 'min-width': '300px' }"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="rechazo-dialog"
+>
+  <div class="dialog-content">
+    <div class="field">
+      <label for="observacion" class="dialog-label">
+        Por favor, indique el motivo del rechazo
+        <span class="required-asterisk">*</span>
+      </label>
+      <textarea
+        id="observacion"
+        pInputTextarea
+        [(ngModel)]="observacionRechazo"
+        rows="5"
+        placeholder="Describa detalladamente los motivos del rechazo..."
+        class="dialog-textarea"
+        [autoResize]="true"
+        required
+      ></textarea>
+      <small *ngIf="!observacionRechazo && formSubmitted" class="error-message">
+        Este campo es obligatorio
+      </small>
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <div class="dialog-footer">
+      <p-button
+        label="Cancelar"
+        icon="pi pi-times"
+        (click)="cerrarModal()"
+        class="cancel-button"
+        [disabled]="procesando"
+      />
+      <p-button
+        class="button-rechazo"
+        label="Confirmar Rechazo"
+        icon="pi pi-check"
+        (click)="rechazarDocumentos()"
+        severity="danger"
+        [loading]="procesando"
+        [disabled]="!observacionRechazo"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

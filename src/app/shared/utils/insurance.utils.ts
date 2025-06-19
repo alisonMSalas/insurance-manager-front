@@ -19,12 +19,15 @@ export const getPaymentPeriodOptions = (): EnumOption[] => {
   ];
 };
 
-export const getInsuranceTypeLabel = (type: InsuranceType): string => {
+// Acepta null y devuelve un valor por defecto si no se encuentra coincidencia
+export const getInsuranceTypeLabel = (type: InsuranceType | null): string => {
+  if (!type) return 'Tipo no disponible';
   const option = getInsuranceTypeOptions().find(opt => opt.value === type);
-  return option ? option.label : type;
+  return option ? option.label : 'Tipo no disponible';
 };
 
-export const getPaymentPeriodLabel = (period: PaymentPeriod): string => {
+export const getPaymentPeriodLabel = (period: PaymentPeriod | null): string => {
+  if (!period) return 'Periodo no disponible';
   const option = getPaymentPeriodOptions().find(opt => opt.value === period);
-  return option ? option.label : period;
-}; 
+  return option ? option.label : 'Periodo no disponible';
+};

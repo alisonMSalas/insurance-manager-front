@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { provideRouter } from '@angular/router';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
@@ -8,7 +8,10 @@ describe('AppComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RouterTestingModule, AppComponent]
+      imports: [AppComponent],
+      providers: [
+        provideRouter([]) 
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppComponent);
@@ -25,8 +28,7 @@ describe('AppComponent', () => {
   });
 
   it('should render title', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
+    
     expect(component.title).toEqual('insurance-manager-front');
   });
-  
 });
