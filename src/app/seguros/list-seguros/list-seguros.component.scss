@@ -461,6 +461,11 @@ h2 {
   border-bottom: 1px solid #f0f0f0;
 }
 
+.benefits-row {
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
 .detail-label {
   font-weight: 600;
   color: #495057;

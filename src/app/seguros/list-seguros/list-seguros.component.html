@@ -193,15 +193,12 @@
                     </button>
                   </div>
                 </ng-template>
-                
-
-
 
 
               </p-pickList>
               <div *ngIf="(!selectedBenefits || selectedBenefits.length === 0) && submitted" class="error-msg">
-                  Debes escoger al menos un beneficio.
-                </div>
+                Debes escoger al menos un beneficio.
+              </div>
             </div>
           </div>
         </div>
@@ -299,6 +296,15 @@
               selectedInsurance.active ? "Activo" : "Inactivo"
               }}</span>
           </div>
+          <div class="detail-row benefits-row">
+            <span class="detail-label">Beneficios Incluidos:</span>
+            <div class="detail-valueList">
+              <ul class="benefits-list">
+                <li *ngFor="let benefit of selectedInsurance.benefits">{{ benefit.name }}</li>
+              </ul>
+            </div>
+          </div>
+
         </div>
       </div>
 
