@@ -15,6 +15,7 @@ import { Attachment, AttachmentType } from '../../../shared/interfaces/attachmen
 import { InsuranceType, PaymentPeriod } from '../../../shared/interfaces/insurance';
 import { ContractStep } from '../../../shared/interfaces/contract-step';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 describe('MainRevisionComponent (integración)', () => {
   let component: MainRevisionComponent;
@@ -127,6 +128,7 @@ describe('MainRevisionComponent (integración)', () => {
       providers: [
         { provide: ContratacionesService, useValue: mockContratacionesService },
         { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        provideNoopAnimations()
       ],
     }).compileComponents();
 

@@ -68,7 +68,8 @@ iniciarPago() {
       next: (paymentUrl: PaymentUrl) => {
         // Puedes agregar un parámetro para saber que volverás de pago
         localStorage.setItem('esperandoPago', 'true');
-        window.location.href = paymentUrl.url;
+        // Usar window.open en lugar de window.location.href para evitar reload en pruebas
+        window.open(paymentUrl.url, '_blank');
       },
       error: err => console.error('Error al iniciar sesión de pago', err)
     });

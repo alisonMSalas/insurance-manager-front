@@ -9,6 +9,7 @@ import { Client } from '../../../shared/interfaces/client';
 import { User } from '../../../core/services/users.service';
 import { ContractStep } from '../../../shared/interfaces/contract-step';
 import { PaymentUrl } from '../../../shared/interfaces/payment-url-dto';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 describe('PaymentsComponent', () => {
   let component: PaymentsComponent;
@@ -88,6 +89,7 @@ describe('PaymentsComponent', () => {
       providers: [
         { provide: ContratacionesService, useValue: mockContratacionesService },
         { provide: PaymentsService, useValue: mockPaymentsService },
+        provideNoopAnimations()
       ]
     }).compileComponents();
 
@@ -179,7 +181,7 @@ describe('PaymentsComponent', () => {
     
     expect(mockPaymentsService.createCheckoutSession).toHaveBeenCalledWith('1');
     expect(localStorage.setItem).toHaveBeenCalledWith('esperandoPago', 'true');
-    expect(window.location.href).toBe(mockPaymentUrl.url);
+    expect(window.open).toHaveBeenCalledWith(mockPaymentUrl.url, '_blank');
   }));
 
   it('debe manejar error al iniciar pago', fakeAsync(() => {

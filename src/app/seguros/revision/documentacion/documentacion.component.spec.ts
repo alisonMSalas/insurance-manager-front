@@ -7,6 +7,7 @@ import { of, throwError } from 'rxjs';
 import { AttachmentType } from '../../../shared/interfaces/attachment';
 import { Contract } from '../../../shared/interfaces/contract';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 describe('DocumentacionComponent (integración)', () => {
   let component: DocumentacionComponent;
@@ -30,6 +31,7 @@ describe('DocumentacionComponent (integración)', () => {
         { provide: AttachmentService, useValue: mockAttachmentService },
         { provide: MessageService, useValue: mockMessageService },
         { provide: ContratacionesService, useValue: mockContratacionesService },
+        provideNoopAnimations()
       ]
     }).compileComponents();
 

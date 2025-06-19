@@ -5,6 +5,7 @@ import { SegurosService } from '../service/seguros.service';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Insurance, InsuranceType, PaymentPeriod } from '../../shared/interfaces/insurance';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 describe('ListSegurosComponent', () => {
   let component: ListSegurosComponent;
@@ -19,7 +20,7 @@ describe('ListSegurosComponent', () => {
   ];
 
   beforeEach(async () => {
-    const segurosSpy = jasmine.createSpyObj('SegurosService', ['getAll', 'updateStatus', 'delete', 'save', 'update']);
+    const segurosSpy = jasmine.createSpyObj('SegurosService', ['getAll', 'updateStatus', 'delete', 'save', 'update', 'getAllBenefits']);
     const messageSpy = jasmine.createSpyObj('MessageService', ['add']);
 
     await TestBed.configureTestingModule({
@@ -27,7 +28,8 @@ describe('ListSegurosComponent', () => {
       providers: [
         { provide: SegurosService, useValue: segurosSpy },
         { provide: MessageService, useValue: messageSpy },
-        ConfirmationService
+        ConfirmationService,
+        provideNoopAnimations()
       ]
     }).compileComponents();
 

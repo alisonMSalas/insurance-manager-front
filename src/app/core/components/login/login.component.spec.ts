@@ -157,7 +157,6 @@ describe('LoginComponent', () => {
     component.onLogin();
 
     expect(mockAuthService.login).toHaveBeenCalled();
-    // El handleError debería ser llamado internamente
   });
 
   it('debe manejar respuesta exitosa como string', fakeAsync(() => {
@@ -254,7 +253,6 @@ describe('LoginComponent', () => {
     component.onLogin();
     tick();
 
-    // Según la lógica actual, igual guarda el token aunque no sea válido
     expect(localStorage.setItem).toHaveBeenCalledWith('token', 'not a valid token');
   }));
 
@@ -314,5 +312,44 @@ describe('LoginComponent', () => {
     component.onLogin();
 
     expect(mockAuthService.login).toHaveBeenCalled();
+  });
+
+  it('debe manejar token expirado en ngOnInit', () => {
+    const expiredToken = 'expired-token';
+    (localStorage.getItem as jasmine.Spy).and.returnValue(expiredToken);
+    mockJwtHelper.isTokenExpired.and.returnValue(Promise.resolve(true));
+
+    // Recrear el componente para que se ejecute ngOnInit
+    fixture = TestBed.createComponent(LoginComponent);
+    component = fixture.componentInstance;
+    
+    // Inicializar el formulario
+    component.loginForm = new FormBuilder().group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+    });
+    
+    fixture.detectChanges();
+
+    expect(mockRouter.navigate).not.toHaveBeenCalled();
+  });
+
+  it('debe manejar plataforma no browser en ngOnInit', () => {
+    // Cambiar PLATFORM_ID a 'server'
+    TestBed.overrideProvider(PLATFORM_ID, { useValue: 'server' });
+    
+    // Recrear el componente
+    fixture = TestBed.createComponent(LoginComponent);
+    component = fixture.componentInstance;
+    
+    // Inicializar el formulario
+    component.loginForm = new FormBuilder().group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+    });
+    
+    fixture.detectChanges();
+
+    expect(localStorage.getItem).not.toHaveBeenCalled();
   });
 });

@@ -5,6 +5,7 @@ import { MenubarModule } from 'primeng/menubar';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
 
 describe('MenuComponent', () => {
   let component: MenuComponent;
@@ -29,7 +30,8 @@ describe('MenuComponent', () => {
         RouterTestingModule
       ],  
       providers: [
-        { provide: MenuService, useValue: mockMenuService }
+        { provide: MenuService, useValue: mockMenuService },
+        provideNoopAnimations()
       ]
     }).compileComponents();
   });
