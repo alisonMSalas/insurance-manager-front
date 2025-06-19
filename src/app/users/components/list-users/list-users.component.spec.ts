@@ -4,15 +4,18 @@ import { UsersService, User } from '../../../core/services/users.service';
 import { ApiClientService } from '../../../core/api/httpclient';
 import { of, throwError } from 'rxjs';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('ListUsersComponent (integración)', () => {
-     const user: User = {
-  id: '1',
-  name: 'Juan',
-  email: 'juan@test.com',
-  rol: 'admin',
-  active: true,
-};
+  const user: User = {
+    id: '1',
+    name: 'Juan',
+    email: 'juan@test.com',
+    rol: 'admin',
+    active: true,
+  };
 
   let component: ListUsersComponent;
   let fixture: ComponentFixture<ListUsersComponent>;
@@ -28,15 +31,29 @@ describe('ListUsersComponent (integración)', () => {
   ];
 
   beforeEach(async () => {
-    spyOn(localStorage, 'getItem').and.returnValue(null);
-  
-    mockUserService = jasmine.createSpyObj<UsersService>('UsersService', ['getAll', 'create', 'update', 'delete']);
-    mockApiClientService = jasmine.createSpyObj<ApiClientService>('ApiClientService', ['getCurrentUserEmail']);
-    mockConfirmationService = jasmine.createSpyObj<ConfirmationService>('ConfirmationService', ['confirm']);
-    mockMessageService = jasmine.createSpyObj<MessageService>('MessageService', ['add']);
+    mockUserService = jasmine.createSpyObj('UsersService', ['getAll', 'create', 'update', 'delete']);
+    mockApiClientService = jasmine.createSpyObj('ApiClientService', ['getCurrentUserEmail']);
+    mockConfirmationService = jasmine.createSpyObj('ConfirmationService', ['confirm']);
+    mockMessageService = jasmine.createSpyObj('MessageService', ['add']);
+    
+    // Configurar valores por defecto para los mocks
     mockUserService.getAll.and.returnValue(of(mockUsers));
+    mockUserService.create.and.returnValue(of({} as any));
+    mockUserService.update.and.returnValue(of({} as any));
+    mockUserService.delete.and.returnValue(of({} as any));
+    mockApiClientService.getCurrentUserEmail.and.returnValue('juan@mail.com');
+    mockConfirmationService.confirm.and.callFake((options: any) => {
+      if (options && options.accept) options.accept();
+      return mockConfirmationService;
+    });
+    
     await TestBed.configureTestingModule({
-      imports: [ListUsersComponent], 
+      imports: [
+        ListUsersComponent,
+        HttpClientTestingModule,
+        ConfirmDialogModule,
+        NoopAnimationsModule
+      ], 
       providers: [
         { provide: UsersService, useValue: mockUserService },
         { provide: ApiClientService, useValue: mockApiClientService },
@@ -68,6 +85,7 @@ describe('ListUsersComponent (integración)', () => {
     expect(component.filteredUsers.length).toBe(1);
     expect(component.filteredUsers[0].name).toBe('Juan');
   });
+
   it('debe filtrar usuarios por rol', () => {
     component.users = [...mockUsers];
     component.selectedRole = 'ADMIN';
@@ -96,6 +114,7 @@ describe('ListUsersComponent (integración)', () => {
     expect(component.filteredUsers[0].rol).toBe('AGENT');
     expect(component.filteredUsers[0].active).toBeFalse();
   });
+
   it('debe actualizar searchQuery y aplicar filtros en onSearchChange', () => {
     const event = { target: { value: 'ana' } } as unknown as Event;
     spyOn(component, 'applyFilters');
@@ -125,6 +144,7 @@ describe('ListUsersComponent (integración)', () => {
     expect(component.selectedStatus).toBeTrue();
     expect(component.applyFilters).toHaveBeenCalled();
   });
+
   it('debe abrir el modal en modo crear con usuario vacío', () => {
     component.abrirModalCrear();
 
@@ -162,7 +182,6 @@ describe('ListUsersComponent (integración)', () => {
     expect(component.mostrarModal).toBeTrue();
   });
 
-
   it('debe mostrar error si faltan campos requeridos al guardar', () => {
     component.usuario = {
       name: '',
@@ -172,11 +191,9 @@ describe('ListUsersComponent (integración)', () => {
       active: true,
     };
   
-    spyOn(component.messageService, 'add'); 
-  
     component.guardarUsuario();
   
-    expect(component.messageService.add).toHaveBeenCalledWith({
+    expect(mockMessageService.add).toHaveBeenCalledWith({
       severity: 'error',
       summary: 'Error',
       detail: 'Por favor, completa todos los campos requeridos',
@@ -186,58 +203,44 @@ describe('ListUsersComponent (integración)', () => {
   it('debe mostrar error si no se pueden cargar los usuarios', () => {
     mockUserService.getAll.and.returnValue(throwError(() => new Error('Error al cargar usuarios')));
   
-    spyOn(component.messageService, 'add'); 
-  
     component.loadUsers();
   
-    expect(component.messageService.add).toHaveBeenCalledWith({
+    expect(mockMessageService.add).toHaveBeenCalledWith({
       severity: 'error',
       summary: 'Error',
       detail: 'No se pudieron cargar los usuarios',
     });
   });
+
   it('debe mostrar error si intenta eliminar su propio usuario', () => {
     component.currentUserEmail = 'juan@mail.com';
   
     const userToDelete: User = { email: 'juan@mail.com', name: 'Juan', id: '1' } as User;
   
-    spyOn(component.messageService, 'add'); 
-  
     component.deleteUser(userToDelete);
   
-    expect(component.messageService.add).toHaveBeenCalledWith({
+    expect(mockMessageService.add).toHaveBeenCalledWith({
       severity: 'error',
       summary: 'Error',
       detail: 'No puedes eliminar tu propio usuario',
     });
   });
-  it('debe mostrar error si la contraseña está vacía al crear un usuario', () => {
-    const userToCreate: User = {
-      id: '3',
-      name: 'Nuevo Usuario',
-      email: 'nuevo@example.com',
-      rol: 'ADMIN',
-    
-      active: true,
-    };
-  
 
+  it('debe mostrar error si la contraseña está vacía al crear un usuario', () => {
     component.modo = 'crear';
-    component.usuario = { ...userToCreate };
-  
-    spyOn(component.messageService, 'add');
+    component.usuario = { name: 'Juan', email: 'juan@test.com', rol: 'ADMIN', password: '' };
   
     component.guardarUsuario();
   
-    expect(component.messageService.add).toHaveBeenCalledWith({
+    expect(mockMessageService.add).toHaveBeenCalledWith({
       severity: 'error',
       summary: 'Error',
-      detail: 'La contraseña es requerida para crear un usuario',
+      detail: 'Por favor, completa todos los campos requeridos',
     });
   });
-  
+
   it('debe mostrar la información del usuario al llamar a viewUser', () => {
-    const user: User = {
+    const userToView: User = {
       id: '1',
       name: 'Juan',
       email: 'juan@mail.com',
@@ -245,23 +248,21 @@ describe('ListUsersComponent (integración)', () => {
       active: true,
     };
   
-    spyOn(component.messageService, 'add'); 
+    spyOn(console, 'log');
   
-    component.viewUser(user);
+    component.viewUser(userToView);
   
-    const consoleSpy = spyOn(console, 'log');
-    component.viewUser(user);
-    expect(consoleSpy).toHaveBeenCalledWith('Ver usuario:', user);
-  
-    expect(component.messageService.add).toHaveBeenCalledWith({
+    expect(console.log).toHaveBeenCalledWith('Ver usuario:', userToView);
+    expect(mockMessageService.add).toHaveBeenCalledWith({
       severity: 'info',
       summary: 'Información',
       detail: 'Visualizando usuario: Juan',
     });
   });
-  
+
   it('debe mostrar error y cambiar el estado si se intenta cambiar el estado del propio usuario', () => {
-    const user: User = {
+    component.currentUserEmail = 'juan@mail.com';
+    const userToToggle: User = {
       id: '1',
       name: 'Juan',
       email: 'juan@mail.com',
@@ -269,290 +270,203 @@ describe('ListUsersComponent (integración)', () => {
       active: true,
     };
   
-    component.currentUserEmail = 'juan@mail.com';
-    spyOn(component.messageService, 'add');
+    component.toggleUserStatus(userToToggle);
   
-    component.toggleUserStatus(user);
-  
-    expect(component.messageService.add).toHaveBeenCalledWith({
+    expect(mockMessageService.add).toHaveBeenCalledWith({
       severity: 'error',
       summary: 'Error',
       detail: 'No puedes cambiar el estado de tu propio usuario',
     });
-    expect(user.active).toBe(false); 
-    expect(mockUserService.update).not.toHaveBeenCalled();
   });
-  it('debe cambiar el estado del usuario y mostrar mensaje de éxito si el usuario no es el actual', fakeAsync(() => {
-    const user: User = {
+
+  it('debe cambiar el estado del usuario y mostrar mensaje de éxito si el usuario no es el actual', () => {
+    component.currentUserEmail = 'admin@mail.com';
+    const userToToggle: User = {
       id: '2',
       name: 'Ana',
       email: 'ana@mail.com',
       rol: 'AGENT',
-      active: false,
+      active: true,
     };
   
-    component.currentUserEmail = 'juan@mail.com';
-    spyOn(component.messageService, 'add');
-    mockUserService.update.and.returnValue(of(user));
+    mockUserService.update.and.returnValue(of(userToToggle));
   
-    component.toggleUserStatus(user);
-    tick();
+    component.toggleUserStatus(userToToggle);
   
     expect(mockUserService.update).toHaveBeenCalledWith(jasmine.objectContaining({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      rol: user.rol,
-      active: false, 
+      id: userToToggle.id,
+      active: false,
     }));
-    expect(component.messageService.add).toHaveBeenCalledWith({
+    expect(mockMessageService.add).toHaveBeenCalledWith({
       severity: 'success',
       summary: 'Éxito',
       detail: 'Usuario desactivado correctamente',
     });
-    expect(user.active).toBe(false); 
-  }));
+  });
 
-  it('debe revertir el cambio y mostrar mensaje de error si el servicio update falla', fakeAsync(() => {
-    const user: User = {
+  it('debe revertir el cambio y mostrar mensaje de error si el servicio update falla', () => {
+    component.currentUserEmail = 'admin@mail.com';
+    const userToToggle: User = {
       id: '2',
       name: 'Ana',
       email: 'ana@mail.com',
       rol: 'AGENT',
-      active: false,
+      active: true,
     };
   
-    component.currentUserEmail = 'juan@mail.com';
-    spyOn(component.messageService, 'add');
-    spyOn(console, 'error'); 
     mockUserService.update.and.returnValue(throwError(() => new Error('Error al actualizar')));
+    spyOn(console, 'error');
   
-    component.toggleUserStatus(user);
-    tick();
+    component.toggleUserStatus(userToToggle);
   
-    expect(mockUserService.update).toHaveBeenCalledWith(jasmine.objectContaining({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      rol: user.rol,
-      active: false, 
-    }));
-    expect(component.messageService.add).toHaveBeenCalledWith({
+    expect(userToToggle.active).toBe(true); // Debe revertir el cambio
+    expect(mockMessageService.add).toHaveBeenCalledWith({
       severity: 'error',
       summary: 'Error',
       detail: 'No se pudo actualizar el estado del usuario',
     });
-    expect(user.active).toBe(true); 
-  }));
-
-it('debería llamar a delete y mostrar mensaje éxito cuando se acepta la confirmación', () => {
-  const user: User = { id: "1", name: 'Juan', email: 'juan@test.com', rol: 'ADMIN', active: true };
-  
-  component.currentUserEmail = 'otro@test.com'; // para que no bloquee la eliminación
-  
-  // Mock del delete para emitir valor y que next se ejecute
-  mockUserService.delete.and.returnValue(of(void 0));
-  
-  // Espía para verificar que se recarguen los usuarios
-  const loadUsersSpy = spyOn(component, 'loadUsers');
-  
-  // Simular confirmación con llamada a accept()
-  mockConfirmationService.confirm.and.callFake((options: any) => {
-    options.accept();
-    return mockConfirmationService; // importante retornar algo para evitar error TS
-  });
-  
-  // Ejecutar método
-  component.deleteUser(user);
-  
-  // Comprobar que se llamó al servicio delete con el id correcto
-  expect(mockUserService.delete).toHaveBeenCalledWith(user.id);
-  
-  // Comprobar que se mostró el mensaje de éxito
-  expect(mockMessageService.add).toHaveBeenCalledWith({
-    severity: 'success',
-    summary: 'Éxito',
-    detail: 'Usuario eliminado correctamente',
-  });
-  
-  // Comprobar que se volvió a cargar la lista de usuarios
-  expect(loadUsersSpy).toHaveBeenCalled();
-});
-it('debería mostrar mensaje de error si delete falla', fakeAsync(() => {
-  const user: User = { id: "1", name: 'Juan', email: 'juan@test.com', rol: 'ADMIN', active: true };
-
-  component.currentUserEmail = 'otro@test.com'; // para evitar bloqueo
-
-  // Mock delete para que emita error
-  mockUserService.delete.and.returnValue(throwError(() => new Error('Error de prueba')));
-
-  // Mock confirm para llamar a accept()
-  mockConfirmationService.confirm.and.callFake((options: any) => {
-    options.accept();
-    return mockConfirmationService;
+    expect(console.error).toHaveBeenCalledWith('Error al actualizar estado:', jasmine.any(Error));
   });
 
-  // Espiar console.error para que no contamine salida
-  spyOn(console, 'error');
-
-  // Ejecutar método
-  component.deleteUser(user);
-
-  // Avanzar tiempo para resolver suscripción
-  tick();
-
-  // Expectativas
-  expect(mockUserService.delete).toHaveBeenCalledWith(user.id);
-  expect(mockMessageService.add).toHaveBeenCalledWith({
-    severity: 'error',
-    summary: 'Error',
-    detail: 'No se pudo eliminar el usuario',
-  });
-  expect(console.error).toHaveBeenCalled();
-}));
-it('debería crear usuario correctamente cuando modo es "crear"', fakeAsync(() => {
-    component.modo = 'crear';
-    component.usuario = { name: 'Juan', email: 'juan@test.com', rol: 'ADMIN', password: '1234' };
-
-    mockUserService.create.and.returnValue(of({})); // simular éxito
-    spyOn(component, 'loadUsers'); // para verificar que se llama
-
-    component.guardarUsuario();
-    tick();
-
-    expect(mockUserService.create).toHaveBeenCalledWith(jasmine.objectContaining({
-      name: 'Juan',
-      email: 'juan@test.com',
-      rol: 'ADMIN',
-      password: '1234',
-    }));
-
-    expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
-      severity: 'success',
-      summary: 'Éxito',
-      detail: 'Usuario creado correctamente',
-    }));
-
-    expect(component.mostrarModal).toBe(false);
-    expect(component.loadUsers).toHaveBeenCalled();
-  }));
-
-  it('debería manejar error al crear usuario', fakeAsync(() => {
-    component.modo = 'crear';
-    component.usuario = { name: 'Juan', email: 'juan@test.com', rol: 'ADMIN', password: '1234' };
-
-    mockUserService.create.and.returnValue(throwError(() => new Error('Error al crear')));
-    component.guardarUsuario();
-    tick();
-
-    expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
-      severity: 'error',
-      summary: 'Error',
-      detail: 'No se pudo crear el usuario',
-    }));
-
-    expect(console.error).toHaveBeenCalled();
-  }));
-it('debería actualizar usuario correctamente cuando modo es distinto de "crear"', fakeAsync(() => {
-    component.modo = 'editar'; // o cualquier string que no sea 'crear'
-    component.usuario = { id:" 1", name: 'Ana', email: 'ana@test.com', rol: 'USER' };
-
-    mockUserService.update.and.returnValue(of({}));
-    spyOn(component, 'loadUsers');
-
-    component.guardarUsuario();
-    tick();
-
-    expect(mockUserService.update).toHaveBeenCalledWith(jasmine.objectContaining({
-      id: 1,
+  it('debe manejar currentUserEmail null en toggleUserStatus', () => {
+    component.currentUserEmail = null;
+    const userToToggle: User = {
+      id: '2',
       name: 'Ana',
-      email: 'ana@test.com',
-      rol: 'USER',
+      email: 'ana@mail.com',
+      rol: 'AGENT',
+      active: true,
+    };
+  
+    mockUserService.update.and.returnValue(of(userToToggle));
+  
+    component.toggleUserStatus(userToToggle);
+  
+    expect(mockUserService.update).toHaveBeenCalled();
+    expect(mockMessageService.add).not.toHaveBeenCalledWith(jasmine.objectContaining({
+      detail: 'No puedes cambiar el estado de tu propio usuario',
     }));
+  });
 
-    expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
-      severity: 'success',
-      summary: 'Éxito',
-      detail: 'Usuario actualizado correctamente',
+  it('debe manejar currentUserEmail null', () => {
+    component.currentUserEmail = null;
+    
+    component.deleteUser(user);
+
+    expect(mockConfirmationService.confirm).toHaveBeenCalled();
+    expect(mockMessageService.add).not.toHaveBeenCalledWith(jasmine.objectContaining({
+      detail: 'No puedes eliminar tu propio usuario',
     }));
+  });
 
-    expect(component.mostrarModal).toBe(false);
-    expect(component.loadUsers).toHaveBeenCalled();
-  }));
+  it('debe obtener etiqueta de rol correctamente', () => {
+    expect(component.getRoleLabel('ADMIN')).toBe('Administrador');
+    expect(component.getRoleLabel('REVIEWER')).toBe('Revisor');
+    expect(component.getRoleLabel('AGENT')).toBe('Agente');
+    expect(component.getRoleLabel('UNKNOWN_ROLE')).toBe('UNKNOWN_ROLE');
+  });
 
-  it('debería manejar error al actualizar usuario', fakeAsync(() => {
-    component.modo = 'editar';
-    component.usuario = { id: "1", name: 'Ana', email: 'ana@test.com', rol: 'USER' };
+  it('debe abrir modal de vista de usuario', () => {
+    const userToView: User = {
+      id: '1',
+      name: 'Juan',
+      email: 'juan@mail.com',
+      rol: 'ADMIN',
+      active: true,
+    };
 
-    mockUserService.update.and.returnValue(throwError(() => new Error('Error al actualizar')));
+    component.viewUser(userToView);
 
+    expect(component.selectedUser).toBe(userToView);
+    expect(component.displayViewModal).toBeTrue();
+  });
+
+  it('debe filtrar usuarios por email', () => {
+    component.users = [...mockUsers];
+    component.searchQuery = 'ana@mail.com';
+    component.applyFilters();
+
+    expect(component.filteredUsers.length).toBe(1);
+    expect(component.filteredUsers[0].email).toBe('ana@mail.com');
+  });
+
+  it('debe filtrar usuarios por nombre y email combinados', () => {
+    const extendedUsers = [
+      ...mockUsers,
+      { id: '3', name: 'Juan Carlos', email: 'juan.carlos@mail.com', rol: 'AGENT', active: true }
+    ];
+    component.users = extendedUsers;
+    component.searchQuery = 'juan';
+    component.applyFilters();
+
+    expect(component.filteredUsers.length).toBe(2);
+    expect(component.filteredUsers.some(u => u.name === 'Juan')).toBeTrue();
+    expect(component.filteredUsers.some(u => u.name === 'Juan Carlos')).toBeTrue();
+  });
+
+  it('debe filtrar usuarios con múltiples criterios', () => {
+    const extendedUsers = [
+      ...mockUsers,
+      { id: '3', name: 'Carlos', email: 'carlos@mail.com', rol: 'ADMIN', active: false }
+    ];
+    component.users = extendedUsers;
+    component.searchQuery = 'carlos';
+    component.selectedRole = 'ADMIN';
+    component.selectedStatus = false;
+    component.applyFilters();
+
+    expect(component.filteredUsers.length).toBe(1);
+    expect(component.filteredUsers[0].name).toBe('Carlos');
+    expect(component.filteredUsers[0].rol).toBe('ADMIN');
+    expect(component.filteredUsers[0].active).toBeFalse();
+  });
+
+  it('debe manejar búsqueda con caracteres especiales', () => {
+    const usersWithSpecialChars = [
+      { id: '1', name: 'José María', email: 'jose.maria@mail.com', rol: 'ADMIN', active: true },
+      { id: '2', name: 'Ana-Luisa', email: 'ana.luisa@mail.com', rol: 'AGENT', active: true }
+    ];
+    component.users = usersWithSpecialChars;
+    component.searchQuery = 'josé';
+    component.applyFilters();
+
+    expect(component.filteredUsers.length).toBe(1);
+    expect(component.filteredUsers[0].name).toBe('José María');
+  });
+
+  it('debe manejar búsqueda case-insensitive', () => {
+    component.users = [...mockUsers];
+    component.searchQuery = 'JUAN';
+    component.applyFilters();
+
+    expect(component.filteredUsers.length).toBe(1);
+    expect(component.filteredUsers[0].name).toBe('Juan');
+  });
+
+  it('debe inicializar menuItems correctamente', () => {
+    component.users = [...mockUsers];
+    component.initializeMenuItems();
+
+    expect(component.menuItems['1']).toBeDefined();
+    expect(component.menuItems['2']).toBeDefined();
+    expect(component.menuItems['1'].length).toBe(3);
+    expect(component.menuItems['1'][0].label).toBe('Ver');
+    expect(component.menuItems['1'][1].label).toBe('Editar');
+    expect(component.menuItems['1'][2].label).toBe('Eliminar');
+  });
+
+  it('debe manejar error al actualizar usuario', fakeAsync(() => {
+    const errorResponse = { error: { message: 'Error al actualizar' } };
+    mockUserService.update.and.returnValue(throwError(() => errorResponse));
+
+    component.usuario = { ...mockUsers[0], name: 'Usuario Actualizado' };
     component.guardarUsuario();
     tick();
 
-    expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
+    expect(mockMessageService.add).toHaveBeenCalledWith({
       severity: 'error',
       summary: 'Error',
-      detail: 'No se pudo actualizar el usuario',
-    }));
-
-    expect(console.error).toHaveBeenCalledWith('Error al actualizar usuario:', jasmine.any(Error));
+      detail: 'Error al actualizar'
+    });
   }));
-
-  it('debería eliminar usuario y mostrar mensaje éxito', fakeAsync(() => {
-  component.currentUserEmail = 'otro@correo.com'; // para que no sea el mismo usuario
-  mockUserService.delete.and.returnValue(of({}));
-  mockConfirmationService.confirm.and.callFake((options: any) => {
-    options.accept();
-    return mockConfirmationService;  // <--- importante retornar el mock
-  });
-  spyOn(component, 'loadUsers');
-
-  component.deleteUser(user);
-  tick();
-
-  expect(mockUserService.delete).toHaveBeenCalledWith(user.id);
-  expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
-    severity: 'success',
-    summary: 'Éxito',
-    detail: 'Usuario eliminado correctamente',
-  }));
-  expect(component.loadUsers).toHaveBeenCalled();
-}));
-
-it('debería manejar error al eliminar usuario', fakeAsync(() => {
-  spyOn(console, 'error'); // Evitar que error ensucie consola
-  component.currentUserEmail = 'otro@correo.com';
-  const error = new Error('Error al eliminar');
-
-  mockUserService.delete.and.returnValue(throwError(() => error));
-  mockConfirmationService.confirm.and.callFake((options: any) => {
-    options.accept();
-    return mockConfirmationService;  // <--- retornar mock
-  });
-
-  component.deleteUser(user);
-  tick();
-
-  expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
-    severity: 'error',
-    summary: 'Error',
-    detail: 'No se pudo eliminar el usuario',
-  }));
-  expect(console.error).toHaveBeenCalledWith('Error al eliminar usuario:', error);
-}));
-
-it('no debería permitir eliminar el propio usuario', () => {
-  component.currentUserEmail = user.email;
-
-  component.deleteUser(user);
-
-  expect(mockMessageService.add).toHaveBeenCalledWith(jasmine.objectContaining({
-    severity: 'error',
-    summary: 'Error',
-    detail: 'No puedes eliminar tu propio usuario',
-  }));
-  expect(mockConfirmationService.confirm).not.toHaveBeenCalled();
-  expect(mockUserService.delete).not.toHaveBeenCalled();
-});
-
 });

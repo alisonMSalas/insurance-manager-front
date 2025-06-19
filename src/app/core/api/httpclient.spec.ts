@@ -1,183 +1,262 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ApiClientService } from './httpclient';
+import { HttpClient } from '@angular/common/http';
+import { of } from 'rxjs';
 import { PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 describe('ApiClientService', () => {
   let service: ApiClientService;
-  let httpMock: HttpTestingController;
-  let getItemSpy: jasmine.Spy;
-  const mockToken = 'mock.token.here';
+  let httpClientSpy: jasmine.SpyObj<HttpClient>;
+  let platformId: string;
 
   beforeEach(() => {
+    const spy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'put', 'delete']);
+    platformId = 'browser';
+
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       providers: [
         ApiClientService,
-        { provide: PLATFORM_ID, useValue: 'browser' }
+        { provide: HttpClient, useValue: spy },
+        { provide: PLATFORM_ID, useValue: platformId }
       ]
     });
-
     service = TestBed.inject(ApiClientService);
-    httpMock = TestBed.inject(HttpTestingController);
-
-    getItemSpy = spyOn(localStorage, 'getItem').and.returnValue(mockToken);
+    httpClientSpy = TestBed.inject(HttpClient) as jasmine.SpyObj<HttpClient>;
   });
 
-  afterEach(() => {
-    httpMock.verify();
-    getItemSpy.and.callThrough();
-  });
-
-  it('should be created', () => {
+  it('debe ser creado', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('HTTP Methods', () => {
-    it('should make GET request with correct headers', () => {
-      const testEndpoint = 'test';
+  describe('get', () => {
+    it('debe hacer GET request con headers correctos', () => {
       const mockResponse = { data: 'test' };
+      httpClientSpy.get.and.returnValue(of(mockResponse));
+      spyOn(localStorage, 'getItem').and.returnValue('mock-token');
 
-      service.get(testEndpoint).subscribe(response => {
-        expect(response).toEqual(mockResponse);
+      service.get('test-endpoint').subscribe(result => {
+        expect(result).toEqual(mockResponse);
       });
 
-      const req = httpMock.expectOne(`http://localhost:8080/${testEndpoint}`);
-      expect(req.request.method).toBe('GET');
-      expect(req.request.headers.get('Authorization')).toBe(`Bearer ${mockToken}`);
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-
-      req.flush(mockResponse);
+      expect(httpClientSpy.get).toHaveBeenCalledWith(
+        'http://localhost:8080/test-endpoint',
+        { headers: jasmine.any(Object) }
+      );
     });
 
-    it('should make POST request with correct headers and body', () => {
-      const testEndpoint = 'test';
-      const testBody = { name: 'test' };
-      const mockResponse = { success: true };
+    it('debe hacer GET request sin token cuando no hay token en localStorage', () => {
+      const mockResponse = { data: 'test' };
+      httpClientSpy.get.and.returnValue(of(mockResponse));
+      spyOn(localStorage, 'getItem').and.returnValue(null);
 
-      service.post(testEndpoint, testBody).subscribe(response => {
-        expect(response).toEqual(mockResponse);
+      service.get('test-endpoint').subscribe(result => {
+        expect(result).toEqual(mockResponse);
       });
 
-      const req = httpMock.expectOne(`http://localhost:8080/${testEndpoint}`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.headers.get('Authorization')).toBe(`Bearer ${mockToken}`);
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-      expect(req.request.body).toEqual(testBody);
-
-      req.flush(mockResponse);
+      expect(httpClientSpy.get).toHaveBeenCalledWith(
+        'http://localhost:8080/test-endpoint',
+        { headers: jasmine.any(Object) }
+      );
     });
+  });
 
-    it('should make PUT request with correct headers and body', () => {
-      const testEndpoint = 'test';
-      const testBody = { name: 'test' };
+  describe('post', () => {
+    it('debe hacer POST request con body y headers correctos', () => {
       const mockResponse = { success: true };
+      const mockBody = { name: 'test' };
+      httpClientSpy.post.and.returnValue(of(mockResponse));
+      spyOn(localStorage, 'getItem').and.returnValue('mock-token');
 
-      service.put(testEndpoint, testBody).subscribe(response => {
-        expect(response).toEqual(mockResponse);
+      service.post('test-endpoint', mockBody).subscribe(result => {
+        expect(result).toEqual(mockResponse);
       });
 
-      const req = httpMock.expectOne(`http://localhost:8080/${testEndpoint}`);
-      expect(req.request.method).toBe('PUT');
-      expect(req.request.headers.get('Authorization')).toBe(`Bearer ${mockToken}`);
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
-      expect(req.request.body).toEqual(testBody);
-
-      req.flush(mockResponse);
+      expect(httpClientSpy.post).toHaveBeenCalledWith(
+        'http://localhost:8080/test-endpoint',
+        mockBody,
+        { headers: jasmine.any(Object) }
+      );
     });
+  });
 
-    it('should make DELETE request with correct headers', () => {
-      const testEndpoint = 'test';
+  describe('put', () => {
+    it('debe hacer PUT request con body y headers correctos', () => {
       const mockResponse = { success: true };
+      const mockBody = { id: 1, name: 'test' };
+      httpClientSpy.put.and.returnValue(of(mockResponse));
+      spyOn(localStorage, 'getItem').and.returnValue('mock-token');
 
-      service.delete(testEndpoint).subscribe(response => {
-        expect(response).toEqual(mockResponse);
+      service.put('test-endpoint', mockBody).subscribe(result => {
+        expect(result).toEqual(mockResponse);
       });
 
-      const req = httpMock.expectOne(`http://localhost:8080/${testEndpoint}`);
-      expect(req.request.method).toBe('DELETE');
-      expect(req.request.headers.get('Authorization')).toBe(`Bearer ${mockToken}`);
-      expect(req.request.headers.get('Content-Type')).toBe('application/json');
+      expect(httpClientSpy.put).toHaveBeenCalledWith(
+        'http://localhost:8080/test-endpoint',
+        mockBody,
+        { headers: jasmine.any(Object) }
+      );
+    });
+  });
 
-      req.flush(mockResponse);
+  describe('delete', () => {
+    it('debe hacer DELETE request con headers correctos', () => {
+      const mockResponse = { success: true };
+      httpClientSpy.delete.and.returnValue(of(mockResponse));
+      spyOn(localStorage, 'getItem').and.returnValue('mock-token');
+
+      service.delete('test-endpoint').subscribe(result => {
+        expect(result).toEqual(mockResponse);
+      });
+
+      expect(httpClientSpy.delete).toHaveBeenCalledWith(
+        'http://localhost:8080/test-endpoint',
+        { headers: jasmine.any(Object) }
+      );
     });
   });
 
   describe('postForm', () => {
-    it('should make POST request with FormData and correct headers', () => {
-      const testEndpoint = 'upload';
-      const formData = new FormData();
-      formData.append('file', new Blob(['test content'], { type: 'text/plain' }));
+    it('debe hacer POST request con FormData y token', () => {
       const mockResponse = { success: true };
+      const formData = new FormData();
+      formData.append('file', new Blob(['test']));
+      httpClientSpy.post.and.returnValue(of(mockResponse));
+      spyOn(localStorage, 'getItem').and.returnValue('mock-token');
 
-      service.postForm(testEndpoint, formData).subscribe(response => {
-        expect(response).toEqual(mockResponse);
+      service.postForm('test-endpoint', formData).subscribe(result => {
+        expect(result).toEqual(mockResponse);
       });
 
-      const req = httpMock.expectOne(`http://localhost:8080/${testEndpoint}`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.headers.get('Authorization')).toBe(`Bearer ${mockToken}`);
-      expect(req.request.body instanceof FormData).toBeTruthy();
-
-      req.flush(mockResponse);
+      expect(httpClientSpy.post).toHaveBeenCalledWith(
+        'http://localhost:8080/test-endpoint',
+        formData,
+        { headers: jasmine.any(Object) }
+      );
     });
 
-    it('should make POST request without Authorization header when token is null', () => {
-      getItemSpy.and.returnValue(null);
-      const testEndpoint = 'upload';
-      const formData = new FormData();
+    it('debe hacer POST request con FormData sin token', () => {
       const mockResponse = { success: true };
+      const formData = new FormData();
+      formData.append('file', new Blob(['test']));
+      httpClientSpy.post.and.returnValue(of(mockResponse));
+      spyOn(localStorage, 'getItem').and.returnValue(null);
 
-      service.postForm(testEndpoint, formData).subscribe(response => {
-        expect(response).toEqual(mockResponse);
+      service.postForm('test-endpoint', formData).subscribe(result => {
+        expect(result).toEqual(mockResponse);
       });
 
-      const req = httpMock.expectOne(`http://localhost:8080/${testEndpoint}`);
-      expect(req.request.method).toBe('POST');
-      expect(req.request.headers.get('Authorization')).toBeNull();
-      expect(req.request.body instanceof FormData).toBeTruthy();
-
-      req.flush(mockResponse);
+      expect(httpClientSpy.post).toHaveBeenCalledWith(
+        'http://localhost:8080/test-endpoint',
+        formData,
+        { headers: jasmine.any(Object) }
+      );
     });
   });
 
   describe('getCurrentUserEmail', () => {
-    it('should return email from token', () => {
-      const validToken = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIn0.signature';
-      getItemSpy.and.returnValue(validToken);
+    it('debe retornar email del usuario desde token válido', () => {
+      const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+      spyOn(localStorage, 'getItem').and.returnValue(mockToken);
 
-      const email = service.getCurrentUserEmail();
-      expect(email).toBe('test@example.com');
+      const result = service.getCurrentUserEmail();
+      expect(result).toBe('test@example.com');
     });
 
-    it('should return null when token is invalid', () => {
-      getItemSpy.and.returnValue('invalid-token');
+    it('debe retornar null cuando no hay token', () => {
+      spyOn(localStorage, 'getItem').and.returnValue(null);
 
-      const email = service.getCurrentUserEmail();
-      expect(email).toBeNull();
+      const result = service.getCurrentUserEmail();
+      expect(result).toBeNull();
     });
 
-    it('should return null when token is missing', () => {
-      getItemSpy.and.returnValue(null);
+    it('debe retornar null cuando el token no tiene payload', () => {
+      const invalidToken = 'invalid.token';
+      spyOn(localStorage, 'getItem').and.returnValue(invalidToken);
 
-      const email = service.getCurrentUserEmail();
-      expect(email).toBeNull();
+      const result = service.getCurrentUserEmail();
+      expect(result).toBeNull();
     });
 
-    it('should return null when token payload is invalid', () => {
-      const invalidPayloadToken = 'header.invalid-payload.signature';
-      getItemSpy.and.returnValue(invalidPayloadToken);
+    it('debe retornar null cuando el payload no es JSON válido', () => {
+      const invalidToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.aW52YWxpZC5wYXlsb2Fk.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+      spyOn(localStorage, 'getItem').and.returnValue(invalidToken);
 
-      const email = service.getCurrentUserEmail();
-      expect(email).toBeNull();
+      const result = service.getCurrentUserEmail();
+      expect(result).toBeNull();
     });
 
-    it('should return null when token payload is not JSON', () => {
-      const nonJsonPayloadToken = 'header.' + btoa('not-json') + '.signature';
-      getItemSpy.and.returnValue(nonJsonPayloadToken);
+    it('debe retornar null cuando el payload no tiene sub', () => {
+      const tokenWithoutSub = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSm9obiBEb2UiLCJpYXQiOjE1MTYyMzkwMjJ9.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+      spyOn(localStorage, 'getItem').and.returnValue(tokenWithoutSub);
 
-      const email = service.getCurrentUserEmail();
-      expect(email).toBeNull();
+      const result = service.getCurrentUserEmail();
+      expect(result).toBeNull();
+    });
+
+    it('debe manejar error al decodificar token', () => {
+      const invalidToken = 'invalid-token';
+      spyOn(localStorage, 'getItem').and.returnValue(invalidToken);
+      spyOn(console, 'error');
+
+      const result = service.getCurrentUserEmail();
+      expect(result).toBeNull();
+      expect(console.error).toHaveBeenCalledWith('Error al decodificar el token:', jasmine.any(Error));
     });
   });
-});
+
+  describe('headers', () => {
+    it('debe incluir Authorization header cuando hay token', () => {
+      spyOn(localStorage, 'getItem').and.returnValue('mock-token');
+      const mockResponse = { data: 'test' };
+      httpClientSpy.get.and.returnValue(of(mockResponse));
+
+      service.get('test').subscribe();
+
+      const callArgs = httpClientSpy.get.calls.mostRecent().args;
+      const headers = callArgs[1].headers;
+      expect(headers.get('Authorization')).toBe('Bearer mock-token');
+      expect(headers.get('Content-Type')).toBe('application/json');
+    });
+
+    it('no debe incluir Authorization header cuando no hay token', () => {
+      spyOn(localStorage, 'getItem').and.returnValue(null);
+      const mockResponse = { data: 'test' };
+      httpClientSpy.get.and.returnValue(of(mockResponse));
+
+      service.get('test').subscribe();
+
+      const callArgs = httpClientSpy.get.calls.mostRecent().args;
+      const headers = callArgs[1].headers;
+      expect(headers.get('Authorization')).toBeNull();
+      expect(headers.get('Content-Type')).toBe('application/json');
+    });
+  });
+
+  describe('server-side rendering', () => {
+    it('debe manejar SSR correctamente cuando no es browser', () => {
+      // Cambiar a platform server
+      TestBed.resetTestingModule();
+      const spy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'put', 'delete']);
+      
+      TestBed.configureTestingModule({
+        providers: [
+          ApiClientService,
+          { provide: HttpClient, useValue: spy },
+          { provide: PLATFORM_ID, useValue: 'server' }
+        ]
+      });
+      
+      const serverService = TestBed.inject(ApiClientService);
+      const serverHttpClient = TestBed.inject(HttpClient) as jasmine.SpyObj<HttpClient>;
+      const mockResponse = { data: 'test' };
+      serverHttpClient.get.and.returnValue(of(mockResponse));
+
+      serverService.get('test').subscribe();
+
+      const callArgs = serverHttpClient.get.calls.mostRecent().args;
+      const headers = callArgs[1].headers;
+      expect(headers.get('Authorization')).toBeNull();
+    });
+  });
+}); 

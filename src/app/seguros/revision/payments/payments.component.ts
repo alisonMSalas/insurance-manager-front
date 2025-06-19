@@ -9,6 +9,8 @@ import { PaymentUrl } from '../../../shared/interfaces/payment-url-dto';
 import { CardModule } from 'primeng/card';
 import { CommonModule } from '@angular/common';
 import { Pipe } from '@angular/core';
+import { ContractStep } from '../../../shared/interfaces/contract-step';
+
 
 @Component({
   selector: 'app-payments',
@@ -26,7 +28,7 @@ export class PaymentsComponent implements OnInit {
   policy: Insurance | null = null;
   client: Client | null = null;
 
-
+  contractStep=ContractStep 
   ngOnInit(): void {
   this.getContractById();
 

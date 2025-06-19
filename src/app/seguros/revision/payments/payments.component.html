@@ -7,20 +7,26 @@
     </div>
     
     <!-- Estado -->
-    <div class="contract-detail">
-      <span class="detail-label"><i class="pi pi-info-circle mr-2"></i> Estado:</span>
-      <span class="status-badge" [ngClass]="contract.status ? getStatusClass(contract.status) : ''">
-        {{ contract.status }}
-      </span>
-    </div>
+   <!-- Estado -->
+<div class="contract-detail">
+  <span class="detail-label">
+    <i class="pi pi-info-circle mr-2"></i> Estado:
+  </span>
+  <span class="status-badge"
+        [ngClass]="getStatusClass(contract.stepStatuses?.[contractStep.PAYMENT_APPROVAL] ? 'Pagado' : 'Pendiente')">
+    {{ contract.stepStatuses?.[contractStep.PAYMENT_APPROVAL] ? 'Pagado' : 'Pendiente' }}
+  </span>
+</div>
+
   </div>
   
 <ng-template pTemplate="footer">
   <div class="flex justify-content-center">
-    <p *ngIf="contract?.status === 'PAGADO'" class="text-success font-bold">
+    <p *ngIf="contract?.stepStatuses?.[contractStep.PAYMENT_APPROVAL] ??
+            false" class="text-success font-bold">
       <i class="pi pi-check-circle"></i> Pago realizado
     </p>
-    <button *ngIf="contract?.status?.toLowerCase() === 'pending'" 
+    <button *ngIf="!contract?.stepStatuses?.[contractStep.PAYMENT_APPROVAL]"
         pButton 
         type="button" 
         label="Realizar Pago" 
