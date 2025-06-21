@@ -1,5 +1,5 @@
 // reportes.component.ts
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
@@ -8,6 +8,10 @@ import { ButtonModule } from 'primeng/button';
 import { TagModule } from 'primeng/tag';
 import { RippleModule } from 'primeng/ripple';
 import { DividerModule } from 'primeng/divider';
+import { ContratacionesService } from '../core/services/contrataciones.service';
+import { Contract } from '../shared/interfaces/contract';
+import { get } from 'http';
+import { ClientContracts } from '../shared/interfaces/clientContract';
 
 @Component({
   selector: 'app-reportes',
@@ -25,58 +29,129 @@ import { DividerModule } from 'primeng/divider';
   styleUrls: ['./reportes.component.scss']
 })
 export class ReportesComponent {
+  contractsService = inject(ContratacionesService);
+  unpaidContracts:Contract[] = [];
+  unpaidContractscount = 0;
+  expiringSoonContracts: Contract[] = [];
+  expiringSoonContractsCount = 0;
+  expiredContracts: Contract[] = [];
+  expiredContractsCount = 0;
+  pendingContracts: Contract[] = [];
+  pendingContractsCount = 0;
+  groupedContracts: ClientContracts[] = [];
+  groupedContractsCount = 0;
+
   user = {
     nombre: 'María González',
     rol: 'Administrador',
     imagen: 'https://randomuser.me/api/portraits/women/44.jpg'
   };
 
-  tarjetas = [
-    {
-      titulo: 'Seguros Impagos',
-      descripcion: 'Pólizas con pagos pendientes o atrasados',
-      cantidad: 24,
-      icono: 'pi pi-exclamation-circle',
-      colorFondo: 'success',
-      colorIcono: 'success',
-      fecha: 'Actualizado hace 2 horas'
-    },
-    {
-      titulo: 'Contratos por Vencer',
-      descripcion: 'Contratos que expirarán en los próximos 30 días',
-      cantidad: 15,
-      icono: 'pi pi-clock',
-      colorFondo: 'warning',
-      colorIcono: 'warning',
-      fecha: 'Actualizado hoy'
-    },
-    {
-      titulo: 'Contratos Vencidos',
-      descripcion: 'Contratos que ya han expirado sin renovación',
-      cantidad: 8,
-      icono: 'pi pi-calendar-times',
-      colorFondo: 'danger',
-      colorIcono: 'danger',
-      fecha: 'Actualizado hoy'
-    },
-    {
-      titulo: 'Contratos por Cliente',
-      descripcion: 'Resumen de contratos agrupados por cliente',
-      cantidad: 42,
-      icono: 'pi pi-users',
-      colorFondo: 'accent',
-      colorIcono: 'accent',
-      fecha: 'Actualizado ayer'
-    },
-    {
-      titulo: 'Solicitudes Pendientes',
-      descripcion: 'Solicitudes de clientes pendientes de revisión',
-      cantidad: 11,
-      icono: 'pi pi-inbox',
-      color: 'primary',
-      fecha: 'Actualizado hace 30 min'
-    }
-  ];
+  tarjetas: any[] = [];
+
+  ngOnInit(): void {
+    this.getUnpaidContracts();
+    this.getContractsExpiringSoon();
+    this.getExpiredContracts();
+    this.getPendingContracts();
+    this.getContractsGroupedByClient();
+  }
+
+  getUnpaidContracts(){
+    this.contractsService.getUnpaidContracts().subscribe((contracts) => {
+      this.unpaidContracts = contracts;
+      this.unpaidContractscount = contracts.length;
+
+      this.cargarTarjetas();
+    });
+  }
+
+  getContractsExpiringSoon() {
+    this.contractsService.getExpiringSoonContracts().subscribe((contracts) => {
+      this.expiringSoonContracts = contracts;
+      this.expiringSoonContractsCount = contracts.length;
+
+      this.cargarTarjetas();
+    });
+  }
+
+  getExpiredContracts() {
+    this.contractsService.getExpiredContracts().subscribe((contracts) => {
+      this.expiredContracts = contracts;
+      this.expiredContractsCount = contracts.length;
+
+      this.cargarTarjetas();
+    });
+  }
+
+  getPendingContracts() {
+    this.contractsService.getPendingContracts().subscribe((contracts) => {
+      this.pendingContracts = contracts;
+      this.pendingContractsCount = contracts.length;
+
+      this.cargarTarjetas();
+    });
+  }
+
+  getContractsGroupedByClient() {
+    this.contractsService.getContractsGroupedByClient().subscribe((grouped) => {
+      this.groupedContracts = grouped;
+      this.groupedContractsCount = grouped.length;
+
+      this.cargarTarjetas();
+    });
+  }
+
+  cargarTarjetas() {
+    this.tarjetas = [
+      {
+        titulo: 'Seguros Impagos',
+        descripcion: 'Pólizas con pagos pendientes o atrasados',
+        cantidad: this.unpaidContractscount,
+        icono: 'pi pi-exclamation-circle',
+        colorFondo: 'success',
+        colorIcono: 'success',
+        fecha: 'Actualizado hace 2 horas'
+      },
+      {
+        titulo: 'Contratos por Vencer',
+        descripcion: 'Contratos que expirarán en los próximos 15 días',
+        cantidad: this.expiringSoonContractsCount,
+        icono: 'pi pi-clock',
+        colorFondo: 'warning',
+        colorIcono: 'warning',
+        fecha: 'Actualizado hoy'
+      },
+      {
+        titulo: 'Contratos Vencidos',
+        descripcion: 'Contratos que ya han expirado sin renovación',
+        cantidad: this.expiredContractsCount,
+        icono: 'pi pi-calendar-times',
+        colorFondo: 'danger',
+        colorIcono: 'danger',
+        fecha: 'Actualizado hoy'
+      },
+      {
+        titulo: 'Contratos por Cliente',
+        descripcion: 'Resumen de contratos agrupados por cliente',
+        cantidad: this.groupedContractsCount,
+        icono: 'pi pi-users',
+        colorFondo: 'accent',
+        colorIcono: 'accent',
+        fecha: 'Actualizado ayer'
+      },
+      {
+        titulo: 'Solicitudes Pendientes',
+        descripcion: 'Solicitudes de clientes pendientes de revisión',
+        cantidad: this.pendingContractsCount,
+        icono: 'pi pi-inbox',
+        color: 'primary',
+        fecha: 'Actualizado hace 30 min'
+      }
+    ];
+  }
+
+  
 
   reportes = [
     {

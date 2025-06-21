@@ -50,4 +50,24 @@ export class ContratacionesService {
   aprobarDocumentos(contractId: string): Observable<Contract> {
     return this.api.post(`contract/approve-attachments/${contractId}`, {});
   }
+
+  getUnpaidContracts(): Observable<Contract[]> {
+    return this.api.get('contract/unpaid');
+  }
+
+  getExpiringSoonContracts(): Observable<Contract[]> {
+    return this.api.get('contract/expiring-soon');
+  }
+
+  getExpiredContracts(): Observable<Contract[]> {
+    return this.api.get('contract/expired');
+  }
+
+  getPendingContracts(): Observable<Contract[]> {
+    return this.api.get('contract/pending');
+  }
+
+  getContractsGroupedByClient(): Observable<any[]> {
+    return this.api.get('contract/grouped-by-client');
+  }
 }
