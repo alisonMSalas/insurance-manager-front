@@ -65,15 +65,15 @@
 /* Grid de tarjetas estilo minimalista */
 .tarjetas-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(5, 1fr); /* Fuerza 5 columnas exactas */
+  gap: 16px;
   margin-bottom: 32px;
 }
 
 /* Estilo corregido para las tarjetas */
 .tarjeta {
   position: relative;
-  border-radius: 20px !important;
+  border-radius: 16px !important;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
   transition: var(--transition);
   border: none !important;
@@ -135,9 +135,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
+  padding: 12px 16px;
   position: relative;
-  z-index: 2; /* Asegura que el contenido esté sobre la franja */
+  z-index: 2;
 }
 
 .tarjeta-encabezado i {
@@ -145,37 +145,50 @@
   opacity: 0.9;
 }
 
+.tarjeta.seleccionada {
+  border: 2px solid var(--primary);
+}
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-approved {
+  background-color: #d4edda;
+  color: #155724;
+}
+
 .cantidad {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
   color: var(--text-dark);
 }
 
 .contenido {
-  padding: 16px 20px;
+  padding: 12px 16px;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
   position: relative;
   z-index: 2;
 }
 
 .contenido h4 {
-  margin: 0 0 8px;
-  font-size: 1rem;
+  margin: 0 0 6px;
+  font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-dark);
 }
 
 .contenido p {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   color: var(--text-medium);
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-size: 0.75rem;
+  line-height: 1.4;
 }
 
 .contenido small {
   display: block;
   color: var(--text-light);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 500;
 }
 
@@ -347,4 +360,9 @@
 .view-insurance-header h3 {
   margin: 0;
   color: #2c3e50;
+}
+.p-button.p-button-text.p-button-danger {
+  background-color: transparent !important;
+  border: none !important;
+  color: #e53935 !important; /* rojo */
 }

@@ -12,6 +12,8 @@ import { ContratacionesService } from '../core/services/contrataciones.service';
 import { Contract } from '../shared/interfaces/contract';
 import { get } from 'http';
 import { ClientContracts } from '../shared/interfaces/clientContract';
+import { ChipModule } from 'primeng/chip';
+import { Dialog, DialogModule } from 'primeng/dialog';
 
 @Component({
   selector: 'app-reportes',
@@ -23,14 +25,14 @@ import { ClientContracts } from '../shared/interfaces/clientContract';
     AvatarModule,
     ButtonModule,
     TagModule,
-    RippleModule, DividerModule
+    RippleModule, DividerModule, ChipModule, DialogModule
   ],
   templateUrl: './reportes.component.html',
   styleUrls: ['./reportes.component.scss']
 })
 export class ReportesComponent {
   contractsService = inject(ContratacionesService);
-  unpaidContracts:Contract[] = [];
+  unpaidContracts: Contract[] = [];
   unpaidContractscount = 0;
   expiringSoonContracts: Contract[] = [];
   expiringSoonContractsCount = 0;
@@ -40,6 +42,12 @@ export class ReportesComponent {
   pendingContractsCount = 0;
   groupedContracts: ClientContracts[] = [];
   groupedContractsCount = 0;
+
+  reporteSeleccionado: string = ''; // tipo de tarjeta seleccionada
+  reportesFiltrados: any[] = [];    // reportes a mostrar
+  contratosFiltrados: any[] = [];
+  modalVisible = false;
+  clienteSeleccionado: ClientContracts | null = null;
 
   user = {
     nombre: 'María González',
@@ -55,9 +63,56 @@ export class ReportesComponent {
     this.getExpiredContracts();
     this.getPendingContracts();
     this.getContractsGroupedByClient();
+
+    setTimeout(() => {
+      this.cargarVistaPrevia();
+    }, 500);
   }
 
-  getUnpaidContracts(){
+  cargarVistaPrevia() {
+    this.contratosFiltrados = [
+      ...this.unpaidContracts.slice(0, 2),
+      ...this.expiringSoonContracts.slice(0, 2),
+      ...this.expiredContracts.slice(0, 2),
+      ...this.pendingContracts.slice(0, 2)
+    ];
+  }
+
+  seleccionarTarjeta(tarjeta: any) {
+    if (this.reporteSeleccionado === tarjeta.titulo) {
+      this.reporteSeleccionado = '';
+      this.cargarVistaPrevia();
+      this.modalVisible = false;
+      this.clienteSeleccionado = null;
+      return;
+    }
+
+    this.reporteSeleccionado = tarjeta.titulo;
+    this.modalVisible = false;
+    this.clienteSeleccionado = null;
+
+    switch (tarjeta.titulo) {
+      case 'Seguros Impagos':
+        this.contratosFiltrados = this.unpaidContracts;
+        break;
+      case 'Contratos por Vencer':
+        this.contratosFiltrados = this.expiringSoonContracts;
+        break;
+      case 'Contratos Vencidos':
+        this.contratosFiltrados = this.expiredContracts;
+        break;
+      case 'Solicitudes Pendientes':
+        this.contratosFiltrados = this.pendingContracts;
+        break;
+      case 'Contratos por Cliente':
+        this.contratosFiltrados = this.groupedContracts;
+        break;
+      default:
+        this.cargarVistaPrevia();
+    }
+  }
+
+  getUnpaidContracts() {
     this.contractsService.getUnpaidContracts().subscribe((contracts) => {
       this.unpaidContracts = contracts;
       this.unpaidContractscount = contracts.length;
@@ -101,6 +156,39 @@ export class ReportesComponent {
       this.cargarTarjetas();
     });
   }
+
+  abrirPdfContrato(contractId: string) {
+    this.contractsService.getContractPdf(contractId).subscribe({
+      next: (base64: string) => {
+        const blob = this.base64ToBlob(base64, 'application/pdf');
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      },
+      error: () => {
+        alert('No se pudo generar el PDF del contrato.');
+      }
+    });
+  }
+
+  base64ToBlob(base64: string, contentType: string): Blob {
+    const byteCharacters = atob(base64);
+    const byteArrays = [];
+
+    for (let i = 0; i < byteCharacters.length; i += 512) {
+      const slice = byteCharacters.slice(i, i + 512);
+      const byteNumbers = new Array(slice.length);
+      for (let j = 0; j < slice.length; j++) {
+        byteNumbers[j] = slice.charCodeAt(j);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      byteArrays.push(byteArray);
+    }
+
+    return new Blob(byteArrays, { type: contentType });
+  }
+
+
+
 
   cargarTarjetas() {
     this.tarjetas = [
@@ -150,39 +238,19 @@ export class ReportesComponent {
       }
     ];
   }
+  abrirModalCliente(cliente: ClientContracts) {
+    this.clienteSeleccionado = cliente;
+    this.modalVisible = true;
+  }
 
-  
+  // Método para cerrar modal
+  cerrarModal() {
+    this.modalVisible = false;
+    this.clienteSeleccionado = null;
+  }
 
-  reportes = [
-    {
-      id: '#REP-2023-045',
-      tipo: 'Seguros Impagos',
-      fecha: '15/05/2023',
-      registros: 24,
-      estado: 'Pendiente revisión'
-    },
-    {
-      id: '#REP-2023-044',
-      tipo: 'Contratos por Vencer',
-      fecha: '14/05/2023',
-      registros: 15,
-      estado: 'Completado'
-    },
-    {
-      id: '#REP-2023-043',
-      tipo: 'Contratos Vencidos',
-      fecha: '13/05/2023',
-      registros: 8,
-      estado: 'Urgente'
-    },
-    {
-      id: '#REP-2023-042',
-      tipo: 'Contratos por Cliente',
-      fecha: '12/05/2023',
-      registros: 42,
-      estado: 'Completado'
-    }
-  ];
+
+
 
   obtenerClaseEstado(estado: string): string {
     if (estado.toLowerCase().includes('pendiente')) return 'warning';
@@ -190,4 +258,17 @@ export class ReportesComponent {
     if (estado.toLowerCase().includes('completado')) return 'success';
     return 'info';
   }
+
+  formatFecha(fecha: string | Date): string {
+    return fecha ? new Date(fecha).toLocaleDateString() : '-';
+  }
+
+  formatStatus(status: string): string {
+    return status?.toUpperCase() || 'DESCONOCIDO';
+  }
+
+  formatBeneficiaries(beneficiarios: any[]): string {
+    return beneficiarios?.length ? beneficiarios.map(b => b.name).join(', ') : '-';
+  }
+
 }
