@@ -70,4 +70,10 @@ export class ContratacionesService {
   getContractsGroupedByClient(): Observable<any[]> {
     return this.api.get('contract/grouped-by-client');
   }
+
+  getContractPdf(contractId: string): Observable<string> {
+    return this.api.get<string>(`contract/${contractId}/pdf`);
+  }
+  
+  
 }
