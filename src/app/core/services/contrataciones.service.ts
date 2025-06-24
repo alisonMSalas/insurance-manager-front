@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { ApiClientService } from '../api/httpclient';
 import { Contract } from '../../shared/interfaces/contract';
 import { Observable, BehaviorSubject } from 'rxjs';
+import { ContractFile } from '../../shared/interfaces/contract-file';
 
 @Injectable({
   providedIn: 'root'
@@ -71,9 +72,7 @@ export class ContratacionesService {
     return this.api.get('contract/grouped-by-client');
   }
 
-  getContractPdf(contractId: string): Observable<string> {
-    return this.api.get<string>(`contract/${contractId}/pdf`);
+  getContractPdf(contractId: string): Observable<ContractFile> {
+    return this.api.get(`contract/${contractId}/pdf`);
   }
-  
-  
 }

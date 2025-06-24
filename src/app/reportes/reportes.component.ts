@@ -14,6 +14,7 @@ import { get } from 'http';
 import { ClientContracts } from '../shared/interfaces/clientContract';
 import { ChipModule } from 'primeng/chip';
 import { Dialog, DialogModule } from 'primeng/dialog';
+import { CLIENT_RENEG_LIMIT } from 'tls';
 
 @Component({
   selector: 'app-reportes',
@@ -158,15 +159,12 @@ export class ReportesComponent {
   }
 
   abrirPdfContrato(contractId: string) {
-    this.contractsService.getContractPdf(contractId).subscribe({
-      next: (base64: string) => {
-        const blob = this.base64ToBlob(base64, 'application/pdf');
-        const url = URL.createObjectURL(blob);
-        window.open(url, '_blank');
-      },
-      error: () => {
-        alert('No se pudo generar el PDF del contrato.');
-      }
+    this.contractsService.getContractPdf(contractId).subscribe(contractFile => {
+      const byteCharacters = atob(contractFile.content);
+      const byteArray = new Uint8Array([...byteCharacters].map(c => c.charCodeAt(0)));
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      window.open(url);
     });
   }
 
