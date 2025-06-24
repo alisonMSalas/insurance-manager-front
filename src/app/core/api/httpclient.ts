@@ -31,8 +31,8 @@ export class ApiClientService {
     return headers;
   }
 
-  get<T>(endpoint: string): Observable<T> {
-    return this.http.get<T>(`${this.baseUrl}/${endpoint}`, { headers: this.getHeaders() });
+  get<T>(endpoint: string, options?: { responseType?: "json" }): Observable<T> {
+    return this.http.get<T>(`${this.baseUrl}/${endpoint}`, { headers: this.getHeaders(), ...options });
   }
 
   post<T>(endpoint: string, body: any): Observable<T> {
@@ -47,16 +47,16 @@ export class ApiClientService {
     return this.http.delete<T>(`${this.baseUrl}/${endpoint}`, { headers: this.getHeaders() });
   }
   postForm<T>(endpoint: string, formData: FormData): Observable<T> {
-  const token = isPlatformBrowser(this.platformId)
-    ? localStorage.getItem('token')
-    : null;
+    const token = isPlatformBrowser(this.platformId)
+      ? localStorage.getItem('token')
+      : null;
 
-  const headers = token
-    ? new HttpHeaders({ Authorization: `Bearer ${token}` })
-    : new HttpHeaders();
+    const headers = token
+      ? new HttpHeaders({ Authorization: `Bearer ${token}` })
+      : new HttpHeaders();
 
-  return this.http.post<T>(`${this.baseUrl}/${endpoint}`, formData, { headers });
-}
+    return this.http.post<T>(`${this.baseUrl}/${endpoint}`, formData, { headers });
+  }
 
 
 
