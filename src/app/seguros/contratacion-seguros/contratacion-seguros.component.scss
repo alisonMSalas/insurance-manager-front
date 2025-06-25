@@ -1,4 +1,19 @@
 
+:host {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.contract-area {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -96,10 +111,10 @@ p-table .p-dropdown {
 .content-area {
   flex: 1;
   flex-grow: 1;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
-  height: auto;
+  min-height: 0;
+  height: fit-content;
   overflow: hidden;
 
   .p-divider {

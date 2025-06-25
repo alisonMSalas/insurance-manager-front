@@ -62,7 +62,7 @@ export class ReembolsoListadoComponent implements OnInit {
     refundType: '',
     description: '',
     observation: '',
-    paidAmount: null,
+    amountPaid: null,
     coveredAmount: 0,
     contractId: '',
     attachments: [],
@@ -204,7 +204,7 @@ reembolsosFiltrados() {
       refundType: '',
       description: '',
       observation: '',
-      paidAmount: null,
+      amountPaid: null,
       coveredAmount: 0,
       contractId: '',
       attachments: [],
@@ -239,7 +239,7 @@ reembolsosFiltrados() {
       !this.newRefund.refundType ||
       !this.newRefund.description ||
       !this.newRefund.contractId ||
-      this.newRefund.paidAmount == null || this.newRefund.paidAmount <= 0
+      this.newRefund.amountPaid == null || this.newRefund.amountPaid <= 0
     ) {
       this.messageService.add({
         severity: 'error',

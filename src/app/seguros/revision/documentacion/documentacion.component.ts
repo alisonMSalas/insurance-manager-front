@@ -67,7 +67,7 @@ export class DocumentacionComponent implements OnChanges {
   totalSize: string = '0B';
   totalSizePercent: number = 0;
   showSaveWarning: boolean = false;
-documentosGuardados: boolean = false;
+  documentosGuardados: boolean = false;
 
   docService = inject(AttachmentService);
   messageService = inject(MessageService);
@@ -104,7 +104,20 @@ documentosGuardados: boolean = false;
             };
           });
         this.updateTotalSize();
+        this.documentosGuardados = this.completedFiles.length === 2;
       }
+    }
+  }
+
+  getUserRole(): string | null {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.role || null;
+    } catch (e) {
+      console.error('Token inválido:', e);
+      return null;
     }
   }
 
@@ -222,7 +235,6 @@ documentosGuardados: boolean = false;
   }
 
   guardar(): void {
-
     if (!this.completedFiles.length) {
       this.messageService.add({
         severity: 'warn',
@@ -256,7 +268,7 @@ documentosGuardados: boolean = false;
             detail: 'Se han guardado los documentos',
           });
           this.showSaveWarning = false;
-           this.documentosGuardados = true;
+          this.documentosGuardados = true;
           this.updateTotalSize();
         },
         error: (err) => {
@@ -305,8 +317,17 @@ documentosGuardados: boolean = false;
 
     this.procesando = true;
     try {
-      await // tu lógica de rechazo aquí
-        this.cerrarModal();
+      await this.contratoService.rechazarDocumentos(this.contratoId, this.observacionRechazo).subscribe({
+        next: () => {
+          this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Documentos rechazados' });
+          this.documentosAprobados = false;
+          this.cerrarModal();
+          this.observacionRechazo = '';
+        },
+        error: (err) => {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al rechazar documentos' });
+        }
+      });
     } finally {
       this.procesando = false;
     }
@@ -318,7 +339,6 @@ documentosGuardados: boolean = false;
     this.modalRechazoVisible = false;
     this.formSubmitted = false;
     this.observacionRechazo = '';
-
   }
 
   aprobarDocumentos() {

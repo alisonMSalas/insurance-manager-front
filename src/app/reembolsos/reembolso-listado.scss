@@ -44,6 +44,10 @@
   display: flex;
   justify-content: end;
   align-items: center;
+
+  button {
+    margin-bottom: 0;
+  }
 }
 
 .custom-table {
@@ -112,7 +116,11 @@
 }
 
 :host ::ng-deep .p-dialog .p-dialog-header {
-  background: linear-gradient(135deg, #407f68, #407f68); /* Cambiado a verde degradado */
+  background: linear-gradient(
+    135deg,
+    #407f68,
+    #407f68
+  ); /* Cambiado a verde degradado */
   color: white;
   border-top-left-radius: 12px;
   border-top-right-radius: 12px;

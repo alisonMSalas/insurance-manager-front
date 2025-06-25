@@ -72,7 +72,7 @@ describe('ReembolsoListadoComponent', () => {
         refundType: 'tipo', 
         description: 'descripción', 
         observation: 'observación', 
-        paidAmount: 100, 
+        amountPaid: 100, 
         coveredAmount: 80, 
         contractId: '1', 
         attachments: [], 
@@ -121,7 +121,7 @@ describe('ReembolsoListadoComponent', () => {
         refundType: 'tipoA', 
         description: 'descripción', 
         observation: 'observación', 
-        paidAmount: 100, 
+        amountPaid: 100, 
         coveredAmount: 80, 
         contractId: '1', 
         attachments: [], 
@@ -133,7 +133,7 @@ describe('ReembolsoListadoComponent', () => {
         refundType: 'tipoB', 
         description: 'descripción', 
         observation: 'observación', 
-        paidAmount: 200, 
+        amountPaid: 200, 
         coveredAmount: 160, 
         contractId: '2', 
         attachments: [], 
@@ -243,7 +243,7 @@ describe('ReembolsoListadoComponent', () => {
       refundType: 'tipo',
       description: 'descripción',
       observation: 'observación',
-      paidAmount: 100,
+      amountPaid: 100,
       coveredAmount: 80,
       contractId: '1',
       attachments: [],
@@ -263,7 +263,7 @@ describe('ReembolsoListadoComponent', () => {
       refundType: 'tipo',
       description: 'descripción',
       observation: 'observación',
-      paidAmount: 100,
+      amountPaid: 100,
       coveredAmount: 80,
       contractId: '1',
       attachments: [],
@@ -304,7 +304,7 @@ describe('ReembolsoListadoComponent', () => {
       refundType: 'tipo',
       description: 'descripción',
       observation: 'observación',
-      paidAmount: 100,
+      amountPaid: 100,
       coveredAmount: 80,
       contractId: '1',
       attachments: [],
@@ -368,7 +368,7 @@ describe('ReembolsoListadoComponent', () => {
       refundType: '',
       description: '',
       observation: '',
-      paidAmount: 0,
+      amountPaid: 0,
       coveredAmount: 0,
       contractId: '',
       attachments: [],
@@ -390,7 +390,7 @@ describe('ReembolsoListadoComponent', () => {
       refundType: 'tipo',
       description: 'desc',
       observation: 'obs',
-      paidAmount: 10,
+      amountPaid: 10,
       coveredAmount: 5,
       contractId: '1',
       attachments: [],
@@ -472,7 +472,7 @@ describe('ReembolsoListadoComponent', () => {
 
   it('debe filtrar correctamente cuando no hay filtro', () => {
     component.reembolsos = [
-      { refundType: 'tipoA', status: 'NEW', contractId: '', description: '', observation: '', paidAmount: 0, coveredAmount: 0, attachments: [], date: '', id: '1' }
+      { refundType: 'tipoA', status: 'NEW', contractId: '', description: '', observation: '', amountPaid: 0, coveredAmount: 0, attachments: [], date: '', id: '1' }
     ];
     component.filtroTipo = '';
     component.filtroEstado = '';
@@ -481,8 +481,8 @@ describe('ReembolsoListadoComponent', () => {
 
   it('debe filtrar correctamente por tipo', () => {
     component.reembolsos = [
-      { refundType: 'tipoA', status: 'NEW', contractId: '', description: '', observation: '', paidAmount: 0, coveredAmount: 0, attachments: [], date: '', id: '1' },
-      { refundType: 'tipoB', status: 'NEW', contractId: '', description: '', observation: '', paidAmount: 0, coveredAmount: 0, attachments: [], date: '', id: '2' }
+      { refundType: 'tipoA', status: 'NEW', contractId: '', description: '', observation: '', amountPaid: 0, coveredAmount: 0, attachments: [], date: '', id: '1' },
+      { refundType: 'tipoB', status: 'NEW', contractId: '', description: '', observation: '', amountPaid: 0, coveredAmount: 0, attachments: [], date: '', id: '2' }
     ];
     component.filtroTipo = 'tipoA';
     component.filtroEstado = '';
@@ -491,8 +491,8 @@ describe('ReembolsoListadoComponent', () => {
 
   it('debe filtrar correctamente por estado', () => {
     component.reembolsos = [
-      { refundType: 'tipoA', status: 'NEW', contractId: '', description: '', observation: '', paidAmount: 0, coveredAmount: 0, attachments: [], date: '', id: '1' },
-      { refundType: 'tipoB', status: 'APPROVED', contractId: '', description: '', observation: '', paidAmount: 0, coveredAmount: 0, attachments: [], date: '', id: '2' }
+      { refundType: 'tipoA', status: 'NEW', contractId: '', description: '', observation: '', amountPaid: 0, coveredAmount: 0, attachments: [], date: '', id: '1' },
+      { refundType: 'tipoB', status: 'APPROVED', contractId: '', description: '', observation: '', amountPaid: 0, coveredAmount: 0, attachments: [], date: '', id: '2' }
     ];
     component.filtroTipo = '';
     component.filtroEstado = 'APPROVED';
@@ -501,8 +501,8 @@ describe('ReembolsoListadoComponent', () => {
 
   it('debe filtrar correctamente por tipo y estado', () => {
     component.reembolsos = [
-      { refundType: 'tipoA', status: 'NEW', contractId: '', description: '', observation: '', paidAmount: 0, coveredAmount: 0, attachments: [], date: '', id: '1' },
-      { refundType: 'tipoA', status: 'APPROVED', contractId: '', description: '', observation: '', paidAmount: 0, coveredAmount: 0, attachments: [], date: '', id: '2' }
+      { refundType: 'tipoA', status: 'NEW', contractId: '', description: '', observation: '', amountPaid: 0, coveredAmount: 0, attachments: [], date: '', id: '1' },
+      { refundType: 'tipoA', status: 'APPROVED', contractId: '', description: '', observation: '', amountPaid: 0, coveredAmount: 0, attachments: [], date: '', id: '2' }
     ];
     component.filtroTipo = 'tipoA';
     component.filtroEstado = 'APPROVED';
@@ -511,7 +511,7 @@ describe('ReembolsoListadoComponent', () => {
 
   it('debe manejar error al cargar contratos en cargarReembolsos', fakeAsync(() => {
     const mockReembolsos: Refund[] = [
-      { id: '1', refundType: 'tipo', description: '', observation: '', paidAmount: 0, coveredAmount: 0, contractId: '1', attachments: [], status: 'NEW', date: new Date().toISOString() }
+      { id: '1', refundType: 'tipo', description: '', observation: '', amountPaid: 0, coveredAmount: 0, contractId: '1', attachments: [], status: 'NEW', date: new Date().toISOString() }
     ];
     mockRefundService.getAll.and.returnValue(of(mockReembolsos));
     mockContratacionesService.getById.and.returnValue(throwError(() => new Error('error')));
@@ -539,7 +539,7 @@ describe('ReembolsoListadoComponent', () => {
       refundType: 'tipo',
       description: 'desc',
       observation: 'obs',
-      paidAmount: 10,
+      amountPaid: 10,
       coveredAmount: 5,
       contractId: '1',
       attachments: [],
@@ -563,7 +563,7 @@ describe('ReembolsoListadoComponent', () => {
       refundType: 'tipo',
       description: 'desc',
       observation: 'obs',
-      paidAmount: 10,
+      amountPaid: 10,
       coveredAmount: 5,
       contractId: '1',
       attachments: [],
@@ -585,7 +585,7 @@ describe('ReembolsoListadoComponent', () => {
       refundType: 'tipo',
       description: 'desc',
       observation: 'obs',
-      paidAmount: 10,
+      amountPaid: 10,
       coveredAmount: 5,
       contractId: '1',
       attachments: [],
@@ -623,7 +623,7 @@ describe('ReembolsoListadoComponent', () => {
       refundType: 'tipo',
       description: 'desc',
       observation: 'obs',
-      paidAmount: 10,
+      amountPaid: 10,
       coveredAmount: 5,
       contractId: '1',
       attachments: [],
@@ -650,7 +650,7 @@ describe('ReembolsoListadoComponent', () => {
       refundType: 'tipo',
       description: 'desc',
       observation: 'obs',
-      paidAmount: 10,
+      amountPaid: 10,
       coveredAmount: 5,
       contractId: '1',
       attachments: [],

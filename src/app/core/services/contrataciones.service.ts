@@ -52,6 +52,10 @@ export class ContratacionesService {
     return this.api.post(`contract/approve-attachments/${contractId}`, {});
   }
 
+  rechazarDocumentos(contractId: string, observation: string): Observable<Contract> {
+    return this.api.post(`contract/reject-attachments/${contractId}`, { observation });
+  }
+
   getUnpaidContracts(): Observable<Contract[]> {
     return this.api.get('contract/unpaid');
   }

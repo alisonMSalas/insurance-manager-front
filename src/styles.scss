@@ -88,3 +88,8 @@ input:focus,
 .content-container {
   overflow-y: auto;
 }
+
+.p-dropdown-panel {
+  z-index: 10000 !important;
+  pointer-events: auto;
+}
