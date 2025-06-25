@@ -50,12 +50,6 @@ export class ReportesComponent {
   modalVisible = false;
   clienteSeleccionado: ClientContracts | null = null;
 
-  user = {
-    nombre: 'María González',
-    rol: 'Administrador',
-    imagen: 'https://randomuser.me/api/portraits/women/44.jpg'
-  };
-
   tarjetas: any[] = [];
 
   ngOnInit(): void {

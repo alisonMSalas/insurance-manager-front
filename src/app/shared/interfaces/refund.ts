@@ -6,7 +6,7 @@ export interface Refund {
   date: string;
   description: string;
   observation: string;
-  paidAmount: number;
+  paidAmount: number | null;
   coveredAmount: number;
   status: RefundStatus;
   attachments: Attachment[];

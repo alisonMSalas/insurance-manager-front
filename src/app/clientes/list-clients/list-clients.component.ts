@@ -19,6 +19,7 @@ import { Client } from '../../shared/interfaces/client';
 import { ApiClientService } from '../../core/api/httpclient';
 import { User } from '../../core/services/users.service';
 import {Tooltip} from 'primeng/tooltip';
+import { CedulaEcuatorianaDirective } from '../../shared/utils/cedula.directive';
 
 @Component({
   selector: 'app-list-clients',
@@ -36,7 +37,7 @@ import {Tooltip} from 'primeng/tooltip';
     ToastModule,
     ConfirmDialogModule,
     DividerModule,
-    MenuModule
+    MenuModule, CedulaEcuatorianaDirective
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './list-clients.component.html',

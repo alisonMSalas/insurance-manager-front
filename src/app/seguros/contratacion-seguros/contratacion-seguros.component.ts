@@ -105,13 +105,34 @@ export class ContratacionSegurosComponent {
 
 
     this.beneficiarioForm = this.fb.group({
-      cedula: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+      cedula: ['', [Validators.required,validarCedulaEcuatoriana(), Validators.pattern(/^\d{10}$/)]],
       nombre: ['', Validators.required],
       apellido: ['', Validators.required],
       parentesco: [null, Validators.required],
 
     });
   }
+  soloNumeros(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  input.value = input.value.replace(/[^0-9]/g, '');
+  // Opcional: actualiza el FormControl si es necesario
+  const controlCliente = this.clienteForm.get('buscar');
+  if (controlCliente) {
+    controlCliente.setValue(input.value, { emitEvent: false });
+  }
+ 
+}
+soloNumerosBeneficiario(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  input.value = input.value.replace(/[^0-9]/g, '');
+
+  const control = this.beneficiarioForm.get('cedula');
+  if (control) {
+    control.setValue(input.value, { emitEvent: false });
+  }
+}
+
+
 
   ngOnInit(): void {
     this.cargarTiposSeguro();

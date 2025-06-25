@@ -5,9 +5,9 @@ export interface Insurance {
   name: string;
   type: InsuranceType | null;
   description: string;
-  coverage: number;
-  deductible: number;
-  paymentAmount: number;
+  coverage: number | null;        // permitir null
+  deductible: number | null;      // permitir null
+  paymentAmount: number | null;
   paymentPeriod: PaymentPeriod | null;
   active: boolean | null;
   benefits?: Benefit[]; 

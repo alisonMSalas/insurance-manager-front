@@ -14,32 +14,22 @@
         (click)="abrirModalCrear()"></button>
     </div>
     <div class="flex flex-wrap gap-4 mb-3">
-  <div class="p-inputgroup">
-    <input
-  type="text"
-  pInputText
-  placeholder="Buscar por tipo"
-  [(ngModel)]="filtroTipo"
-/>
+      <div class="p-inputgroup">
+        <input type="text" pInputText placeholder="Buscar por tipo" [(ngModel)]="filtroTipo" />
 
-  </div>
+      </div>
 
-  <div>
-<p-select 
-  [options]="estados" 
-  [(ngModel)]="filtroEstado" 
-  optionLabel="label" 
-  optionValue="value" 
-  placeholder="Filtrar por estado"
-  class="w-full md:w-56">
-</p-select>
+      <div>
+        <p-select [options]="estados" [(ngModel)]="filtroEstado" optionLabel="label" optionValue="value"
+          placeholder="Filtrar por estado" class="w-full md:w-56">
+        </p-select>
 
 
 
-  </div>
-</div>
+      </div>
+    </div>
 
-    <p-table [value]="reembolsosFiltrados()"[paginator]="true" [rows]="10" [responsiveLayout]="'scroll'">
+    <p-table [value]="reembolsosFiltrados()" [paginator]="true" [rows]="10" [responsiveLayout]="'scroll'">
       <ng-template pTemplate="header">
         <tr>
           <th>Tipo de Reembolso</th>
@@ -113,8 +103,9 @@
     <!-- Tipo de Reembolso -->
     <div class="p-field p-col-12 p-md-6">
       <label for="refundType">Tipo de Reembolso *</label>
-      <input id="refundType" pInputText [(ngModel)]="newRefund.refundType" />
-      <small *ngIf="formSubmitted && !newRefund.refundType" class="p-error">Este campo es obligatorio</small>
+      <input id="refundType" pInputText [(ngModel)]="newRefund.refundType" maxlength="80" />
+      <small *ngIf="formSubmitted && !newRefund.refundType" class="p-error" style="color: red;">Este campo es
+        obligatorio</small>
     </div>
 
     <!-- Contrato -->
@@ -122,21 +113,29 @@
       <label for="contractId">Contrato *</label>
       <p-dropdown id="contractId" [options]="contracts" optionLabel="label" optionValue="id"
         [(ngModel)]="newRefund.contractId" placeholder="Selecciona un contrato"></p-dropdown>
-      <small *ngIf="formSubmitted && !newRefund.contractId" class="p-error">Este campo es obligatorio</small>
+      <small *ngIf="formSubmitted && !newRefund.contractId" class="p-error" style="color: red;">Este campo es
+        obligatorio</small>
     </div>
 
     <!-- Monto Pagado -->
     <div class="p-field p-col-12 p-md-6">
       <label for="paidAmount">Monto Pagado *</label>
-      <input id="paidAmount" type="number" pInputText [(ngModel)]="newRefund.paidAmount" />
-      <small *ngIf="formSubmitted && newRefund.paidAmount <= 0" class="p-error">Debe ser mayor a 0</small>
+      <p-inputNumber inputId="paidAmount" [(ngModel)]="newRefund.paidAmount" [min]="0" [max]="99999999" mode="currency"
+        currency="USD" locale="en-US" [useGrouping]="true" placeholder="$0.00" inputStyleClass="w-full" class="w-full"
+        #paidAmountRef></p-inputNumber>
+
+      <small *ngIf="formSubmitted && (newRefund?.paidAmount ?? 0) <= 0" class="p-error" style="color: red;">
+        Debe ser mayor a 0
+      </small>
     </div>
+
 
     <!-- Descripción -->
     <div class="p-field p-col-12">
       <label for="description">Descripción *</label>
-      <input id="description" pInputText [(ngModel)]="newRefund.description" />
-      <small *ngIf="formSubmitted && !newRefund.description" class="p-error">Este campo es obligatorio</small>
+      <input id="description" pInputText [(ngModel)]="newRefund.description" max="80" />
+      <small *ngIf="formSubmitted && !newRefund.description" class="p-error" style="color: red;">Este campo es
+        obligatorio</small>
     </div>
 
 

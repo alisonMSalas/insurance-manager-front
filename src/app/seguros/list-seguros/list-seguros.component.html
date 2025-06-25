@@ -82,7 +82,10 @@
         <div class="form-row">
           <div class="form-field">
             <label for="name">Nombre del Seguro</label>
-            <input id="name" type="text" pInputText [(ngModel)]="insurance.name" />
+            <input id="name" type="text" pInputText [(ngModel)]="insurance.name" maxlength="45" name="nombre" required
+              #nombre="ngModel" />
+            <small *ngIf="nombre.touched && nombre.errors?.['required']" class="p-error" style="color: red;"> El nombre
+              es obligatorio.</small>
             <div *ngIf="!insurance.name && submitted" class="error-msg">
               El nombre es obligatorio.
             </div>
@@ -100,17 +103,18 @@
         <div class="form-row">
           <div class="form-field">
             <label for="coverage">Cobertura</label>
-            <input id="coverage" type="number" pInputText min="0" (keydown)="preventNegativeInput($event)"
-              [(ngModel)]="insurance.coverage" />
+            <p-inputNumber inputId="coverage" [(ngModel)]="insurance.coverage" [min]="0" [max]="99999" mode="currency"
+              currency="USD" locale="en-US" [useGrouping]="true" placeholder="$0.00"></p-inputNumber>
             <div *ngIf="!insurance.coverage && submitted" class="error-msg">
-              La cobertura es obligatorio.
+              La cobertura es obligatoria.
             </div>
           </div>
 
           <div class="form-field">
             <label for="deductible">Deducible</label>
-            <input id="deductible" type="number" min="0" (keydown)="preventNegativeInput($event)" pInputText
-              [(ngModel)]="insurance.deductible" />
+            <p-inputNumber inputId="deductible" [(ngModel)]="insurance.deductible" [min]="0" [max]="99999999"
+              mode="currency" currency="USD" locale="en-US" [useGrouping]="true" placeholder="$0.00"
+              #deductibleInput></p-inputNumber>
             <div *ngIf="!insurance.deductible && submitted" class="error-msg">
               El deducible es obligatorio.
             </div>
@@ -121,8 +125,9 @@
         <div class="form-row">
           <div class="form-field">
             <label for="paymentAmount">Monto de Pago</label>
-            <input id="paymentAmount" type="number" min="0" (keydown)="preventNegativeInput($event)" pInputText
-              [(ngModel)]="insurance.paymentAmount" />
+            <p-inputNumber inputId="paymentAmount" [(ngModel)]="insurance.paymentAmount" [min]="0" [max]="99999999"
+              mode="currency" currency="USD" locale="en-US" [useGrouping]="true" placeholder="$0.00"
+              #paymentInput></p-inputNumber>
             <div *ngIf="!insurance.paymentAmount && submitted" class="error-msg">
               El monto de pago es obligatorio.
             </div>

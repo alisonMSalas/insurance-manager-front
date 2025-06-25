@@ -10,7 +10,7 @@
         <div class="text-2xl text-white">Contratación</div>
 
       </div>
-      
+
 
     </div>
   </div>
@@ -22,12 +22,12 @@
         <label for="buscar">Buscar Cliente</label>
         <div class="p-inputgroup search-group">
           <input id="buscar" type="text" pInputText formControlName="buscar" placeholder="Ingrese cédula" maxlength="10"
-            pattern="[0-9]*" inputmode="numeric" class="search-input" />
+            pattern="[0-9]*" inputmode="numeric" class="search-input" (input)="soloNumeros($event)" />
           <button pButton icon="pi pi-search" type="button" class="boton-azul search-button"
             (click)="buscarCliente()"></button>
         </div>
         <small *ngIf="clienteForm.get('buscar')?.touched && clienteForm.get('buscar')?.errors?.['cedulaInvalida']"
-          class="p-error">Cédula inválida</small>
+          class="p-error" style="color: rgb(221, 56, 56);">Cédula inválida</small >
       </div>
 
       <div class="form-group">
@@ -126,15 +126,35 @@
           <div class="p-fluid">
             <div class="p-field">
               <label for="cedula">Cédula</label>
-              <input id="cedula" type="text" pInputText formControlName="cedula" />
+              <input id="cedula" type="text" pInputText formControlName="cedula"
+                (input)="soloNumerosBeneficiario($event)" maxlength="10" />
+                <small *ngIf="
+      beneficiarioForm.get('cedula')?.touched &&
+      beneficiarioForm.get('cedula')?.errors?.['cedulaInvalida']
+    " class="p-error" style="color: red;">
+              Cédula inválida
+            </small>
+            <br>
+            <small *ngIf="
+      beneficiarioForm.get('cedula')?.touched &&
+      beneficiarioForm.get('cedula')?.errors?.['pattern']
+    " class="p-error" style="color: red;">
+              La cédula debe contener exactamente 10 dígitos numéricos.
+            </small> 
             </div>
+            
+
             <div class="p-field">
               <label for="nombre">Nombre</label>
-              <input id="nombre" type="text" pInputText formControlName="nombre" />
+              <input id="nombre" type="text" pInputText formControlName="nombre" maxlength="50" />
+              <small *ngIf="beneficiarioForm.get('nombre')?.touched && beneficiarioForm.get('nombre')?.errors?.['required']"
+                class="p-error" style="color: red;" >El nombre es requerido.</small>
             </div>
             <div class="p-field">
               <label for="apellido">Apellido</label>
-              <input id="apellido" type="text" pInputText formControlName="apellido" />
+              <input id="apellido" type="text" pInputText formControlName="apellido"  maxlength="50" />
+              <small *ngIf="beneficiarioForm.get('apellido')?.touched && beneficiarioForm.get('apellido')?.errors?.['required']"
+                class="p-error" style="color: red;">El apellido es requerido.</small>
             </div>
             <div class="p-field">
               <label for="parentesco">Parentesco</label>
@@ -181,13 +201,13 @@
                 La fecha de inicio no puede ser anterior a hoy.
               </small>
             </div>
-<div style="flex: 1;">
-      <label for="periodicidad">Periodicidad</label>
-      <label style="display: block; padding: 0.5rem 0; font-weight: normal;">
-  {{ coberturasForm.get('periodicidad')?.value || '-' }}
-</label>
+            <div style="flex: 1;">
+              <label for="periodicidad">Periodicidad</label>
+              <label style="display: block; padding: 0.5rem 0; font-weight: normal;">
+                {{ coberturasForm.get('periodicidad')?.value || '-' }}
+              </label>
 
-    </div>
+            </div>
           </div>
 
         </form>

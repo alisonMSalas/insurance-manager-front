@@ -23,7 +23,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { MessageModule } from 'primeng/message';
 import { FormsModule } from '@angular/forms';
 import { SelectModule } from 'primeng/select';
-
+import { InputNumberModule } from 'primeng/inputnumber';
 @Component({
   selector: 'app-reembolso-listado',
   standalone: true,
@@ -42,7 +42,7 @@ import { SelectModule } from 'primeng/select';
     FloatLabelModule,
     MessageModule,
     FormsModule,
-    SelectModule
+    SelectModule, InputNumberModule
   ],
   templateUrl: './reembolso-listado.html',
   styleUrls: ['./reembolso-listado.scss']
@@ -62,7 +62,7 @@ export class ReembolsoListadoComponent implements OnInit {
     refundType: '',
     description: '',
     observation: '',
-    paidAmount: 0,
+    paidAmount: null,
     coveredAmount: 0,
     contractId: '',
     attachments: [],
@@ -204,7 +204,7 @@ reembolsosFiltrados() {
       refundType: '',
       description: '',
       observation: '',
-      paidAmount: 0,
+      paidAmount: null,
       coveredAmount: 0,
       contractId: '',
       attachments: [],
@@ -239,7 +239,7 @@ reembolsosFiltrados() {
       !this.newRefund.refundType ||
       !this.newRefund.description ||
       !this.newRefund.contractId ||
-      this.newRefund.paidAmount <= 0
+      this.newRefund.paidAmount == null || this.newRefund.paidAmount <= 0
     ) {
       this.messageService.add({
         severity: 'error',

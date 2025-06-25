@@ -8,14 +8,7 @@
 
   <div class="content-container">
     <div class="reportes-container">
-      <div class="user-info">
-        <p-avatar [image]="user.imagen" shape="circle" size="large"></p-avatar>
-        <div class="user-details">
-          <h3>{{ user.nombre }}</h3>
-          <p>{{ user.rol }}</p>
-        </div>
-      </div>
-
+      <h2 class="mb-4">Selecciona un reporte</h2>
       <div class="tarjetas-grid">
         <p-card *ngFor="let tarjeta of tarjetas"
           class="tarjeta color-{{ tarjeta.colorFondo }} {{ tarjeta.titulo === reporteSeleccionado ? 'seleccionada' : '' }}"

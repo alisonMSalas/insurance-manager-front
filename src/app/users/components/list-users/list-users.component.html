@@ -1,240 +1,155 @@
-  <p-toast></p-toast>
-  <p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
 
-  <div class="content-area">
-    <div class="insurance-header">
-      <div>
-        <div class="text-2xl text-white">Usuarios</div>
+<div class="content-area">
+  <div class="insurance-header">
+    <div>
+      <div class="text-2xl text-white">Usuarios</div>
+    </div>
+  </div>
+
+  <p-divider></p-divider>
+
+  <div class="content-container">
+    <div class="actions-container">
+      <div class="filters-container">
+        <div class="filter-group">
+          <p-floatlabel>
+            <input id="search" pInputText [(ngModel)]="searchQuery" (input)="onSearchChange($event)"
+              class="w-full md:w-56" />
+            <label for="search">Buscar</label>
+          </p-floatlabel>
+        </div>
+        <div class="filter-group">
+          <label for="roleFilter">Rol:</label>
+          <p-dropdown [options]="roleOptions" [(ngModel)]="selectedRole" (onChange)="onRoleChange($event)"
+            placeholder="Todos los roles" class="w-full md:w-56"></p-dropdown>
+        </div>
+        <div class="filter-group">
+          <label for="statusFilter">Estado:</label>
+          <p-dropdown [options]="statusOptions" [(ngModel)]="selectedStatus" (onChange)="onStatusChange($event)"
+            placeholder="Todos los estados" class="w-full md:w-56"></p-dropdown>
+        </div>
       </div>
+      <p-button icon="pi pi-plus" label="Nuevo Usuario" styleClass="p-button-primary" size="small"
+        (click)="abrirModalCrear()"></p-button>
     </div>
 
-    <p-divider></p-divider>
-
-    <div class="content-container">
-      <div class="actions-container">
-        <div class="filters-container">
-          <div class="filter-group">
-            <p-floatlabel>
-              <input
-                id="search"
-                pInputText
-                [(ngModel)]="searchQuery"
-                (input)="onSearchChange($event)"
-                class="w-full md:w-56"
-              />
-              <label for="search">Buscar</label>
-            </p-floatlabel>
-          </div>
-          <div class="filter-group">
-            <label for="roleFilter">Rol:</label>
-            <p-dropdown
-              [options]="roleOptions"
-              [(ngModel)]="selectedRole"
-              (onChange)="onRoleChange($event)"
-              placeholder="Todos los roles"
-              class="w-full md:w-56"
-            ></p-dropdown>
-          </div>
-          <div class="filter-group">
-            <label for="statusFilter">Estado:</label>
-            <p-dropdown
-              [options]="statusOptions"
-              [(ngModel)]="selectedStatus"
-              (onChange)="onStatusChange($event)"
-              placeholder="Todos los estados"
-              class="w-full md:w-56"
-            ></p-dropdown>
-          </div>
-        </div>
-        <p-button
-          icon="pi pi-plus"
-          label="Nuevo Usuario"
-          styleClass="p-button-primary"
-          size="small"
-          (click)="abrirModalCrear()"
-        ></p-button>
-      </div>
-
-      <!-- Tabla de usuarios -->
-      <div class="insurance-table-container">
-        <p-table
-          [value]="filteredUsers"
-          [tableStyle]="{ 'min-width': '50rem' }"
-          [scrollable]="true"
-          scrollHeight="500px"
-          [paginator]="true"
-          [rows]="5"
-          [rowsPerPageOptions]="[5, 10, 20]"
-          [showCurrentPageReport]="true"
-          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios"
-        >
-          <ng-template pTemplate="header">
-            <tr>
-              <th scope="col">Nombre</th>
-              <th scope="col">Email</th>
-              <th scope="col">Rol</th>
-              <th scope="col">Estado</th>
-              <th scope="col">Acciones</th>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="body" let-user>
-            <tr>
-              <td>{{ user.name }}</td>
-              <td>{{ user.email }}</td>
-              <td>
-                <span
-                  class="role-status"
-                  [ngClass]="{
+    <!-- Tabla de usuarios -->
+    <div class="insurance-table-container">
+      <p-table [value]="filteredUsers" [tableStyle]="{ 'min-width': '50rem' }" [scrollable]="true" scrollHeight="500px"
+        [paginator]="true" [rows]="5" [rowsPerPageOptions]="[5, 10, 20]" [showCurrentPageReport]="true"
+        currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} usuarios">
+        <ng-template pTemplate="header">
+          <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Email</th>
+            <th scope="col">Rol</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acciones</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-user>
+          <tr>
+            <td>{{ user.name }}</td>
+            <td>{{ user.email }}</td>
+            <td>
+              <span class="role-status" [ngClass]="{
                     'role-admin': user.rol === 'ADMIN',
                     'role-user': user.rol === 'REVIEWER',
                     'role-agent': user.rol === 'AGENT',
                     'role-client': user.rol === 'CLIENT'
-                  }"
-                >
-                  {{ getRoleLabel(user.rol) }}
-                </span>
-              </td>
-              <td>
-                <p-checkbox
-                  [(ngModel)]="user.active"
-                  (onChange)="toggleUserStatus(user)"
-                  binary="true"
-                ></p-checkbox>
-              </td>
-              <td>
-                <p-menu
-                  #menu
-                  [popup]="true"
-                  [model]="menuItems[user.id]"
-                  appendTo="body"
-                ></p-menu>
-                <p-button
-                  icon="pi pi-ellipsis-v"
-                  styleClass="p-button-text p-button-plain action-btn"
-                  (click)="menu.toggle($event)"
-                ></p-button>
-              </td>
-            </tr>
-          </ng-template>
-        </p-table>
+                  }">
+                {{ getRoleLabel(user.rol) }}
+              </span>
+            </td>
+            <td>
+              <p-checkbox [(ngModel)]="user.active" (onChange)="toggleUserStatus(user)" binary="true"></p-checkbox>
+            </td>
+            <td>
+              <p-menu #menu [popup]="true" [model]="menuItems[user.id]" appendTo="body"></p-menu>
+              <p-button icon="pi pi-ellipsis-v" styleClass="p-button-text p-button-plain action-btn"
+                (click)="menu.toggle($event)"></p-button>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+
+    <!-- Modal de Creación/Edición -->
+    <p-dialog [header]="modo === 'crear' ? 'Agregar Nuevo Usuario' : 'Editar Usuario'" [(visible)]="mostrarModal"
+      [modal]="true" [style]="{ width: '50vw' }" [closable]="true" [dismissableMask]="true">
+      <div class="form-grid">
+        <div class="form-field">
+          <label for="nombre">Nombre Completo</label>
+          <input id="nombre" type="text" pInputText [(ngModel)]="usuario.name" name="nombre" required
+            placeholder="Ej: Carlos Mendoza" maxlength="50" #nombre="ngModel" />
+          <small *ngIf="nombre.touched && nombre.errors?.['required']" class="p-error" style="color: red;">El nombre es
+            requerido.</small>
+        </div>
+        <div class="form-field">
+          <label for="rol">Rol del Usuario</label>
+          <p-dropdown id="rol" [options]="roles" optionLabel="nombre" optionValue="codigo" [(ngModel)]="usuario.rol"
+            placeholder="Selecciona un rol"  #rol="ngModel" name="rol" required></p-dropdown>
+          <small *ngIf="rol.touched && rol.errors?.['required']" class="p-error" style="color: red;">
+            El rol es requerido.
+          </small>
+        </div>
+        <div class="form-field">
+          <label for="email">Correo Electrónico</label>
+          <input id="email" type="email" pInputText [(ngModel)]="usuario.email" placeholder="Ej: usuario@dominio.com"
+            maxlength="50" #email="ngModel" name="email" required />
+          <small *ngIf="email.touched && email.errors?.['required']" class="p-error" style="color: red;">El correo
+            electrónico es requerido.</small>
+        </div>
+        <div class="form-field" *ngIf="modo === 'crear'">
+          <label for="password">Las credenciales de la cuenta se enviarán a su correo*</label>
+        </div>
+        <div class="form-field-checkbox">
+          <p-checkbox inputId="active" [(ngModel)]="usuario.active" binary="true"></p-checkbox>
+          <label for="active">Activo</label>
+        </div>
       </div>
 
-      <!-- Modal de Creación/Edición -->
-      <p-dialog
-        [header]="modo === 'crear' ? 'Agregar Nuevo Usuario' : 'Editar Usuario'"
-        [(visible)]="mostrarModal"
-        [modal]="true"
-        [style]="{ width: '50vw' }"
-        [closable]="true"
-        [dismissableMask]="true"
-      >
-        <div class="form-grid">
-          <div class="form-field">
-            <label for="nombre">Nombre Completo</label>
-            <input
-              id="nombre"
-              type="text"
-              pInputText
-              [(ngModel)]="usuario.name"
-              placeholder="Ej: Carlos Mendoza"
-            />
-          </div>
-          <div class="form-field">
-            <label for="rol">Rol del Usuario</label>
-            <p-dropdown
-              id="rol"
-              [options]="roles"
-              optionLabel="nombre"
-              optionValue="codigo"
-              [(ngModel)]="usuario.rol"
-              placeholder="Selecciona un rol"
-            ></p-dropdown>
-          </div>
-          <div class="form-field">
-            <label for="email">Correo Electrónico</label>
-            <input
-              id="email"
-              type="email"
-              pInputText
-              [(ngModel)]="usuario.email"
-              placeholder="Ej: usuario@dominio.com"
-            />
-          </div>
-          <div class="form-field" *ngIf="modo === 'crear'">
-            <label for="password">Las credenciales de la cuenta se enviarán a su correo*</label>
-          </div>
-          <div class="form-field-checkbox">
-            <p-checkbox
-              inputId="active"
-              [(ngModel)]="usuario.active"
-              binary="true"
-            ></p-checkbox>
-            <label for="active">Activo</label>
-          </div>
-        </div>
+      <ng-template pTemplate="footer">
+        <p-button label="Cancelar" icon="pi pi-times" (onClick)="mostrarModal = false" class="p-button-text"></p-button>
+        <p-button label="Guardar" icon="pi pi-check" (onClick)="guardarUsuario()" class="p-button-primary"></p-button>
+      </ng-template>
+    </p-dialog>
 
-        <ng-template pTemplate="footer">
-          <p-button
-            label="Cancelar"
-            icon="pi pi-times"
-            (onClick)="mostrarModal = false"
-            class="p-button-text"
-          ></p-button>
-          <p-button
-            label="Guardar"
-            icon="pi pi-check"
-            (onClick)="guardarUsuario()"
-            class="p-button-primary"
-          ></p-button>
-        </ng-template>
-      </p-dialog>
-
-      <!-- Modal de Visualización -->
-      <p-dialog
-        header="Detalles del Usuario"
-        [(visible)]="displayViewModal"
-        [modal]="true"
-        [style]="{ width: '50vw' }"
-        [closable]="true"
-        [dismissableMask]="true"
-      >
-        <div class="view-insurance-container" *ngIf="selectedUser">
-          <div class="view-insurance-header">
-            <h3>{{ selectedUser.name }}</h3>
-            <span
-              class="insurance-badge"
-              [ngClass]="{
+    <!-- Modal de Visualización -->
+    <p-dialog header="Detalles del Usuario" [(visible)]="displayViewModal" [modal]="true" [style]="{ width: '50vw' }"
+      [closable]="true" [dismissableMask]="true">
+      <div class="view-insurance-container" *ngIf="selectedUser">
+        <div class="view-insurance-header">
+          <h3>{{ selectedUser.name }}</h3>
+          <span class="insurance-badge" [ngClass]="{
                 active: selectedUser.active,
                 inactive: !selectedUser.active
-              }"
-            >
-              {{ selectedUser.active ? "ACTIVO" : "INACTIVO" }}
-            </span>
+              }">
+            {{ selectedUser.active ? "ACTIVO" : "INACTIVO" }}
+          </span>
+        </div>
+        <div class="view-insurance-details">
+          <div class="detail-row">
+            <span class="detail-label">Email:</span>
+            <span class="detail-value">{{ selectedUser.email }}</span>
           </div>
-          <div class="view-insurance-details">
-            <div class="detail-row">
-              <span class="detail-label">Email:</span>
-              <span class="detail-value">{{ selectedUser.email }}</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Rol:</span>
-              <span class="detail-value">{{ getRoleLabel(selectedUser.rol) }}</span>
-            </div>
-            <div class="detail-row">
-              <span class="detail-label">Estado:</span>
-              <span class="detail-value">{{ selectedUser.active ? "Activo" : "Inactivo" }}</span>
-            </div>
+          <div class="detail-row">
+            <span class="detail-label">Rol:</span>
+            <span class="detail-value">{{ getRoleLabel(selectedUser.rol) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Estado:</span>
+            <span class="detail-value">{{ selectedUser.active ? "Activo" : "Inactivo" }}</span>
           </div>
         </div>
+      </div>
 
-        <ng-template pTemplate="footer">
-          <p-button
-            label="Cerrar"
-            icon="pi pi-times"
-            (onClick)="displayViewModal = false"
-            class="p-button-text"
-          ></p-button>
-        </ng-template>
-      </p-dialog>
-    </div>
+      <ng-template pTemplate="footer">
+        <p-button label="Cerrar" icon="pi pi-times" (onClick)="displayViewModal = false"
+          class="p-button-text"></p-button>
+      </ng-template>
+    </p-dialog>
   </div>
+</div>

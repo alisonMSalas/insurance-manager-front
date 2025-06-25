@@ -22,6 +22,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { DividerModule } from 'primeng/divider';
 import { Benefit } from '../../shared/interfaces/benefit';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { InputNumberModule } from 'primeng/inputnumber';
 
 interface StatusOption {
   label: string;
@@ -47,7 +48,7 @@ interface StatusOption {
     ConfirmDialogModule,
     TooltipModule,
     DividerModule,
-    PickListModule, MultiSelectModule
+    PickListModule, MultiSelectModule, InputNumberModule
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './list-seguros.component.html',
@@ -225,9 +226,9 @@ export class ListSegurosComponent implements OnInit {
     name: '',
     type: InsuranceType.HEALTH,
     description: '',
-    coverage: 0,
-    deductible: 0,
-    paymentAmount: 0,
+    coverage: null,
+    deductible: null,
+    paymentAmount: null,
     paymentPeriod: PaymentPeriod.MONTHLY,
     active: false,
   };
@@ -238,22 +239,22 @@ export class ListSegurosComponent implements OnInit {
   saveInsurance() {
     this.submitted = true;
     if (
-    !this.insurance.name ||
-    !this.insurance.type ||
-    !this.insurance.description ||
-    this.insurance.coverage == null ||
-    this.insurance.deductible == null ||
-    this.insurance.paymentAmount == null ||
-    !this.insurance.paymentPeriod ||
-    !this.selectedBenefits || this.selectedBenefits.length === 0
-  ) {
-    this.messageService.add({
-      severity: 'warn',
-      summary: 'Campos obligatorios',
-      detail: 'Por favor, complete todos los campos requeridos y seleccione al menos un beneficio.'
-    });
-    return; 
-  }
+      !this.insurance.name ||
+      !this.insurance.type ||
+      !this.insurance.description ||
+      this.insurance.coverage == null ||
+      this.insurance.deductible == null ||
+      this.insurance.paymentAmount == null ||
+      !this.insurance.paymentPeriod ||
+      !this.selectedBenefits || this.selectedBenefits.length === 0
+    ) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Campos obligatorios',
+        detail: 'Por favor, complete todos los campos requeridos y seleccione al menos un beneficio.'
+      });
+      return;
+    }
     console.log('benefits seleccionados:', this.selectedBenefits);
     this.insurance.benefits = [...this.selectedBenefits];
     console.log('cambios de beneficios', this.insurance.benefits);
@@ -343,12 +344,12 @@ export class ListSegurosComponent implements OnInit {
   resetCampos() {
     this.insurance = {
       name: '',
-      type: InsuranceType.HEALTH, 
+      type: InsuranceType.HEALTH,
       description: '',
-      coverage: 0,
-      deductible: 0,
-      paymentAmount: 0,
-      paymentPeriod: PaymentPeriod.MONTHLY, 
+      coverage: null,
+      deductible: null,
+      paymentAmount: null,
+      paymentPeriod: PaymentPeriod.MONTHLY,
       active: false,
     };
     this.selectedBenefits = [];
@@ -410,5 +411,16 @@ export class ListSegurosComponent implements OnInit {
       }
     });
   }
+  onInputLengthLimit(event: any, maxLength: number) {
+    const inputValue = event.target.value;
+    if (inputValue.length > maxLength) {
+      // Trunca el valor a maxLength
+      event.target.value = inputValue.slice(0, maxLength);
+      // Actualiza el ngModel si es necesario
+      this.insurance.coverage = +event.target.value;
+    }
+  }
+  
+
 
 }
