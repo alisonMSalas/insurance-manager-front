@@ -10,11 +10,11 @@ import { RippleModule } from 'primeng/ripple';
 import { DividerModule } from 'primeng/divider';
 import { ContratacionesService } from '../core/services/contrataciones.service';
 import { Contract } from '../shared/interfaces/contract';
-import { get } from 'http';
+
 import { ClientContracts } from '../shared/interfaces/clientContract';
 import { ChipModule } from 'primeng/chip';
 import { Dialog, DialogModule } from 'primeng/dialog';
-import { CLIENT_RENEG_LIMIT } from 'tls';
+
 
 @Component({
   selector: 'app-reportes',

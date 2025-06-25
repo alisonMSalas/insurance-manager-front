@@ -31,7 +31,6 @@
             ],
             "scripts": [],
             "server": "src/main.server.ts"
-            
           },
           "configurations": {
             "production": {
@@ -82,8 +81,9 @@
             "tsConfig": "tsconfig.spec.json",
             "assets": [
               {
-                "glob": "/*",
-                "input": "public"
+                "glob": "**/*",
+                "input": "public",
+                "output": "/public"
               }
             ],
             "styles": [
