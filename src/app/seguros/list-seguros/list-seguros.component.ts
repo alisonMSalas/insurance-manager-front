@@ -411,15 +411,7 @@ export class ListSegurosComponent implements OnInit {
       }
     });
   }
-  onInputLengthLimit(event: any, maxLength: number) {
-    const inputValue = event.target.value;
-    if (inputValue.length > maxLength) {
-      // Trunca el valor a maxLength
-      event.target.value = inputValue.slice(0, maxLength);
-      // Actualiza el ngModel si es necesario
-      this.insurance.coverage = +event.target.value;
-    }
-  }
+ 
   
 
 
